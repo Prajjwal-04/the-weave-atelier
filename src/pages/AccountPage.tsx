@@ -76,14 +76,24 @@ export const AccountPage: React.FC = () => {
   const [confirmPasswordInput, setConfirmPasswordInput] = useState('');
   const [resendCooldown, setResendCooldown] = useState(0);
 
+  const [isRecoveryLinkActive, setIsRecoveryLinkActive] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return (
+      searchParams.get('mode') === 'reset' ||
+      window.location.hash.includes('type=recovery') ||
+      window.location.hash.includes('access_token=')
+    );
+  });
+
   // Check URL parameters for password recovery link
   useEffect(() => {
     const mode = searchParams.get('mode');
     const hash = window.location.hash;
-    if (mode === 'reset' || hash.includes('type=recovery')) {
+    if (mode === 'reset' || hash.includes('type=recovery') || hash.includes('access_token=')) {
+      setIsRecoveryLinkActive(true);
       setAuthMode('forgot_password');
       setResetStep('verify');
-      setAuthSuccess('Recovery session active. Enter your new password below.');
+      setAuthSuccess('Recovery link verified! Please enter your new password below.');
     }
   }, [searchParams]);
 
@@ -180,8 +190,8 @@ export const AccountPage: React.FC = () => {
     const cleanEmail = emailInput.trim();
     const cleanOtp = otpCode.trim();
 
-    if (!cleanOtp && !isLoggedIn) {
-      setAuthError('Please enter the 6-digit verification code from your email.');
+    if (!cleanOtp && !isLoggedIn && !isRecoveryLinkActive) {
+      setAuthError('Please enter the 6-digit verification code or click the recovery link in your email.');
       return;
     }
 
@@ -499,24 +509,32 @@ export const AccountPage: React.FC = () => {
                   </button>
                 </div>
 
-                <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <label className="text-[11px] text-atelier-taupe block">6-Digit Recovery OTP *</label>
-                    <span className="text-[10px] text-atelier-taupe">From your email</span>
+                {isRecoveryLinkActive ? (
+                  <div className="p-3 bg-emerald-50/80 border border-emerald-200 text-xs text-emerald-900 space-y-0.5">
+                    <div className="font-medium">✓ Secure Recovery Session Verified</div>
+                    <div className="text-[11px] text-emerald-800">
+                      You are authorized to set your new password below.
+                    </div>
                   </div>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      required
-                      maxLength={8}
-                      placeholder="e.g. 123456"
-                      value={otpCode}
-                      onChange={(e) => setOtpCode(e.target.value.trim())}
-                      className="w-full bg-atelier-ivory border border-atelier-parchment px-4 py-2.5 text-sm font-mono tracking-widest text-atelier-softblack focus:outline-none placeholder:font-sans placeholder:tracking-normal placeholder:text-xs"
-                    />
-                    <Key size={13} className="absolute right-3.5 top-3.5 text-atelier-taupe" />
+                ) : (
+                  <div>
+                    <div className="flex justify-between items-center mb-1">
+                      <label className="text-[11px] text-atelier-taupe block">6-Digit Recovery OTP</label>
+                      <span className="text-[10px] text-atelier-taupe">Or click link in email</span>
+                    </div>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        maxLength={8}
+                        placeholder="e.g. 123456 (or click recovery link in email)"
+                        value={otpCode}
+                        onChange={(e) => setOtpCode(e.target.value.trim())}
+                        className="w-full bg-atelier-ivory border border-atelier-parchment px-4 py-2.5 text-sm font-mono tracking-widest text-atelier-softblack focus:outline-none placeholder:font-sans placeholder:tracking-normal placeholder:text-xs"
+                      />
+                      <Key size={13} className="absolute right-3.5 top-3.5 text-atelier-taupe" />
+                    </div>
                   </div>
-                </div>
+                )}
 
                 <div>
                   <div className="flex justify-between items-center mb-1">
