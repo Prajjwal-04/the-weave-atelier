@@ -68,7 +68,7 @@ An artisanal luxury handcrafted rug e-commerce and catalog platform, honoring th
 Clone the repository and install dependencies:
 
 ```bash
-git clone <your-repository-url>
+git clone https://github.com/Prajjwal-04/the-weave-atelier.git
 cd the-weave-atelier
 npm install
 ```
