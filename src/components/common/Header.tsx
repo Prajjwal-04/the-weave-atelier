@@ -59,38 +59,32 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
     { name: 'Hand-Knotted Collection', path: '/collections/hand-knotted-collection', desc: 'Generational loom-woven master craft' },
   ];
 
+  const isHomePage = location.pathname === '/';
+  const isTransparent = isHomePage && !isScrolled;
+
   return (
     <header className="fixed top-0 left-0 right-0 z-40 transition-all duration-300">
-      {/* Announcement Bar */}
-      <div className="bg-atelier-softblack text-atelier-parchment text-[11px] tracking-widest uppercase py-2 px-4 text-center font-medium border-b border-atelier-charcoal/40">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <span className="hidden sm:inline-block text-[10px] text-atelier-taupe tracking-wider">
-            BHADOHI, INDIA · DIRECT FROM THE ATELIER
-          </span>
-          <span className="mx-auto sm:mx-0">
-            Complimentary Worldwide Express Delivery on Orders Over $1,500 USD
-          </span>
-          <span className="hidden md:inline-block text-[10px] text-atelier-taupe tracking-wider">
-            BESPOKE SIZING AVAILABLE
-          </span>
-        </div>
-      </div>
-
       {/* Main Navbar */}
       <nav
         className={`transition-all duration-300 ${
-          isScrolled
+          isTransparent
+            ? 'bg-transparent border-b border-white/15 py-5'
+            : isScrolled
             ? 'bg-atelier-ivory/95 backdrop-blur-md shadow-subtle border-b border-atelier-parchment/60 py-3'
-            : 'bg-atelier-ivory/80 backdrop-blur-sm border-b border-atelier-parchment/40 py-4'
+            : 'bg-atelier-ivory/90 backdrop-blur-sm border-b border-atelier-parchment/40 py-4'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
-            {/* Left: Mobile menu button & Desktop primary links */}
+            {/* Left: Mobile menu button */}
             <div className="flex items-center lg:hidden">
               <button
                 onClick={() => setMobileMenuOpen(true)}
-                className="p-1.5 text-atelier-softblack hover:text-atelier-brown transition-colors"
+                className={`p-1.5 transition-colors ${
+                  isTransparent
+                    ? 'text-white hover:text-atelier-parchment'
+                    : 'text-atelier-softblack hover:text-atelier-brown'
+                }`}
                 aria-label="Open navigation menu"
               >
                 <Menu size={22} strokeWidth={1.5} />
@@ -101,10 +95,20 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
             <div className="flex-1 lg:flex-initial text-center lg:text-left">
               <Link to="/" className="inline-block group">
                 <div className="flex flex-col items-center lg:items-start">
-                  <span className="font-serif text-xl sm:text-2xl tracking-[0.24em] sm:tracking-[0.28em] text-atelier-softblack font-normal transition-colors group-hover:text-atelier-darkbrown">
+                  <span
+                    className={`font-serif text-xl sm:text-2xl tracking-[0.24em] sm:tracking-[0.28em] font-normal transition-colors ${
+                      isTransparent
+                        ? 'text-white group-hover:text-atelier-parchment'
+                        : 'text-atelier-softblack group-hover:text-atelier-darkbrown'
+                    }`}
+                  >
                     THE WEAVE ATELIER
                   </span>
-                  <span className="text-[8px] tracking-[0.35em] text-atelier-taupe uppercase font-sans mt-0.5">
+                  <span
+                    className={`text-[8px] tracking-[0.35em] uppercase font-sans mt-0.5 transition-colors ${
+                      isTransparent ? 'text-white/70' : 'text-atelier-taupe'
+                    }`}
+                  >
                     BHADOHI · INDIA
                   </span>
                 </div>
@@ -113,45 +117,52 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
 
             {/* Desktop Navigation Links */}
             <div className="hidden lg:flex items-center space-x-7">
-              {navLinks.map((link) => (
-                <div key={link.label} className="relative group">
-                  <Link
-                    to={link.path}
-                    className={`text-[12px] tracking-[0.2em] font-medium transition-colors duration-200 py-1 inline-block ${
-                      location.pathname === link.path
-                        ? 'text-atelier-softblack border-b border-atelier-softblack'
-                        : 'text-atelier-charcoal/80 hover:text-atelier-softblack'
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
+              {navLinks.map((link) => {
+                const isActive = location.pathname === link.path;
+                return (
+                  <div key={link.label} className="relative group">
+                    <Link
+                      to={link.path}
+                      className={`relative text-[12px] tracking-[0.2em] font-medium transition-colors duration-300 py-1 inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-[1px] after:transition-all after:duration-300 ${
+                        isTransparent
+                          ? isActive
+                            ? 'text-white after:w-full after:bg-white'
+                            : 'text-white/80 hover:text-white after:w-0 hover:after:w-full after:bg-white'
+                          : isActive
+                          ? 'text-atelier-softblack after:w-full after:bg-atelier-softblack'
+                          : 'text-atelier-charcoal/80 hover:text-atelier-softblack after:w-0 hover:after:w-full after:bg-atelier-softblack'
+                      }`}
+                    >
+                      {link.label}
+                    </Link>
 
-                  {/* Mega dropdown for Collections */}
-                  {link.hasDropdown && (
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 w-80 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 z-50">
-                      <div className="bg-atelier-ivory border border-atelier-parchment shadow-luxury p-4 space-y-1">
-                        <div className="text-[10px] tracking-widest text-atelier-taupe uppercase pb-2 border-b border-atelier-parchment font-medium">
-                          Curated Rug Collections
+                    {/* Mega dropdown for Collections */}
+                    {link.hasDropdown && (
+                      <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 w-80 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 z-50">
+                        <div className="bg-atelier-ivory border border-atelier-parchment shadow-luxury p-4 space-y-1 text-left">
+                          <div className="text-[10px] tracking-widest text-atelier-taupe uppercase pb-2 border-b border-atelier-parchment font-medium">
+                            Curated Rug Collections
+                          </div>
+                          {collections.map((c) => (
+                            <Link
+                              key={c.name}
+                              to={c.path}
+                              className="block px-2 py-2 hover:bg-atelier-cream/70 transition-colors"
+                            >
+                              <div className="text-xs font-serif tracking-wider text-atelier-softblack font-medium">
+                                {c.name}
+                              </div>
+                              <div className="text-[11px] text-atelier-taupe line-clamp-1">
+                                {c.desc}
+                              </div>
+                            </Link>
+                          ))}
                         </div>
-                        {collections.map((c) => (
-                          <Link
-                            key={c.name}
-                            to={c.path}
-                            className="block px-2 py-2 hover:bg-atelier-cream/70 transition-colors"
-                          >
-                            <div className="text-xs font-serif tracking-wider text-atelier-softblack font-medium">
-                              {c.name}
-                            </div>
-                            <div className="text-[11px] text-atelier-taupe line-clamp-1">
-                              {c.desc}
-                            </div>
-                          </Link>
-                        ))}
                       </div>
-                    </div>
-                  )}
-                </div>
-              ))}
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
             {/* Right: Currency, Search, Wishlist, Account, Cart */}
@@ -160,16 +171,31 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
               <div className="relative">
                 <button
                   onClick={() => setCurrencyDropdownOpen(!currencyDropdownOpen)}
-                  className="flex items-center text-[11px] tracking-widest text-atelier-charcoal hover:text-atelier-softblack transition-colors py-1 px-1.5 border border-transparent hover:border-atelier-parchment rounded"
+                  className={`flex items-center text-[11px] tracking-widest transition-colors py-1 px-1.5 border rounded ${
+                    isTransparent
+                      ? 'text-white/85 hover:text-white border-white/20 hover:border-white/40'
+                      : 'text-atelier-charcoal hover:text-atelier-softblack border-transparent hover:border-atelier-parchment'
+                  }`}
                   aria-label="Change currency"
                 >
-                  <Globe size={13} className="mr-1 text-atelier-taupe" strokeWidth={1.5} />
+                  <Globe
+                    size={13}
+                    className={`mr-1 transition-colors ${
+                      isTransparent ? 'text-white/80' : 'text-atelier-taupe'
+                    }`}
+                    strokeWidth={1.5}
+                  />
                   <span>{currency}</span>
-                  <ChevronDown size={11} className="ml-0.5 text-atelier-taupe" />
+                  <ChevronDown
+                    size={11}
+                    className={`ml-0.5 transition-colors ${
+                      isTransparent ? 'text-white/80' : 'text-atelier-taupe'
+                    }`}
+                  />
                 </button>
 
                 {currencyDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-44 bg-atelier-ivory border border-atelier-parchment shadow-luxury py-1 z-50">
+                  <div className="absolute right-0 mt-2 w-44 bg-atelier-ivory border border-atelier-parchment shadow-luxury py-1 z-50 text-atelier-softblack text-left">
                     <div className="px-3 py-1.5 text-[9px] uppercase tracking-widest text-atelier-taupe font-medium border-b border-atelier-parchment">
                       Select Currency
                     </div>
@@ -181,11 +207,15 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
                           setCurrencyDropdownOpen(false);
                         }}
                         className={`w-full text-left px-3 py-1.5 text-xs flex items-center justify-between hover:bg-atelier-cream/80 transition-colors ${
-                          currency === rate.code ? 'font-semibold text-atelier-softblack bg-atelier-cream/50' : 'text-atelier-charcoal'
+                          currency === rate.code
+                            ? 'font-semibold text-atelier-softblack bg-atelier-cream/50'
+                            : 'text-atelier-charcoal'
                         }`}
                       >
                         <span>{rate.name}</span>
-                        <span className="font-mono text-atelier-taupe text-[11px]">{rate.code} ({rate.symbol})</span>
+                        <span className="font-mono text-atelier-taupe text-[11px]">
+                          {rate.code} ({rate.symbol})
+                        </span>
                       </button>
                     ))}
                   </div>
@@ -195,7 +225,11 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
               {/* Search Icon */}
               <button
                 onClick={onOpenSearch}
-                className="p-1.5 text-atelier-charcoal hover:text-atelier-softblack transition-colors"
+                className={`p-1.5 transition-colors ${
+                  isTransparent
+                    ? 'text-white/85 hover:text-white'
+                    : 'text-atelier-charcoal hover:text-atelier-softblack'
+                }`}
                 aria-label="Search rugs"
               >
                 <Search size={18} strokeWidth={1.5} />
@@ -204,7 +238,11 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
               {/* Wishlist */}
               <Link
                 to="/account?tab=wishlist"
-                className="relative p-1.5 text-atelier-charcoal hover:text-atelier-softblack transition-colors"
+                className={`relative p-1.5 transition-colors ${
+                  isTransparent
+                    ? 'text-white/85 hover:text-white'
+                    : 'text-atelier-charcoal hover:text-atelier-softblack'
+                }`}
                 aria-label="Wishlist"
               >
                 <Heart size={18} strokeWidth={1.5} />
@@ -218,7 +256,11 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
               {/* Account */}
               <Link
                 to="/account"
-                className="p-1.5 text-atelier-charcoal hover:text-atelier-softblack transition-colors hidden sm:inline-block"
+                className={`p-1.5 transition-colors hidden sm:inline-block ${
+                  isTransparent
+                    ? 'text-white/85 hover:text-white'
+                    : 'text-atelier-charcoal hover:text-atelier-softblack'
+                }`}
                 aria-label="Customer Account"
               >
                 <User size={18} strokeWidth={1.5} />
@@ -227,12 +269,22 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
               {/* Cart Button */}
               <button
                 onClick={toggleCart}
-                className="relative p-1.5 text-atelier-charcoal hover:text-atelier-softblack transition-colors"
+                className={`relative p-1.5 transition-colors ${
+                  isTransparent
+                    ? 'text-white/85 hover:text-white'
+                    : 'text-atelier-charcoal hover:text-atelier-softblack'
+                }`}
                 aria-label="Shopping Bag"
               >
                 <ShoppingBag size={18} strokeWidth={1.5} />
                 {totalItemCount > 0 && (
-                  <span className="absolute top-0 right-0 w-3.5 h-3.5 bg-atelier-darkbrown text-white rounded-full text-[9px] flex items-center justify-center font-mono">
+                  <span
+                    className={`absolute top-0 right-0 w-3.5 h-3.5 rounded-full text-[9px] flex items-center justify-center font-mono ${
+                      isTransparent
+                        ? 'bg-atelier-parchment text-atelier-softblack font-semibold'
+                        : 'bg-atelier-darkbrown text-white'
+                    }`}
+                  >
                     {totalItemCount}
                   </span>
                 )}
@@ -379,8 +431,11 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
           {/* Mobile Footer */}
           <div className="p-6 bg-atelier-cream border-t border-atelier-parchment">
             <div className="text-xs text-atelier-taupe mb-2">Bhadohi Studio Coordinates</div>
+            <div className="text-xs text-atelier-charcoal font-medium">
+              Prasri Rugs
+            </div>
             <div className="text-xs text-atelier-charcoal">
-              Bhadohi, Uttar Pradesh 221401, India
+              G.T. Road, Gopiganj, Bhadohi, Uttar Pradesh 221303, India
             </div>
             <div className="text-xs text-atelier-taupe mt-1">
               WhatsApp Concierge: +91 94500 00000

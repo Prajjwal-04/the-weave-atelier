@@ -44,3 +44,22 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Luxury hairline scroll indicator */
+@keyframes scrollPulse {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(200%);
+    opacity: 0;
+  }
+}
+
+.animate-scrollPulse {
+  animation: scrollPulse 2.2s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}

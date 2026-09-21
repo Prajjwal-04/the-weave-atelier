@@ -18,6 +18,10 @@ dist-ssr
 .env.*
 !.env.example
 
+# Local server databases and backups
+server/verified_orders.json
+*-backup.*
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

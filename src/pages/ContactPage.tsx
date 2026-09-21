@@ -37,7 +37,7 @@ export const ContactPage: React.FC = () => {
   );
 
   return (
-    <div className="pt-24 sm:pt-28 pb-24 bg-atelier-ivory min-h-screen">
+    <div className="pt-20 sm:pt-24 pb-24 bg-atelier-ivory min-h-screen">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         {/* Header */}
         <div className="border-b border-atelier-parchment pb-8 max-w-3xl">
@@ -64,8 +64,10 @@ export const ContactPage: React.FC = () => {
                 <div className="flex items-start space-x-3">
                   <MapPin size={16} className="text-atelier-agedgold flex-shrink-0 mt-0.5" />
                   <div>
-                    <strong className="font-medium text-atelier-softblack block">Atelier Location</strong>
-                    <span>Station Road, Maryadpatti, Bhadohi, Uttar Pradesh 221401, India</span>
+                    <strong className="font-medium text-atelier-softblack block">Atelier & Studio Location</strong>
+                    <div className="font-medium text-atelier-softblack">Prasri Rugs</div>
+                    <div>G.T. Road, Gopiganj</div>
+                    <div>Bhadohi, Uttar Pradesh 221303, India</div>
                   </div>
                 </div>
 

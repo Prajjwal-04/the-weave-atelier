@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   Heart,
@@ -23,6 +23,7 @@ import { SizeSelector } from '../components/product/SizeSelector';
 import { StockBadge } from '../components/product/StockBadge';
 import { CustomSizeModal } from '../components/product/CustomSizeModal';
 import { ProductCard } from '../components/product/ProductCard';
+import { RoomScaleVisualizer } from '../components/product/RoomScaleVisualizer';
 
 export const ProductDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -37,9 +38,29 @@ export const ProductDetailPage: React.FC = () => {
   const [notifyEmail, setNotifyEmail] = useState('');
   const [notifySubmitted, setNotifySubmitted] = useState(false);
   const [isAddedToBag, setIsAddedToBag] = useState(false);
+  const [showStickyBar, setShowStickyBar] = useState(false);
+  const purchaseRef = useRef<HTMLDivElement>(null);
 
   // Accordion tabs
   const [openAccordion, setOpenAccordion] = useState<string | null>('specs');
+
+  // Lightweight IntersectionObserver to trigger sticky purchase bar when main buy box scrolls out of view
+  useEffect(() => {
+    const el = purchaseRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setShowStickyBar(!entry.isIntersecting && entry.boundingClientRect.top < 0);
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+    };
+  }, [product]);
 
   const { addToCart, closeCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
@@ -168,7 +189,7 @@ export const ProductDetailPage: React.FC = () => {
   const relatedProducts = (products || []).filter((p) => product && p.id !== product.id).slice(0, 3);
 
   return (
-    <div className="pt-24 sm:pt-28 pb-20 bg-atelier-ivory min-h-screen">
+    <div className="pt-20 sm:pt-24 pb-20 bg-atelier-ivory min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <div className="text-[11px] text-atelier-taupe tracking-wider uppercase mb-8 flex items-center space-x-2">
@@ -246,7 +267,7 @@ export const ProductDetailPage: React.FC = () => {
                   <div>
                     <span className="font-medium">Ready to Ship: </span>
                     <span className="text-atelier-charcoal">
-                      In stock at our Bhadohi studio. Dispatches via DHL Express in 2–4 business days.
+                      In stock at our Bhadohi studio. Dispatches via insured express air in 2–4 business days.
                     </span>
                     {isLastPiece && (
                       <div className="text-amber-800 font-medium text-[11px] mt-0.5">
@@ -317,7 +338,7 @@ export const ProductDetailPage: React.FC = () => {
             )}
 
             {/* Quantity Stepper, Add to Bag & Buy Now */}
-            <div className="space-y-3 pt-2">
+            <div ref={purchaseRef} className="space-y-3 pt-2">
               <div className="flex items-center space-x-3">
                 {/* Quantity */}
                 <div className="flex items-center border border-atelier-parchment bg-atelier-cream">
@@ -398,7 +419,7 @@ export const ProductDetailPage: React.FC = () => {
               </div>
               <div className="flex items-center space-x-1.5">
                 <Truck size={14} className="text-atelier-agedgold" />
-                <span>Complimentary Over $1,500</span>
+                <span>Insured Air Delivery</span>
               </div>
               <div className="flex items-center space-x-1.5">
                 <RotateCcw size={14} className="text-atelier-agedgold" />
@@ -507,10 +528,10 @@ export const ProductDetailPage: React.FC = () => {
                 {openAccordion === 'shipping' && (
                   <div className="pb-4 space-y-2 text-atelier-charcoal font-light leading-relaxed">
                     <p>
-                      Shipped via express courier (DHL Express / FedEx) with full door-to-door insurance. Transit time to USA and Europe is 5–7 business days.
+                      Shipped via insured international express air courier with full door-to-door tracking. Transit time to USA and Europe is 5–7 business days.
                     </p>
                     <p>
-                      Returns are accepted within 14 calendar days of delivery.
+                      Returns are accepted within 14 calendar days of delivery. Return shipping must be handled and covered by the buyer. A refund will be placed once the product is received back by our atelier in the same quality without any damage.
                     </p>
                     <div className="pt-2">
                       <Link to="/shipping-returns" className="underline text-atelier-darkbrown hover:text-black">
@@ -523,6 +544,16 @@ export const ProductDetailPage: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Interactive Room Scale Visualizer */}
+        {product && (
+          <RoomScaleVisualizer
+            variants={product.variants && product.variants.length > 0 ? product.variants : [activeVariant]}
+            selectedVariant={activeVariant}
+            onSelectVariant={setSelectedVariant}
+            productName={product.name}
+          />
+        )}
 
         {/* Complete the Space: Related Rugs */}
         <div className="pt-16">
@@ -548,6 +579,51 @@ export const ProductDetailPage: React.FC = () => {
         isOpen={customModalOpen}
         onClose={() => setCustomModalOpen(false)}
       />
+
+      {/* Sticky Floating Purchase Bar (GPU-accelerated slide-in, 0 reflow) */}
+      <aside
+        aria-label="Quick purchase navigation"
+        className={`fixed bottom-0 left-0 right-0 z-30 bg-atelier-ivory/95 backdrop-blur-md border-t border-atelier-parchment py-3 px-4 sm:px-6 shadow-luxury transform transition-transform duration-300 ease-out ${
+          showStickyBar ? 'translate-y-0' : 'translate-y-full pointer-events-none'
+        }`}
+      >
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+          <div className="flex items-center space-x-3.5 truncate">
+            {product && product.images && product.images[0]?.url && (
+              <img
+                src={product.images[0].url}
+                alt={product.name}
+                className="w-10 h-10 object-cover border border-atelier-parchment flex-shrink-0"
+              />
+            )}
+            <div className="truncate">
+              <div className="font-serif text-sm sm:text-base text-atelier-softblack truncate font-normal">
+                {product?.name}
+              </div>
+              <div className="text-[11px] text-atelier-taupe font-mono truncate">
+                {activeVariant.dimensionsFt || activeVariant.size} · {formatPrice(activeVariant.priceUSD)}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-3 flex-shrink-0">
+            <button
+              type="button"
+              onClick={() => handleAddToCart(true)}
+              className="bg-atelier-softblack text-atelier-parchment py-2.5 px-5 sm:px-7 text-xs tracking-widest uppercase hover:bg-atelier-darkbrown transition-all font-medium flex items-center space-x-1.5 shadow-sm"
+            >
+              {isAddedToBag ? (
+                <>
+                  <Check size={13} className="text-emerald-400 stroke-[2.5]" />
+                  <span>Added ✓</span>
+                </>
+              ) : (
+                <span>{isAvailable ? 'Add to Bag' : 'Order'}</span>
+              )}
+            </button>
+          </div>
+        </div>
+      </aside>
     </div>
   );
 };

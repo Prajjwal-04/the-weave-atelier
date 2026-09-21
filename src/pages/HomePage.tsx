@@ -8,7 +8,6 @@ import { BhadohiNarrative } from '../components/home/BhadohiNarrative';
 import { MaterialsSection } from '../components/home/MaterialsSection';
 import { CustomRugsPreview } from '../components/home/CustomRugsPreview';
 import { EditorialJournalPreview } from '../components/home/EditorialJournalPreview';
-import { InstagramFeed } from '../components/home/InstagramFeed';
 import { TrustBanner } from '../components/home/TrustBanner';
 import { useInventory } from '../context/InventoryContext';
 
@@ -44,10 +43,7 @@ export const HomePage: React.FC = () => {
       {/* 9. Editorial / Journal */}
       <EditorialJournalPreview />
 
-      {/* 10. Instagram Feed */}
-      <InstagramFeed />
-
-      {/* 11. Trust & Authenticity Banner */}
+      {/* 10. Trust & Authenticity Banner */}
       <TrustBanner />
     </div>
   );

@@ -24,6 +24,9 @@ export interface RazorpayPaymentParams {
     phone?: string;
   };
   orderNumber: string;
+  amountINR?: number;
+  preferredMethod?: 'upi' | 'card' | 'netbanking' | 'wallet';
+  upiVpa?: string;
   notes?: Record<string, string>;
 }
 
@@ -173,10 +176,9 @@ export const paymentService = {
       };
     }
 
-    // 1. Calculate amount in paise (1 USD = 84.00 INR benchmark)
-    const inrRate = 84.0;
-    const amountINR = Math.round(params.amountUSD * inrRate);
-    const amountPaise = Math.max(100, amountINR * 100); // Minimum 100 paise
+    // 1. Calculate amount in paise
+    const amountINR = params.amountINR ?? Math.round(params.amountUSD * 84.0);
+    const amountPaise = Math.max(100, Math.round(amountINR * 100)); // Minimum 100 paise
 
     // 2. Load SDK
     const isLoaded = await this.loadRazorpaySdk();
@@ -215,7 +217,21 @@ export const paymentService = {
     // 4. STEP 2: Open Razorpay Checkout Modal
     return new Promise((resolve) => {
       try {
-        const options = {
+        const prefillData: Record<string, any> = {
+          name: params.customer.name,
+          email: params.customer.email,
+          contact: params.customer.phone || '',
+        };
+
+        if (params.preferredMethod) {
+          prefillData.method = params.preferredMethod;
+        }
+
+        if (params.upiVpa && params.upiVpa.trim()) {
+          prefillData.vpa = params.upiVpa.trim();
+        }
+
+        const options: any = {
           key: keyId,
           amount: backendOrder.amount,
           currency: backendOrder.currency,
@@ -223,14 +239,12 @@ export const paymentService = {
           description: `Handcrafted Rug Order (${params.orderNumber})`,
           image: '/favicon.svg',
           order_id: backendOrder.order_id,
-          prefill: {
-            name: params.customer.name,
-            email: params.customer.email,
-            contact: params.customer.phone || '',
-          },
+          prefill: prefillData,
           notes: {
             order_number: params.orderNumber,
             amount_usd: `$${params.amountUSD} USD`,
+            selected_method: params.preferredMethod || 'all',
+            ...(params.upiVpa ? { upi_id: params.upiVpa.trim() } : {}),
             ...params.notes,
           },
           theme: {
@@ -244,7 +258,7 @@ export const paymentService = {
                 success: false,
                 transactionId: '',
                 provider: 'razorpay',
-                message: 'Payment was cancelled before completion.',
+                message: 'Payment session was closed before completion. No funds were deducted.',
               });
             },
           },

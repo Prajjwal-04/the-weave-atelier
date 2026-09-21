@@ -11,7 +11,7 @@ export const BrandStatement: React.FC = () => {
         </div>
 
         <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-atelier-softblack font-light tracking-tight leading-snug">
-          Made slowly. Chosen thoughtfully.
+          Made slowly. Chosen <span className="italic font-normal">thoughtfully</span>.
         </h2>
 
         <p className="text-base sm:text-lg text-atelier-charcoal font-light leading-relaxed max-w-2xl mx-auto">

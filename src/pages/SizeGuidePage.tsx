@@ -65,7 +65,7 @@ export const SizeGuidePage: React.FC = () => {
   const currentConfig = sizeConfigs[activeSize] || sizeConfigs["8' × 10'"];
 
   return (
-    <div className="pt-24 sm:pt-28 pb-24 bg-atelier-ivory min-h-screen">
+    <div className="pt-20 sm:pt-24 pb-24 bg-atelier-ivory min-h-screen">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto space-y-3">

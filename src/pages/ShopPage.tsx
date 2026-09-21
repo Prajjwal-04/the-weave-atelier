@@ -133,7 +133,7 @@ export const ShopPage: React.FC = () => {
     !!searchQuery;
 
   return (
-    <div className="pt-24 sm:pt-28 pb-20 bg-atelier-ivory min-h-screen">
+    <div className="pt-20 sm:pt-24 pb-20 bg-atelier-ivory min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Page Header */}
         <div className="border-b border-atelier-parchment pb-8 mb-8">

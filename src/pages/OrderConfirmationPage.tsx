@@ -59,7 +59,7 @@ export const OrderConfirmationPage: React.FC = () => {
   }
 
   return (
-    <div className="pt-24 sm:pt-28 pb-24 bg-atelier-ivory min-h-screen">
+    <div className="pt-20 sm:pt-24 pb-24 bg-atelier-ivory min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
         {/* Success Banner */}
         <div className="text-center space-y-4 py-8 border-b border-atelier-parchment">
@@ -99,7 +99,11 @@ export const OrderConfirmationPage: React.FC = () => {
               </div>
               <div>
                 <div className="text-xs text-atelier-taupe">Air Tracking Code</div>
-                <div className="font-mono text-sm text-atelier-darkbrown font-bold">{order.trackingNumber}</div>
+                {order.trackingNumber ? (
+                  <div className="font-mono text-sm text-atelier-darkbrown font-bold">{order.trackingNumber}</div>
+                ) : (
+                  <div className="text-xs text-atelier-charcoal font-light italic">Assigned upon dispatch</div>
+                )}
               </div>
               <div>
                 <div className="text-xs text-atelier-taupe">Estimated Delivery</div>

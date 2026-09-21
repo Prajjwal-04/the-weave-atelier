@@ -13,6 +13,11 @@ import {
   Zap,
   Globe,
   Building2,
+  QrCode,
+  Smartphone,
+  HelpCircle,
+  CheckCircle2,
+  RotateCcw,
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useCurrency } from '../context/CurrencyContext';
@@ -23,9 +28,20 @@ import { paymentService } from '../services/paymentService';
 import { orderService } from '../services/orderService';
 import { emailService } from '../services/emailService';
 
+const COMMON_UPI_HANDLES = ['@okhdfcbank', '@oksbi', '@okaxis', '@paytm', '@ybl', '@ibl'];
+
+const POPULAR_BANKS = [
+  { id: 'HDFC', name: 'HDFC Bank' },
+  { id: 'ICICI', name: 'ICICI Bank' },
+  { id: 'SBI', name: 'State Bank of India' },
+  { id: 'AXIS', name: 'Axis Bank' },
+  { id: 'KOTAK', name: 'Kotak Mahindra' },
+  { id: 'OTHER', name: '50+ Other Banks' },
+];
+
 export const CheckoutPage: React.FC = () => {
   const { items, subtotalUSD, shippingUSD, destinationCountry, setDestinationCountry, clearCart } = useCart();
-  const { formatPrice, currency } = useCurrency();
+  const { formatPrice, currency, rates } = useCurrency();
   const { addOrder, user, updateSavedAddress } = useAuth();
   const { decrementInventory } = useInventory();
   const navigate = useNavigate();
@@ -43,16 +59,18 @@ export const CheckoutPage: React.FC = () => {
   if (items.length === 0 && localCartItems.length === 0) {
     return (
       <div className="pt-32 pb-24 text-center bg-atelier-ivory min-h-screen">
-        <h2 className="font-serif text-3xl text-atelier-softblack">Your bag is empty</h2>
-        <p className="text-xs text-atelier-charcoal mt-2 mb-6 font-light">
-          Add a handcrafted rug before proceeding to checkout.
-        </p>
-        <Link
-          to="/shop"
-          className="px-6 py-3 bg-atelier-softblack text-atelier-parchment text-xs tracking-widest uppercase hover:bg-atelier-darkbrown transition-colors"
-        >
-          Explore Catalog
-        </Link>
+        <div className="max-w-md mx-auto space-y-4 px-4">
+          <h2 className="font-serif text-3xl text-atelier-softblack">Your Bag is Empty</h2>
+          <p className="text-xs text-atelier-charcoal font-light">
+            You haven't selected any handcrafted rugs for checkout yet.
+          </p>
+          <Link
+            to="/shop"
+            className="px-6 py-3 bg-atelier-softblack text-atelier-parchment text-xs tracking-widest uppercase hover:bg-atelier-darkbrown transition-colors"
+          >
+            Explore Catalog
+          </Link>
+        </div>
       </div>
     );
   }
@@ -78,12 +96,29 @@ export const CheckoutPage: React.FC = () => {
   const [postalCode, setPostalCode] = useState(user?.savedAddress?.postalCode || '');
   const [country, setCountry] = useState(destinationCountry || 'United States');
 
-  // Razorpay Payment State
+  // Payment Method Selection State
+  const [paymentMethod, setPaymentMethod] = useState<'upi' | 'card' | 'netbanking' | 'international'>('upi');
+  const [upiMode, setUpiMode] = useState<'qr_app' | 'vpa'>('qr_app');
+  const [upiVpa, setUpiVpa] = useState('');
+  const [upiError, setUpiError] = useState('');
+  const [selectedBank, setSelectedBank] = useState('HDFC');
   const [errorMessage, setErrorMessage] = useState('');
-  const [showKeyConfig, setShowKeyConfig] = useState(false);
-  const [tempKey, setTempKey] = useState(paymentService.getRazorpayKeyId());
 
   const totalUSD = effectiveSubtotalUSD + shippingUSD;
+  const inrRate = rates['INR']?.rate || 84.0;
+  const amountINR = Math.round(totalUSD * inrRate);
+  const isINR = currency === 'INR';
+
+  const handleApplyUpiHandle = (handle: string) => {
+    setUpiError('');
+    if (!upiVpa) {
+      setUpiVpa(handle);
+    } else if (upiVpa.includes('@')) {
+      setUpiVpa(upiVpa.split('@')[0] + handle);
+    } else {
+      setUpiVpa(upiVpa + handle);
+    }
+  };
 
   const handleShippingSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,8 +128,23 @@ export const CheckoutPage: React.FC = () => {
 
   const handlePaymentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsProcessing(true);
     setErrorMessage('');
+    setUpiError('');
+
+    // If UPI ID mode is chosen, validate UPI ID format
+    if (paymentMethod === 'upi' && upiMode === 'vpa') {
+      const cleanVpa = upiVpa.trim();
+      if (!cleanVpa) {
+        setUpiError('Please enter your UPI ID (e.g. yourname@okhdfcbank or 9876543210@paytm)');
+        return;
+      }
+      if (!/^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/.test(cleanVpa)) {
+        setUpiError('Invalid UPI ID format. Expected username@bank (e.g. mobile@paytm or name@okhdfcbank)');
+        return;
+      }
+    }
+
+    setIsProcessing(true);
 
     try {
       const orderNum = `TWA-2026-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -103,6 +153,7 @@ export const CheckoutPage: React.FC = () => {
       // 1. Process payment via Razorpay All-In-One Checkout
       const paymentRes = await paymentService.processPayment({
         amountUSD: totalUSD,
+        amountINR,
         currency,
         customer: {
           name: `${firstName} ${lastName}`.trim(),
@@ -110,10 +161,14 @@ export const CheckoutPage: React.FC = () => {
           phone,
         },
         orderNumber: orderNum,
+        preferredMethod: paymentMethod === 'upi' ? 'upi' : paymentMethod === 'card' ? 'card' : paymentMethod === 'netbanking' ? 'netbanking' : undefined,
+        upiVpa: paymentMethod === 'upi' && upiMode === 'vpa' ? upiVpa.trim() : undefined,
         notes: {
           shipping_city: city,
           shipping_state: state,
           shipping_country: country,
+          payment_channel: paymentMethod,
+          bank_selected: paymentMethod === 'netbanking' ? selectedBank : '',
         },
       });
 
@@ -146,7 +201,7 @@ export const CheckoutPage: React.FC = () => {
           country,
         },
         shippingMethod: {
-          name: 'Atelier Express Air via DHL Express (Insured)',
+          name: 'Atelier Insured Express Air Delivery',
           estimatedDays: hasMadeToOrder ? '4–6 weeks handcrafted' : '5–7 business days',
           costUSD: shippingUSD,
         },
@@ -157,8 +212,8 @@ export const CheckoutPage: React.FC = () => {
         taxUSD: 0,
         totalUSD,
         status: hasMadeToOrder ? 'IN PRODUCTION' : 'PROCESSING',
-        carrier: 'DHL Express International',
-        trackingNumber: `DHL-IN-${Math.floor(10000000 + Math.random() * 90000000)}`,
+        carrier: 'Insured Express Air',
+        trackingNumber: '',
         estimatedDeliveryDate: hasMadeToOrder ? 'Late October 2026' : 'September 22, 2026',
         isMadeToOrder: hasMadeToOrder,
         paymentProvider: paymentRes.provider === 'razorpay' ? 'Razorpay Live' : 'Razorpay Sandbox',
@@ -197,7 +252,7 @@ export const CheckoutPage: React.FC = () => {
                 completed: false,
               },
               {
-                title: 'Dispatched via DHL Express',
+                title: 'Dispatched via Express Air Courier',
                 date: 'Estimated Week 6',
                 description: 'Handed to express air courier with international tracking.',
                 completed: false,
@@ -218,7 +273,7 @@ export const CheckoutPage: React.FC = () => {
                 completed: false,
               },
               {
-                title: 'Dispatched via DHL Express',
+                title: 'Dispatched via Express Air Courier',
                 date: 'Within 2–3 business days',
                 description: 'Air dispatch from New Delhi International logistics hub.',
                 completed: false,
@@ -292,7 +347,7 @@ export const CheckoutPage: React.FC = () => {
   };
 
   return (
-    <div className="pt-24 sm:pt-28 pb-24 bg-atelier-ivory min-h-screen">
+    <div className="pt-20 sm:pt-24 pb-24 bg-atelier-ivory min-h-screen">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
         {/* Checkout Header */}
         <div className="flex items-center justify-between border-b border-atelier-parchment pb-6">
@@ -492,11 +547,13 @@ export const CheckoutPage: React.FC = () => {
                   <div className="flex items-center justify-between text-xs">
                     <span className="font-medium text-atelier-softblack flex items-center">
                       <Truck size={14} className="mr-1.5 text-atelier-gold" />
-                      Atelier Express Air via DHL Express / FedEx
+                      Atelier Insured Express Air Delivery
                     </span>
-                    <span className="font-mono text-atelier-darkbrown">
-                      {shippingUSD === 0 ? 'Complimentary' : formatPrice(shippingUSD)}
-                    </span>
+                    {shippingUSD > 0 && (
+                      <span className="font-mono text-atelier-darkbrown">
+                        {formatPrice(shippingUSD)}
+                      </span>
+                    )}
                   </div>
                   <div className="text-[11px] text-atelier-taupe font-light">
                     Includes full transit cargo insurance, door-to-door tracking, and signature on delivery.
@@ -522,143 +579,468 @@ export const CheckoutPage: React.FC = () => {
                 </div>
               </form>
             ) : (
-              /* Payment Step - Razorpay All-in-One Integration */
+              /* Payment Step - Authentic Production Multi-Channel Gateway */
               <form onSubmit={handlePaymentSubmit} className="space-y-6">
                 <div className="flex items-center justify-between border-b border-atelier-parchment pb-4">
                   <div>
                     <div className="flex items-center space-x-2">
-                      <span className="text-[10px] tracking-[0.2em] uppercase font-mono text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                        Official Payment Suite
+                      <span className="text-[10px] tracking-[0.2em] uppercase font-mono text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 flex items-center">
+                        <ShieldCheck size={11} className="mr-1 text-emerald-600" />
+                        Verified Payment Gateway
                       </span>
+                      <span className="text-[10px] text-atelier-taupe font-mono">· 256-Bit TLS Secured</span>
                     </div>
                     <h2 className="font-serif text-2xl sm:text-3xl text-atelier-softblack font-normal mt-1">
-                      Razorpay Secure Checkout
+                      Payment & Order Authorization
                     </h2>
                     <p className="text-xs text-atelier-charcoal font-light mt-0.5">
-                      All payment methods are handled seamlessly within Razorpay's bank-grade payment gateway.
+                      Select your preferred payment method. Direct from our Bhadohi atelier with 100% insured transit.
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={() => setStep('shipping')}
-                    className="text-xs text-atelier-taupe hover:text-black underline"
+                    className="text-xs text-atelier-taupe hover:text-black underline flex items-center"
                   >
-                    Edit Shipping
+                    <ArrowLeft size={12} className="mr-1" />
+                    <span>Edit Shipping</span>
                   </button>
                 </div>
 
-                {/* Razorpay Channel Visual Showcase */}
-                <div className="bg-atelier-ivory border border-atelier-parchment p-6 space-y-4">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-medium text-atelier-softblack">Supported Payment Methods</span>
-                    <span className="text-[10px] font-mono text-atelier-taupe">Powered by Razorpay</span>
-                  </div>
-
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                    <div className="bg-atelier-cream border border-atelier-parchment p-3 text-center space-y-1">
-                      <div className="font-medium text-atelier-softblack flex items-center justify-center">
-                        <Zap size={14} className="mr-1 text-emerald-600" />
-                        <span>Instant UPI</span>
-                      </div>
-                      <div className="text-[10px] text-atelier-taupe">Google Pay, PhonePe, Paytm, QR</div>
+                {/* Shipping Destination Recap */}
+                <div className="bg-atelier-ivory border border-atelier-parchment p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                  <div className="space-y-0.5">
+                    <div className="text-[10px] uppercase font-mono tracking-wider text-atelier-taupe">Shipping Destination</div>
+                    <div className="font-medium text-atelier-softblack">
+                      {firstName} {lastName} · <span className="font-normal text-atelier-charcoal">{address}{apartment ? `, ${apartment}` : ''}, {city}, {state} {postalCode}, {country}</span>
                     </div>
-
-                    <div className="bg-atelier-cream border border-atelier-parchment p-3 text-center space-y-1">
-                      <div className="font-medium text-atelier-softblack flex items-center justify-center">
-                        <CreditCard size={14} className="mr-1 text-atelier-agedgold" />
-                        <span>Cards</span>
-                      </div>
-                      <div className="text-[10px] text-atelier-taupe">Visa, Mastercard, RuPay, Amex</div>
-                    </div>
-
-                    <div className="bg-atelier-cream border border-atelier-parchment p-3 text-center space-y-1">
-                      <div className="font-medium text-atelier-softblack flex items-center justify-center">
-                        <Building2 size={14} className="mr-1 text-blue-600" />
-                        <span>NetBanking</span>
-                      </div>
-                      <div className="text-[10px] text-atelier-taupe">50+ Banks & Institutional Wire</div>
-                    </div>
-
-                    <div className="bg-atelier-cream border border-atelier-parchment p-3 text-center space-y-1">
-                      <div className="font-medium text-atelier-softblack flex items-center justify-center">
-                        <Globe size={14} className="mr-1 text-amber-700" />
-                        <span>International</span>
-                      </div>
-                      <div className="text-[10px] text-atelier-taupe">Multi-Currency Global Cards</div>
+                    <div className="text-[11px] text-atelier-taupe">
+                      Courier: <span className="font-medium text-atelier-softblack">Atelier Insured Express Air</span> · Phone: {phone || 'Not specified'}
                     </div>
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => setStep('shipping')}
+                    className="text-[11px] text-atelier-darkbrown hover:text-black underline flex-shrink-0 self-start sm:self-center"
+                  >
+                    Change
+                  </button>
+                </div>
 
-                  <div className="pt-2 border-t border-atelier-parchment/60 flex flex-col sm:flex-row items-start sm:items-center justify-between text-[11px] text-atelier-taupe gap-2">
-                    <div className="flex items-center space-x-3">
-                      <span className="flex items-center"><ShieldCheck size={13} className="mr-1 text-emerald-700" /> 256-Bit SSL</span>
-                      <span className="flex items-center"><Lock size={13} className="mr-1 text-emerald-700" /> RBI Authorized</span>
-                      <span className="flex items-center"><Check size={13} className="mr-1 text-emerald-700" /> PCI-DSS Level 1</span>
-                    </div>
+                {/* Payment Method Selector Tabs */}
+                <div className="space-y-3">
+                  <label className="text-xs font-medium text-atelier-softblack uppercase tracking-wider block">
+                    Choose Payment Method
+                  </label>
 
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {/* 1. UPI */}
                     <button
                       type="button"
-                      onClick={() => setShowKeyConfig(!showKeyConfig)}
-                      className="text-[10px] font-mono underline hover:text-atelier-softblack transition-colors"
+                      onClick={() => { setPaymentMethod('upi'); setErrorMessage(''); }}
+                      className={`p-3.5 text-left border transition-all flex items-start space-x-3 relative ${
+                        paymentMethod === 'upi'
+                          ? 'bg-atelier-ivory border-atelier-softblack shadow-sm ring-1 ring-atelier-softblack'
+                          : 'bg-atelier-cream border-atelier-parchment hover:border-atelier-taupe'
+                      }`}
                     >
-                      {paymentService.isConfigured()
-                        ? `Key: ${paymentService.getRazorpayKeyId().substring(0, 9)}...`
-                        : 'Configure Razorpay Key'}
+                      <div className="mt-0.5">
+                        <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                          paymentMethod === 'upi' ? 'border-atelier-softblack' : 'border-atelier-taupe'
+                        }`}>
+                          {paymentMethod === 'upi' && <div className="w-2 h-2 rounded-full bg-atelier-softblack" />}
+                        </div>
+                      </div>
+                      <div className="flex-1 min-w-0 space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium text-xs text-atelier-softblack flex items-center">
+                            <Zap size={14} className="mr-1.5 text-emerald-600 flex-shrink-0" />
+                            Instant UPI
+                          </span>
+                          <span className="text-[10px] font-mono uppercase bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded font-semibold">
+                            Recommended
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-atelier-taupe font-light">
+                          Google Pay, PhonePe, Paytm, BHIM, QR
+                        </p>
+                      </div>
+                    </button>
+
+                    {/* 2. Cards */}
+                    <button
+                      type="button"
+                      onClick={() => { setPaymentMethod('card'); setErrorMessage(''); }}
+                      className={`p-3.5 text-left border transition-all flex items-start space-x-3 ${
+                        paymentMethod === 'card'
+                          ? 'bg-atelier-ivory border-atelier-softblack shadow-sm ring-1 ring-atelier-softblack'
+                          : 'bg-atelier-cream border-atelier-parchment hover:border-atelier-taupe'
+                      }`}
+                    >
+                      <div className="mt-0.5">
+                        <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                          paymentMethod === 'card' ? 'border-atelier-softblack' : 'border-atelier-taupe'
+                        }`}>
+                          {paymentMethod === 'card' && <div className="w-2 h-2 rounded-full bg-atelier-softblack" />}
+                        </div>
+                      </div>
+                      <div className="flex-1 min-w-0 space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium text-xs text-atelier-softblack flex items-center">
+                            <CreditCard size={14} className="mr-1.5 text-atelier-agedgold flex-shrink-0" />
+                            Credit & Debit Cards
+                          </span>
+                          <span className="text-[10px] font-mono text-atelier-taupe">
+                            3D Secure
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-atelier-taupe font-light">
+                          Visa, Mastercard, RuPay, Amex
+                        </p>
+                      </div>
+                    </button>
+
+                    {/* 3. NetBanking */}
+                    <button
+                      type="button"
+                      onClick={() => { setPaymentMethod('netbanking'); setErrorMessage(''); }}
+                      className={`p-3.5 text-left border transition-all flex items-start space-x-3 ${
+                        paymentMethod === 'netbanking'
+                          ? 'bg-atelier-ivory border-atelier-softblack shadow-sm ring-1 ring-atelier-softblack'
+                          : 'bg-atelier-cream border-atelier-parchment hover:border-atelier-taupe'
+                      }`}
+                    >
+                      <div className="mt-0.5">
+                        <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                          paymentMethod === 'netbanking' ? 'border-atelier-softblack' : 'border-atelier-taupe'
+                        }`}>
+                          {paymentMethod === 'netbanking' && <div className="w-2 h-2 rounded-full bg-atelier-softblack" />}
+                        </div>
+                      </div>
+                      <div className="flex-1 min-w-0 space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium text-xs text-atelier-softblack flex items-center">
+                            <Building2 size={14} className="mr-1.5 text-blue-700 flex-shrink-0" />
+                            NetBanking
+                          </span>
+                          <span className="text-[10px] font-mono text-atelier-taupe">
+                            50+ Banks
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-atelier-taupe font-light">
+                          HDFC, ICICI, SBI, Axis, Kotak
+                        </p>
+                      </div>
+                    </button>
+
+                    {/* 4. International */}
+                    <button
+                      type="button"
+                      onClick={() => { setPaymentMethod('international'); setErrorMessage(''); }}
+                      className={`p-3.5 text-left border transition-all flex items-start space-x-3 ${
+                        paymentMethod === 'international'
+                          ? 'bg-atelier-ivory border-atelier-softblack shadow-sm ring-1 ring-atelier-softblack'
+                          : 'bg-atelier-cream border-atelier-parchment hover:border-atelier-taupe'
+                      }`}
+                    >
+                      <div className="mt-0.5">
+                        <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                          paymentMethod === 'international' ? 'border-atelier-softblack' : 'border-atelier-taupe'
+                        }`}>
+                          {paymentMethod === 'international' && <div className="w-2 h-2 rounded-full bg-atelier-softblack" />}
+                        </div>
+                      </div>
+                      <div className="flex-1 min-w-0 space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium text-xs text-atelier-softblack flex items-center">
+                            <Globe size={14} className="mr-1.5 text-amber-700 flex-shrink-0" />
+                            Global & Wire
+                          </span>
+                          <span className="text-[10px] font-mono text-atelier-taupe">
+                            Export Invoice
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-atelier-taupe font-light">
+                          Multi-Currency International Cards
+                        </p>
+                      </div>
                     </button>
                   </div>
                 </div>
 
-                {/* Key Configurator Dropdown */}
-                {showKeyConfig && (
-                  <div className="p-4 bg-atelier-cream border border-atelier-gold/40 space-y-2 animate-fadeIn">
-                    <div className="flex items-center justify-between text-xs">
-                      <strong className="text-atelier-softblack">Razorpay Key Configuration</strong>
-                      <button
-                        type="button"
-                        onClick={() => setShowKeyConfig(false)}
-                        className="text-atelier-taupe hover:text-black"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                    <p className="text-[11px] text-atelier-charcoal font-light">
-                      Enter your Razorpay Key ID (e.g. <code>rzp_test_...</code> or <code>rzp_live_...</code>) to connect your live dashboard.
-                    </p>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={tempKey}
-                        onChange={(e) => setTempKey(e.target.value)}
-                        placeholder="rzp_test_..."
-                        className="flex-1 px-3 py-2 text-xs font-mono bg-atelier-ivory border border-atelier-parchment focus:outline-none"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          paymentService.setRazorpayKeyId(tempKey);
-                          setShowKeyConfig(false);
-                        }}
-                        className="px-4 py-2 bg-atelier-softblack text-atelier-parchment text-xs uppercase tracking-wider font-medium"
-                      >
-                        Save Key
-                      </button>
-                    </div>
-                  </div>
-                )}
+                {/* Method Specific Details Pane */}
+                <div className="bg-atelier-ivory border border-atelier-parchment p-5 sm:p-6 space-y-4">
+                  {/* UPI DETAILS */}
+                  {paymentMethod === 'upi' && (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between pb-3 border-b border-atelier-parchment">
+                        <div>
+                          <span className="text-xs font-semibold text-atelier-softblack flex items-center">
+                            <Zap size={15} className="mr-1.5 text-emerald-600" />
+                            Unified Payments Interface (UPI)
+                          </span>
+                          <p className="text-[11px] text-atelier-taupe font-light mt-0.5">
+                            Real-time zero-fee settlement via National Payments Corporation of India (NPCI)
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <span className="text-[10px] font-bold tracking-wider px-1.5 py-0.5 bg-white border border-atelier-parchment text-emerald-800">
+                            UPI
+                          </span>
+                          <span className="text-[10px] font-medium px-1.5 py-0.5 bg-white border border-atelier-parchment text-slate-700">
+                            GPay
+                          </span>
+                          <span className="text-[10px] font-medium px-1.5 py-0.5 bg-white border border-atelier-parchment text-purple-700">
+                            PhonePe
+                          </span>
+                          <span className="text-[10px] font-medium px-1.5 py-0.5 bg-white border border-atelier-parchment text-sky-700">
+                            Paytm
+                          </span>
+                        </div>
+                      </div>
 
-                {/* Amount Summary */}
-                <div className="p-5 bg-atelier-ivory border border-atelier-parchment space-y-2 text-xs">
-                  <div className="flex justify-between items-center text-atelier-softblack font-medium">
-                    <span>Amount to Authorize:</span>
-                    <div className="text-right">
-                      <div className="font-serif text-xl">{formatPrice(totalUSD)}</div>
-                      <div className="font-mono text-[11px] text-atelier-taupe font-normal">
-                        Approx. ₹{Math.round(totalUSD * 84).toLocaleString('en-IN')} INR
+                      {/* Sub-modes for UPI */}
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <button
+                          type="button"
+                          onClick={() => { setUpiMode('qr_app'); setUpiError(''); }}
+                          className={`p-3 border text-left flex items-center space-x-2 transition-colors ${
+                            upiMode === 'qr_app'
+                              ? 'bg-atelier-cream border-atelier-softblack font-medium'
+                              : 'bg-white border-atelier-parchment text-atelier-taupe hover:border-atelier-charcoal'
+                          }`}
+                        >
+                          <QrCode size={16} className={upiMode === 'qr_app' ? 'text-atelier-softblack' : 'text-atelier-taupe'} />
+                          <div>
+                            <div className="text-xs text-atelier-softblack">Scan QR / Any UPI App</div>
+                            <div className="text-[10px] text-atelier-taupe font-normal">GPay, PhonePe, Paytm QR</div>
+                          </div>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => { setUpiMode('vpa'); setUpiError(''); }}
+                          className={`p-3 border text-left flex items-center space-x-2 transition-colors ${
+                            upiMode === 'vpa'
+                              ? 'bg-atelier-cream border-atelier-softblack font-medium'
+                              : 'bg-white border-atelier-parchment text-atelier-taupe hover:border-atelier-charcoal'
+                          }`}
+                        >
+                          <Smartphone size={16} className={upiMode === 'vpa' ? 'text-atelier-softblack' : 'text-atelier-taupe'} />
+                          <div>
+                            <div className="text-xs text-atelier-softblack">Enter UPI ID / VPA</div>
+                            <div className="text-[10px] text-atelier-taupe font-normal">Direct collect request</div>
+                          </div>
+                        </button>
+                      </div>
+
+                      {upiMode === 'qr_app' ? (
+                        <div className="p-3.5 bg-emerald-50/70 border border-emerald-200 text-emerald-950 text-xs space-y-1.5">
+                          <div className="flex items-center font-medium">
+                            <CheckCircle2 size={14} className="mr-1.5 text-emerald-700" />
+                            Instant QR Code & App Redirection
+                          </div>
+                          <p className="text-[11px] text-emerald-900/80 font-light leading-relaxed">
+                            Clicking <strong>Authorize with UPI</strong> launches Razorpay's verified UPI window with a dynamic QR code you can scan with any phone, or direct one-tap links to open Google Pay, PhonePe, or Paytm on mobile.
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="space-y-2.5 pt-1">
+                          <label className="text-[11px] font-medium text-atelier-softblack block">
+                            Your Virtual Payment Address (UPI ID)
+                          </label>
+                          <div className="relative">
+                            <input
+                              type="text"
+                              value={upiVpa}
+                              onChange={(e) => {
+                                setUpiVpa(e.target.value);
+                                setUpiError('');
+                              }}
+                              placeholder="e.g. yourname@okhdfcbank or 9876543210@paytm"
+                              className={`w-full px-3.5 py-2.5 bg-white border text-xs font-mono text-atelier-softblack focus:outline-none ${
+                                upiError ? 'border-rose-400 focus:border-rose-600' : 'border-atelier-parchment focus:border-black'
+                              }`}
+                            />
+                          </div>
+
+                          {upiError && (
+                            <div className="text-[11px] text-rose-700 flex items-center">
+                              <AlertCircle size={12} className="mr-1 flex-shrink-0" />
+                              <span>{upiError}</span>
+                            </div>
+                          )}
+
+                          {/* Quick Append Chips */}
+                          <div className="space-y-1">
+                            <span className="text-[10px] text-atelier-taupe font-mono uppercase">Quick Add Bank Handle:</span>
+                            <div className="flex flex-wrap gap-1.5">
+                              {COMMON_UPI_HANDLES.map((handle) => (
+                                <button
+                                  key={handle}
+                                  type="button"
+                                  onClick={() => handleApplyUpiHandle(handle)}
+                                  className="px-2 py-1 bg-white border border-atelier-parchment hover:border-atelier-softblack text-[11px] font-mono text-atelier-charcoal hover:text-black transition-colors"
+                                >
+                                  {handle}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          <p className="text-[11px] text-atelier-taupe font-light">
+                            A collect request will be sent to your UPI app. Simply open your app and enter your UPI PIN to approve.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* CARDS DETAILS */}
+                  {paymentMethod === 'card' && (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between pb-3 border-b border-atelier-parchment">
+                        <div>
+                          <span className="text-xs font-semibold text-atelier-softblack flex items-center">
+                            <CreditCard size={15} className="mr-1.5 text-atelier-agedgold" />
+                            Credit & Debit Cards
+                          </span>
+                          <p className="text-[11px] text-atelier-taupe font-light mt-0.5">
+                            Bank-grade 256-bit encryption with dynamic OTP verification
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-1 text-[10px] font-mono">
+                          <span className="px-1.5 py-0.5 bg-blue-900 text-white rounded font-bold">VISA</span>
+                          <span className="px-1.5 py-0.5 bg-red-800 text-white rounded font-bold">MC</span>
+                          <span className="px-1.5 py-0.5 bg-emerald-800 text-white rounded font-bold">RUPAY</span>
+                          <span className="px-1.5 py-0.5 bg-sky-800 text-white rounded font-bold">AMEX</span>
+                        </div>
+                      </div>
+
+                      <div className="p-3.5 bg-atelier-cream border border-atelier-parchment text-xs space-y-1.5">
+                        <div className="flex items-center font-medium text-atelier-softblack">
+                          <ShieldCheck size={14} className="mr-1.5 text-emerald-700" />
+                          RBI 3D Secure 2.0 Dynamic OTP
+                        </div>
+                        <p className="text-[11px] text-atelier-charcoal font-light leading-relaxed">
+                          Your card details are securely authorized via Razorpay's PCI-DSS Level 1 compliant gateway. You will be redirected to your bank's secure page to complete authentication via OTP. No card data is stored on atelier servers.
+                        </p>
                       </div>
                     </div>
+                  )}
+
+                  {/* NETBANKING DETAILS */}
+                  {paymentMethod === 'netbanking' && (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between pb-3 border-b border-atelier-parchment">
+                        <div>
+                          <span className="text-xs font-semibold text-atelier-softblack flex items-center">
+                            <Building2 size={15} className="mr-1.5 text-blue-700" />
+                            Indian NetBanking
+                          </span>
+                          <p className="text-[11px] text-atelier-taupe font-light mt-0.5">
+                            Direct debit access across all major retail and commercial banks
+                          </p>
+                        </div>
+                        <span className="text-[10px] font-mono text-atelier-taupe">50+ Banks</span>
+                      </div>
+
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+                        {POPULAR_BANKS.map((b) => (
+                          <button
+                            key={b.id}
+                            type="button"
+                            onClick={() => setSelectedBank(b.name)}
+                            className={`p-2.5 border text-left transition-colors flex items-center justify-between ${
+                              selectedBank === b.name
+                                ? 'bg-atelier-cream border-atelier-softblack font-medium text-atelier-softblack'
+                                : 'bg-white border-atelier-parchment text-atelier-charcoal hover:border-atelier-taupe'
+                            }`}
+                          >
+                            <span>{b.name}</span>
+                            {selectedBank === b.name && <Check size={12} className="text-emerald-700" />}
+                          </button>
+                        ))}
+                      </div>
+
+                      <p className="text-[11px] text-atelier-taupe font-light">
+                        Selected: <strong className="text-atelier-softblack">{selectedBank}</strong>. Upon submission, you will be redirected to your bank's portal to authenticate and approve the payment.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* INTERNATIONAL DETAILS */}
+                  {paymentMethod === 'international' && (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between pb-3 border-b border-atelier-parchment">
+                        <div>
+                          <span className="text-xs font-semibold text-atelier-softblack flex items-center">
+                            <Globe size={15} className="mr-1.5 text-amber-700" />
+                            International Patrons & Export Wire
+                          </span>
+                          <p className="text-[11px] text-atelier-taupe font-light mt-0.5">
+                            Seamless overseas card clearance in USD, EUR, GBP, CAD, or AUD
+                          </p>
+                        </div>
+                        <span className="text-[10px] font-mono text-atelier-taupe">Worldwide</span>
+                      </div>
+
+                      <div className="p-3.5 bg-atelier-cream border border-atelier-parchment text-xs space-y-1.5">
+                        <div className="flex items-center font-medium text-atelier-softblack">
+                          <CheckCircle2 size={14} className="mr-1.5 text-emerald-700" />
+                          Official Commercial Export Invoice
+                        </div>
+                        <p className="text-[11px] text-atelier-charcoal font-light leading-relaxed">
+                          International payments include export packing declarations, Certificate of Origin from Bhadohi, and HS Code 5701/5702 custom clearance documentation.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Amount Authorization Summary */}
+                <div className="p-5 bg-atelier-ivory border border-atelier-parchment space-y-3 text-xs">
+                  <div className="flex justify-between items-center text-atelier-softblack font-medium">
+                    <div>
+                      <span className="text-[10px] uppercase font-mono tracking-wider text-atelier-taupe block">Amount to Authorize</span>
+                      <div className="font-serif text-2xl sm:text-3xl text-atelier-softblack font-normal mt-0.5">
+                        {formatPrice(totalUSD)}
+                      </div>
+                    </div>
+                    {!isINR && (
+                      <div className="text-right">
+                        <span className="text-[10px] uppercase font-mono tracking-wider text-atelier-taupe block">Indian Banking Equivalent</span>
+                        <div className="font-mono text-sm font-semibold text-emerald-900 bg-emerald-50 px-2.5 py-1 border border-emerald-200 inline-block mt-0.5">
+                          ₹{amountINR.toLocaleString('en-IN')} INR
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <p className="text-[11px] text-atelier-taupe font-light leading-relaxed">
-                    Clicking the button below opens the secure <strong>Razorpay Checkout</strong> overlay where you can select UPI, Cards, NetBanking, or Wallets. Once verified, your order is registered and an immediate confirmation is emailed to you.
-                  </p>
+
+                  {!isINR && (
+                    <div className="pt-2 border-t border-atelier-parchment/70 flex flex-col sm:flex-row sm:items-center justify-between text-[11px] text-atelier-taupe gap-1">
+                      <span>Conversion rate: 1 USD ≈ ₹{inrRate} INR</span>
+                      <span className="flex items-center text-emerald-800 font-medium">
+                        <Check size={12} className="mr-1 text-emerald-600" /> 0% Payment Surcharge
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Atelier Concierge Direct Support Strip */}
+                <div className="p-3 bg-atelier-ivory border border-dashed border-atelier-parchment flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] text-atelier-charcoal">
+                  <div className="flex items-center space-x-2">
+                    <HelpCircle size={14} className="text-atelier-gold flex-shrink-0" />
+                    <span>Need assistance with payment limits or corporate GST invoices?</span>
+                  </div>
+                  <a
+                    href="https://wa.me/919415226500"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-emerald-800 hover:text-emerald-950 font-medium font-mono text-[11px] underline flex items-center self-start sm:self-auto"
+                  >
+                    WhatsApp Concierge (+91 94152 26500)
+                  </a>
                 </div>
 
                 {errorMessage && (
@@ -685,11 +1067,21 @@ export const CheckoutPage: React.FC = () => {
                     className="px-8 py-4 bg-atelier-softblack text-atelier-parchment text-xs tracking-widest uppercase hover:bg-atelier-darkbrown transition-colors font-medium flex items-center disabled:opacity-50 group"
                   >
                     {isProcessing ? (
-                      <span className="animate-pulse">Launching Razorpay Checkout...</span>
+                      <span className="animate-pulse">Authorizing Payment Session...</span>
                     ) : (
                       <>
                         <ShieldCheck size={16} className="mr-2 text-atelier-gold" />
-                        <span>Pay with Razorpay · {formatPrice(totalUSD)}</span>
+                        <span>
+                          {paymentMethod === 'upi'
+                            ? isINR
+                              ? `Authorize with UPI · ${formatPrice(totalUSD)}`
+                              : `Authorize with UPI · ${formatPrice(totalUSD)} (₹${amountINR.toLocaleString('en-IN')})`
+                            : paymentMethod === 'card'
+                            ? `Authorize with Card · ${formatPrice(totalUSD)}`
+                            : paymentMethod === 'netbanking'
+                            ? `Authorize NetBanking · ${formatPrice(totalUSD)}`
+                            : `Authorize Payment · ${formatPrice(totalUSD)}`}
+                        </span>
                         <ArrowRight size={14} className="ml-2 group-hover:translate-x-1 transition-transform" />
                       </>
                     )}
@@ -739,12 +1131,14 @@ export const CheckoutPage: React.FC = () => {
                 <span>Subtotal</span>
                 <span className="font-mono text-atelier-softblack">{formatPrice(effectiveSubtotalUSD)}</span>
               </div>
-              <div className="flex justify-between">
-                <span>Insured International Courier</span>
-                <span className="font-mono text-atelier-softblack">
-                  {shippingUSD === 0 ? 'Complimentary' : formatPrice(shippingUSD)}
-                </span>
-              </div>
+              {shippingUSD > 0 && (
+                <div className="flex justify-between">
+                  <span>Shipping & Delivery</span>
+                  <span className="font-mono text-atelier-softblack">
+                    {formatPrice(shippingUSD)}
+                  </span>
+                </div>
+              )}
               <div className="flex justify-between text-atelier-taupe text-[11px]">
                 <span>Customs / Duties (Bhadohi, India Export)</span>
                 <span>Included / Under De Minimis</span>
@@ -753,15 +1147,23 @@ export const CheckoutPage: React.FC = () => {
                 <span>Total Due</span>
                 <span className="font-mono text-2xl text-atelier-darkbrown font-bold">{formatPrice(totalUSD)}</span>
               </div>
+              {!isINR && (
+                <div className="flex justify-between items-center text-[11px] text-atelier-taupe pt-0.5">
+                  <span>Equivalent (INR):</span>
+                  <span className="font-mono font-medium text-emerald-800">
+                    ₹{amountINR.toLocaleString('en-IN')} INR
+                  </span>
+                </div>
+              )}
             </div>
 
             <div className="p-4 bg-atelier-ivory border border-atelier-parchment space-y-2 text-[11px] text-atelier-taupe font-light">
               <div className="flex items-center text-atelier-softblack font-medium">
-                <ShieldCheck size={13} className="mr-1.5 text-atelier-gold" />
-                The Weave Atelier Authenticity Guarantee
+                <ShieldCheck size={14} className="mr-1.5 text-emerald-700" />
+                100% Insured Transit & Escrow Protection
               </div>
               <p>
-                Each piece is certified handmade in Bhadohi. Your tracking code and high-resolution conditioning photographs are shared upon final inspection.
+                Each rug is certified handmade at our Bhadohi atelier. Your payment is held with escrow protection until final hand-shearing inspection and international air dispatch.
               </p>
             </div>
           </div>

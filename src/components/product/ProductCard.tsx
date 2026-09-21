@@ -119,7 +119,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       </div>
 
       {/* Card Info */}
-      <div className="pt-4 pb-2 space-y-1">
+      <div className="pt-4 pb-2 space-y-1.5">
         <div className="flex items-center justify-between text-[11px] text-atelier-taupe tracking-wider uppercase">
           <span>{product.technique}</span>
           <span className="font-mono text-atelier-charcoal font-medium">
@@ -133,18 +133,26 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </Link>
         </h3>
 
-        <p className="text-xs text-atelier-charcoal/70 line-clamp-1 font-light">
-          {product.material} · {product.origin.split(',')[0]}
-        </p>
+        <div className="flex items-center justify-between text-xs text-atelier-charcoal/70 font-light">
+          <span className="truncate">{product.material}</span>
+          {product.pileHeight && (
+            <span className="text-[10px] text-atelier-taupe tracking-wider uppercase flex-shrink-0 ml-2 border border-atelier-parchment px-1.5 py-0.5 rounded-sm bg-atelier-ivory/70">
+              {product.pileHeight}
+            </span>
+          )}
+        </div>
 
-        {/* Subtle hover link */}
-        <div className="pt-1">
+        {/* Subtle bottom info with size count & view link */}
+        <div className="pt-1 flex items-center justify-between text-[11px] tracking-widest text-atelier-taupe uppercase">
+          <span className="text-[10px] text-atelier-taupe/90 font-mono">
+            {product.variants.length} Sizes · Bespoke
+          </span>
           <Link
             to={`/product/${product.slug}`}
-            className="text-[11px] tracking-widest text-atelier-taupe hover:text-atelier-softblack uppercase transition-colors inline-flex items-center group/cta"
+            className="text-atelier-charcoal/80 hover:text-atelier-softblack transition-colors inline-flex items-center group/cta"
           >
-            <span>View Rug</span>
-            <span className="inline-block transition-transform duration-200 group-hover/cta:translate-x-1 ml-1">
+            <span>Explore</span>
+            <span className="inline-block transition-transform duration-200 group-hover/cta:translate-x-1 ml-1 font-sans">
               →
             </span>
           </Link>

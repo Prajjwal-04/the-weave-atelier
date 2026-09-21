@@ -25,7 +25,7 @@ export const HeroSection: React.FC = () => {
           </div>
 
           <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-light text-white tracking-tight leading-[1.1]">
-            Rugs for spaces that endure.
+            Rugs for spaces that <span className="italic font-normal">endure</span>.
           </h1>
 
           <p className="text-sm sm:text-base text-atelier-parchment/85 font-light leading-relaxed max-w-xl">
@@ -49,6 +49,23 @@ export const HeroSection: React.FC = () => {
             </Link>
           </div>
         </div>
+      </div>
+
+      {/* Ambient Scroll to Explore Indicator */}
+      <div className="absolute bottom-8 right-6 sm:right-12 z-10 hidden sm:flex items-center space-x-3 text-atelier-parchment/70 select-none pointer-events-none">
+        <span className="text-[9px] tracking-[0.3em] uppercase font-sans font-light">Scroll to Explore</span>
+        <div className="w-[1px] h-8 bg-atelier-parchment/30 relative overflow-hidden">
+          <div className="w-full h-1/2 bg-atelier-parchment animate-scrollPulse" />
+        </div>
+      </div>
+
+      {/* Subtle Provenance Stamp */}
+      <div className="absolute bottom-8 left-6 sm:left-8 z-10 hidden lg:flex items-center space-x-2 text-[9px] tracking-[0.25em] uppercase text-atelier-parchment/60 font-mono select-none pointer-events-none">
+        <span>01 / 06</span>
+        <span>·</span>
+        <span>Pure Bikaner Wool & Raw Silk</span>
+        <span>·</span>
+        <span>Loom 14, Bhadohi</span>
       </div>
     </section>
   );

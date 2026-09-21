@@ -16,7 +16,7 @@ export const TrustBanner: React.FC = () => {
     {
       icon: Truck,
       title: 'Insured Global Transit',
-      desc: 'Shipped via DHL Express & FedEx with full transit insurance and door-to-door tracking.',
+      desc: 'Dispatched via insured international air express with full cargo insurance and door-to-door tracking.',
     },
     {
       icon: ShieldCheck,
@@ -25,8 +25,8 @@ export const TrustBanner: React.FC = () => {
     },
     {
       icon: RefreshCw,
-      title: '14-Day Atelier Guarantee',
-      desc: 'We want your rug to sit comfortably in your home. Returnable within 14 days of delivery.',
+      title: '14-Day Return Guarantee',
+      desc: 'Standard catalog pieces returnable within 14 days. Refund issued upon return in original quality without damage.',
     },
   ];
 

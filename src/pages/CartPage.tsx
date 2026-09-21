@@ -47,7 +47,7 @@ export const CartPage: React.FC = () => {
   };
 
   return (
-    <div className="pt-24 sm:pt-28 pb-24 bg-atelier-ivory min-h-screen">
+    <div className="pt-20 sm:pt-24 pb-24 bg-atelier-ivory min-h-screen">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         {/* Header */}
         <div className="border-b border-atelier-parchment pb-6 flex items-baseline justify-between">
@@ -95,27 +95,13 @@ export const CartPage: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
             {/* Left: Line items list (8 cols) */}
             <div className="lg:col-span-8 space-y-6">
-              {/* Free shipping banner */}
-              <div className="p-4 bg-atelier-cream border border-atelier-parchment text-xs space-y-2">
-                {amountNeededForFreeShippingUSD > 0 ? (
-                  <div>
-                    <div className="flex justify-between text-atelier-charcoal font-medium">
-                      <span>Add {formatPrice(amountNeededForFreeShippingUSD)} more for complimentary worldwide express delivery</span>
-                      <span className="font-mono text-atelier-taupe">{progressPercent}%</span>
-                    </div>
-                    <div className="w-full bg-atelier-parchment h-1.5 rounded-full overflow-hidden mt-1.5">
-                      <div
-                        className="bg-atelier-agedgold h-full transition-all duration-500"
-                        style={{ width: `${progressPercent}%` }}
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center text-atelier-darkbrown font-medium">
-                    <Truck size={15} className="mr-2 text-atelier-agedgold" />
-                    <span>Your order qualifies for Complimentary Worldwide Express Courier!</span>
-                  </div>
-                )}
+              {/* Insured air transit banner */}
+              <div className="p-3.5 bg-atelier-cream border border-atelier-parchment text-xs flex items-center justify-between">
+                <div className="flex items-center text-atelier-softblack">
+                  <Truck size={15} className="mr-2 text-atelier-agedgold flex-shrink-0" />
+                  <span>Insured international express air dispatch with door-to-door tracking.</span>
+                </div>
+                <span className="text-[11px] text-atelier-taupe font-mono hidden sm:inline">Direct from Bhadohi</span>
               </div>
 
               {/* Items */}

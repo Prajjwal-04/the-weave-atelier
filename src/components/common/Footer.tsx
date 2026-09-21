@@ -34,8 +34,8 @@ export const Footer: React.FC = () => {
               Contemporary rugs rooted in Indian craftsmanship. Handcrafted slowly, with patience and restraint, in Bhadohi for considered architectural spaces worldwide.
             </p>
             <div className="text-xs text-atelier-taupe pt-2 space-y-1">
-              <div>Independent Rug Atelier · Bhadohi, Uttar Pradesh, India</div>
-              <div>International Delivery via DHL Express & FedEx</div>
+              <div>Prasri Rugs · G.T. Road, Gopiganj, Bhadohi, Uttar Pradesh 221303, India</div>
+              <div>Insured International Express Air Delivery</div>
             </div>
           </div>
 
@@ -172,6 +172,11 @@ export const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
+                <Link to="/journal?tab=faq" className="text-atelier-parchment/80 hover:text-white transition-colors">
+                  FAQ & Inquiries
+                </Link>
+              </li>
+              <li>
                 <Link to="/contact" className="text-atelier-parchment/80 hover:text-white transition-colors">
                   Contact & Studio
                 </Link>
@@ -245,7 +250,7 @@ export const Footer: React.FC = () => {
               </div>
 
               <div className="text-[11px] text-atelier-taupe leading-relaxed">
-                Handcrafted in Bhadohi, Uttar Pradesh 221401, India. All rugs certified handmade.
+                Handcrafted at Prasri Rugs, G.T. Road, Gopiganj, Bhadohi, Uttar Pradesh 221303, India. All rugs certified handmade.
               </div>
             </div>
           </div>

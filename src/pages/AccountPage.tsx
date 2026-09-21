@@ -286,7 +286,7 @@ export const AccountPage: React.FC = () => {
   };
 
   return (
-    <div className="pt-24 sm:pt-28 pb-24 bg-atelier-ivory min-h-screen">
+    <div className="pt-20 sm:pt-24 pb-24 bg-atelier-ivory min-h-screen">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         {/* Header */}
         <div className="border-b border-atelier-parchment pb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">

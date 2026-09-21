@@ -138,7 +138,7 @@ export const AdminDashboardPage: React.FC = () => {
     }
     return false;
   });
-  const [adminEmail, setAdminEmail] = useState(ADMIN_EMAIL);
+  const [adminEmail, setAdminEmail] = useState(() => ADMIN_EMAIL.split(',')[0].trim());
   const [passwordInput, setPasswordInput] = useState('');
   const [authError, setAuthError] = useState('');
   const [authSuccess, setAuthSuccess] = useState('');
@@ -288,7 +288,7 @@ export const AdminDashboardPage: React.FC = () => {
       const initialCourier: Record<string, { carrier: string; trackingNumber: string }> = {};
       fetchedOrders.forEach((o) => {
         initialCourier[o.orderNumber] = {
-          carrier: o.carrier || 'DHL Express International',
+          carrier: o.carrier || 'Insured Express International',
           trackingNumber: o.trackingNumber || '',
         };
       });
@@ -319,7 +319,7 @@ export const AdminDashboardPage: React.FC = () => {
         const { data: { session } } = await client.auth.getSession();
         if (!isMounted) return;
 
-        if (session?.user?.email && isStoreOwnerEmail(session.user.email)) {
+        if (session?.user?.email && (isStoreOwnerEmail(session.user.email) || (session.user as any).app_metadata?.role === 'admin')) {
           setIsAuthenticated(true);
           setCurrentAdminUser(session.user.email);
           localStorage.setItem('twa_admin_auth', 'true');
@@ -350,7 +350,7 @@ export const AdminDashboardPage: React.FC = () => {
 
     const { data: authListener } = client.auth.onAuthStateChange((_event, session) => {
       if (!isMounted) return;
-      if (session?.user?.email && isStoreOwnerEmail(session.user.email)) {
+      if (session?.user?.email && (isStoreOwnerEmail(session.user.email) || (session.user as any).app_metadata?.role === 'admin')) {
         setIsAuthenticated(true);
         setCurrentAdminUser(session.user.email);
         localStorage.setItem('twa_admin_auth', 'true');
@@ -408,13 +408,14 @@ export const AdminDashboardPage: React.FC = () => {
         setAuthError(error.message);
       } else if (data.user) {
         const email = data.user.email?.toLowerCase();
-        if (email && isStoreOwnerEmail(email)) {
+        const isAdminRole = (data.user as any).app_metadata?.role === 'admin';
+        if ((email && isStoreOwnerEmail(email)) || isAdminRole) {
           localStorage.setItem('twa_admin_auth', 'true');
           localStorage.setItem('twa_admin_user', data.user.email || ADMIN_EMAIL);
           setCurrentAdminUser(data.user.email || ADMIN_EMAIL);
           setIsAuthenticated(true);
         } else {
-          setAuthError(`Access restricted. User ${data.user.email} is not authorized as the atelier administrator (${ADMIN_EMAIL}).`);
+          setAuthError(`Access restricted. User ${data.user.email} is not authorized as an atelier administrator.`);
           await supabase.auth.signOut();
         }
       }
@@ -853,7 +854,7 @@ export const AdminDashboardPage: React.FC = () => {
     setCourierInputs((prev) => ({
       ...prev,
       [orderNumber]: {
-        carrier: field === 'carrier' ? value : (prev[orderNumber]?.carrier || 'DHL Express International'),
+        carrier: field === 'carrier' ? value : (prev[orderNumber]?.carrier || 'Insured Express International'),
         trackingNumber: field === 'trackingNumber' ? value : (prev[orderNumber]?.trackingNumber || ''),
       },
     }));
@@ -2032,7 +2033,7 @@ export const AdminDashboardPage: React.FC = () => {
                   const isUpdatingStage = orderStageUpdating === order.orderNumber;
                   const isSendingEmail = emailDispatchingOrder === order.orderNumber;
                   const currentCourier = courierInputs[order.orderNumber] || {
-                    carrier: order.carrier || 'DHL Express International',
+                    carrier: order.carrier || 'Insured Express International',
                     trackingNumber: order.trackingNumber || '',
                   };
 
@@ -2240,10 +2241,10 @@ export const AdminDashboardPage: React.FC = () => {
                                 onChange={(e) => handleCourierInputChange(order.orderNumber, 'carrier', e.target.value)}
                                 className="w-full px-2 py-1 bg-atelier-ivory border border-atelier-parchment text-[11px] text-atelier-softblack focus:outline-none focus:border-black"
                               >
-                                <option value="DHL Express International">DHL Express International</option>
-                                <option value="FedEx Priority">FedEx Priority</option>
-                                <option value="India Post Speed Post / EMS">India Post Speed Post / EMS</option>
-                                <option value="BlueDart Air">BlueDart Air</option>
+                                <option value="Insured Express International">Insured Express International</option>
+                                <option value="Insured Express Air">Insured Express Air</option>
+                                <option value="Speed Post / EMS International">Speed Post / EMS International</option>
+                                <option value="Express Air Cargo">Express Air Cargo</option>
                               </select>
 
                               <div className="flex space-x-1.5">
@@ -2251,7 +2252,7 @@ export const AdminDashboardPage: React.FC = () => {
                                   type="text"
                                   value={currentCourier.trackingNumber}
                                   onChange={(e) => handleCourierInputChange(order.orderNumber, 'trackingNumber', e.target.value)}
-                                  placeholder="Enter Air Waybill tracking # (e.g. DHL-IN-9821)"
+                                  placeholder="Enter Air Waybill tracking # (e.g. EXP-IN-9821)"
                                   className="flex-1 px-2.5 py-1 bg-atelier-ivory border border-atelier-parchment text-xs font-mono text-atelier-softblack focus:outline-none focus:border-black"
                                 />
                                 <button
@@ -2623,7 +2624,7 @@ export const AdminDashboardPage: React.FC = () => {
                     <div className="flex items-center justify-between">
                       <span className="font-serif text-sm text-atelier-softblack font-medium">Transactional Email Relay</span>
                       <span className="text-[10px] font-mono uppercase px-2 py-0.5 bg-atelier-parchment/60 text-atelier-charcoal">
-                        FormSubmit & Resend
+                        Direct Gmail SMTP
                       </span>
                     </div>
                     <p className="text-xs text-atelier-charcoal/80 font-light leading-relaxed">

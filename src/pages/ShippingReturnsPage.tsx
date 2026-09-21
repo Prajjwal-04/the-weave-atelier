@@ -7,43 +7,43 @@ export const ShippingReturnsPage: React.FC = () => {
     {
       region: 'United States & Canada',
       transit: '5 to 7 business days',
-      carrier: 'DHL Express / FedEx Priority',
+      carrier: 'Insured Express Air',
       duties: 'Duty-free under $800 USD (USA Section 321 de minimis). Canada subject to GST/PST.',
     },
     {
       region: 'United Kingdom',
       transit: '5 to 7 business days',
-      carrier: 'DHL Express International',
+      carrier: 'Insured Express Air',
       duties: 'Subject to standard UK VAT and HMRC customs processing.',
     },
     {
       region: 'European Union',
       transit: '5 to 7 business days',
-      carrier: 'DHL Express Worldwide',
+      carrier: 'Insured Express Air',
       duties: 'Delivered DDU/DDP depending on checkout country selection. Local VAT applies.',
     },
     {
       region: 'Australia & New Zealand',
       transit: '7 to 10 business days',
-      carrier: 'DHL Express / Australia Post Global',
+      carrier: 'Insured Express Air',
       duties: 'Orders under $1,000 AUD are duty-free. 10% GST applies.',
     },
     {
       region: 'India (Domestic)',
       transit: '3 to 5 business days',
-      carrier: 'Bluedart / Delhivery Express',
-      duties: 'All GST included. Doorstep white glove dispatch from Bhadohi.',
+      carrier: 'Domestic Express Air Courier',
+      duties: 'All GST included. Direct insured dispatch from Bhadohi.',
     },
     {
       region: 'Rest of the World (50+ Countries)',
       transit: '7 to 12 business days',
-      carrier: 'DHL Express Insured Air Freight',
+      carrier: 'Insured International Express Air',
       duties: 'Calculated at destination customs per national tariff guidelines.',
     },
   ];
 
   return (
-    <div className="pt-24 sm:pt-28 pb-24 bg-atelier-ivory min-h-screen">
+    <div className="pt-20 sm:pt-24 pb-24 bg-atelier-ivory min-h-screen">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         {/* Header */}
         <div className="border-b border-atelier-parchment pb-8 max-w-3xl">
@@ -58,14 +58,14 @@ export const ShippingReturnsPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Free Shipping Policy Notice */}
+        {/* Worldwide Delivery Policy Notice */}
         <div className="p-8 bg-atelier-cream border border-atelier-parchment space-y-3">
           <div className="flex items-center space-x-2 text-xs font-medium text-atelier-darkbrown uppercase tracking-wider">
             <ShieldCheck size={16} className="text-atelier-gold" />
-            <span>Complimentary Worldwide Delivery Policy</span>
+            <span>Worldwide Insured Delivery Policy</span>
           </div>
           <p className="text-xs sm:text-sm text-atelier-charcoal font-light leading-relaxed">
-            We offer complimentary worldwide express shipping on all orders over <strong>$1,500 USD</strong> (or equivalent in EUR, GBP, AUD, CAD, INR). For orders under this threshold, shipping is dynamically calculated at checkout based on rug weight, cubic dimensions, and destination country.
+            Every rug is dispatched directly from our studio in Bhadohi, India via insured international air express with complete door-to-door tracking. Shipping is calculated at checkout based on rug weight, dimensions, and destination country.
           </p>
         </div>
 
@@ -154,10 +154,19 @@ export const ShippingReturnsPage: React.FC = () => {
           <p className="text-xs sm:text-sm text-atelier-charcoal font-light leading-relaxed">
             We understand that seeing a rug in your unique daylight and alongside your furniture is the ultimate test. You may initiate a return for standard catalog rugs within <strong>14 calendar days</strong> of confirmed courier delivery.
           </p>
-          <div className="text-xs text-atelier-taupe space-y-1.5 font-light pt-2">
-            <div>• Items must be in original, unsoiled condition with atelier tags attached.</div>
-            <div>• Custom sized and made-to-order bespoke rugs are crafted specifically for your space and cannot be returned once production commences, except in cases of manufacturing defect.</div>
-            <div>• Return shipping coordination is facilitated by our atelier concierge.</div>
+          <div className="text-xs text-atelier-charcoal/90 space-y-2.5 font-light pt-2">
+            <div>
+              • <strong>Buyer-Handled Return Shipping:</strong> Return shipping must be arranged and handled directly by the buyer. All associated return freight, courier booking, and export/import charges are the sole responsibility of the buyer.
+            </div>
+            <div>
+              • <strong>Refund Quality Verification:</strong> A refund will be placed once the product is received back by our atelier in the exact same quality and condition without any damage, stains, odors, pulls, or wear.
+            </div>
+            <div>
+              • <strong>Secure Protective Packaging:</strong> Rugs must be returned with all original atelier documentation and securely wrapped in moisture-resistant protective packaging to prevent transit damage.
+            </div>
+            <div>
+              • <strong>Custom Sizing & Bespoke Commissions:</strong> Custom sized and made-to-order bespoke rugs are woven specifically for your architectural space and are non-refundable once production commences, except in cases of proven manufacturing defect.
+            </div>
           </div>
         </div>
       </div>

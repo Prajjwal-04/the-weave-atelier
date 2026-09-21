@@ -85,27 +85,13 @@ export const CartDrawer: React.FC = () => {
             </button>
           </div>
 
-          {/* Free Shipping Progress Indicator */}
-          <div className="px-6 py-3 bg-atelier-cream border-b border-atelier-parchment text-xs">
-            {amountNeededForFreeShippingUSD > 0 ? (
-              <div className="space-y-1.5">
-                <div className="flex justify-between text-atelier-charcoal">
-                  <span>Add {formatPrice(amountNeededForFreeShippingUSD)} more for complimentary express delivery</span>
-                  <span className="font-mono text-atelier-taupe">{progressPercent}%</span>
-                </div>
-                <div className="w-full bg-atelier-parchment h-1 rounded-full overflow-hidden">
-                  <div
-                    className="bg-atelier-agedgold h-full transition-all duration-500"
-                    style={{ width: `${progressPercent}%` }}
-                  />
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center text-atelier-darkbrown font-medium">
-                <Truck size={14} className="mr-1.5 text-atelier-agedgold" />
-                <span>You qualify for complimentary worldwide express courier!</span>
-              </div>
-            )}
+          {/* Dispatch Notice */}
+          <div className="px-6 py-2.5 bg-atelier-cream/80 border-b border-atelier-parchment text-[11px] text-atelier-charcoal flex items-center justify-between">
+            <span className="flex items-center">
+              <Truck size={13} className="mr-1.5 text-atelier-agedgold" />
+              <span>Insured International Express Air Dispatch</span>
+            </span>
+            <span className="text-atelier-taupe font-mono text-[10px]">Door-to-door tracking</span>
           </div>
 
           {/* Cart Items List */}

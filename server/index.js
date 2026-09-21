@@ -1,5 +1,6 @@
 import http from 'http';
 import { handleCreateOrder, handleVerifyPayment, handleGetOrders, sendJsonResponse } from './razorpayHandlers.js';
+import { handleSendEmail } from './emailHandler.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -25,6 +26,10 @@ const server = http.createServer(async (req, res) => {
 
   if (req.method === 'POST' && url === '/api/verify-payment') {
     return handleVerifyPayment(req, res);
+  }
+
+  if (req.method === 'POST' && url === '/api/send-email') {
+    return handleSendEmail(req, res);
   }
 
   if (req.method === 'GET' && url === '/api/orders') {

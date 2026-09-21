@@ -13,12 +13,17 @@ export const FAQS: FAQItem[] = [
   {
     category: 'Orders & Custom Sizing',
     question: 'What is the difference between Ready to Ship and Made to Order?',
-    answer: 'Ready to Ship rugs have already completed our stringent quality washing and inspection in Bhadohi. They dispatch within 2 to 4 business days via DHL/FedEx Express. Made to Order rugs are woven or tufted specifically upon order, requiring 4 to 6 weeks for thorough handcrafting, washing, and finishing.'
+    answer: 'Ready to Ship rugs have already completed our stringent quality washing and inspection in Bhadohi. They dispatch within 2 to 4 business days via insured express air. Made to Order rugs are woven or tufted specifically upon order, requiring 4 to 6 weeks for thorough handcrafting, washing, and finishing.'
+  },
+  {
+    category: 'Orders & Custom Sizing',
+    question: 'What is your return and refund policy?',
+    answer: 'You may initiate a return for standard catalog rugs within 14 calendar days of confirmed delivery. Return shipping must be arranged and handled directly by the buyer. A refund will be placed once the product is received back by our atelier in the same quality without any damage, wear, or alterations. Custom sized and bespoke rugs are non-refundable once production commences.'
   },
   {
     category: 'International Shipping',
     question: 'Which countries do you ship to, and how is shipping calculated?',
-    answer: 'We ship worldwide directly from Bhadohi, India, via premium express air couriers (DHL Express and FedEx). Transit time to the USA, UK, and Europe is typically 5 to 7 business days with door-to-door insured tracking. Orders exceeding $1,500 USD receive complimentary worldwide express shipping.'
+    answer: 'We ship worldwide directly from Bhadohi, India, via insured express air couriers with door-to-door tracking. Transit time to the USA, UK, and Europe is typically 5 to 7 business days. Shipping charges are dynamically calculated at checkout based on rug weight, packaging dimensions, and destination country.'
   },
   {
     category: 'International Shipping',

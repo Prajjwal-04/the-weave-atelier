@@ -72,7 +72,7 @@ export const OrderTrackingPage: React.FC = () => {
   };
 
   return (
-    <div className="pt-24 sm:pt-28 pb-24 bg-atelier-ivory min-h-screen">
+    <div className="pt-20 sm:pt-24 pb-24 bg-atelier-ivory min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         {/* Header */}
         <div className="border-b border-atelier-parchment pb-8 max-w-3xl">
@@ -154,7 +154,9 @@ export const OrderTrackingPage: React.FC = () => {
                 </div>
                 <div className="text-xs text-atelier-charcoal font-light">
                   Carrier: <span className="font-medium">{currentOrder.carrier}</span> · Tracking:{' '}
-                  <span className="font-mono">{currentOrder.trackingNumber}</span>
+                  <span className="font-mono">
+                    {currentOrder.trackingNumber || 'Pending Courier Dispatch'}
+                  </span>
                 </div>
               </div>
             </div>

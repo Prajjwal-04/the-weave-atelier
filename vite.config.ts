@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv, Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { handleCreateOrder, handleVerifyPayment, handleGetOrders, sendJsonResponse } from './server/razorpayHandlers.js';
+import { handleSendEmail } from './server/emailHandler.js';
 
 function razorpayApiPlugin(): Plugin {
   return {
@@ -15,6 +16,10 @@ function razorpayApiPlugin(): Plugin {
 
         if (req.method === 'POST' && url === '/api/verify-payment') {
           return handleVerifyPayment(req, res);
+        }
+
+        if (req.method === 'POST' && url === '/api/send-email') {
+          return handleSendEmail(req, res);
         }
 
         if (req.method === 'GET' && url === '/api/orders') {

@@ -4,7 +4,7 @@ import { ArrowRight, CheckCircle2, Shield, Sparkles } from 'lucide-react';
 
 export const CraftPage: React.FC = () => {
   return (
-    <div className="pt-24 sm:pt-28 pb-24 bg-atelier-ivory min-h-screen">
+    <div className="pt-20 sm:pt-24 pb-24 bg-atelier-ivory min-h-screen">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-20">
         {/* Header */}
         <div className="space-y-4 max-w-3xl">
