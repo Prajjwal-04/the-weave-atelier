@@ -24,8 +24,8 @@ export const BhadohiNarrative: React.FC = () => {
     },
     {
       step: '04',
-      title: 'River Washing & Sun Drying',
-      desc: 'Finished carpets are washed thoroughly in fresh local water with wooden paddles, then sun-cured on open rooftops.',
+      title: 'Artisanal Washing & Sun Curing',
+      desc: 'Finished carpets are thoroughly cleansed with purified soft water and gentle plant-based cleansers, then cured under open-air sunlight on atelier terraces.',
       image: '/images/narrative/stage-04-washing-sun-drying.jpg',
     },
     {

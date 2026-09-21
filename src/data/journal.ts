@@ -62,7 +62,7 @@ export const JOURNAL_ARTICLES: JournalArticle[] = [
       {
         heading: 'The Philosophy of the Small Atelier',
         body: [
-          'Rather than operating as a sprawling mass exporter, The Weave Atelier maintains an intimate scale. We work directly with master weavers, overseeing every phase—from raw wool selection and small-batch dyeing to the final river washing and edge binding.',
+          'Rather than operating as a sprawling mass exporter, The Weave Atelier maintains an intimate scale. We work directly with master weavers, overseeing every phase—from raw wool selection and small-batch dyeing to the final purified artisanal washing and edge binding.',
           'By connecting homeowners directly with the workshop in Bhadohi, we preserve the intimacy of the maker-to-owner relationship. When you step onto one of our rugs, you are feeling the work of real hands in Bhadohi.'
         ]
       }

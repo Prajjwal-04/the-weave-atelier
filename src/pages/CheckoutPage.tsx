@@ -240,9 +240,9 @@ export const CheckoutPage: React.FC = () => {
                 completed: false,
               },
               {
-                title: 'River Washing & Rooftop Sun Drying',
+                title: 'Artisanal Washing & Rooftop Sun Curing',
                 date: 'Estimated Week 5',
-                description: 'Thorough paddle wash in groundwater and natural open-air sun curing.',
+                description: 'Thorough gentle wash in purified soft water and natural open-air sun curing.',
                 completed: false,
               },
               {

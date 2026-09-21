@@ -22,7 +22,7 @@ const FAQ_DATA: FaqItem[] = [
     category: 'craft',
     question: 'How long does it take to weave a single piece?',
     answer:
-      'Depending on the knot density (ranging from 60 to 180 KPSI) and the scale of the rug, weaving a standard 8×10 ft piece takes anywhere from 90 to 180 days of patient, uninterrupted loom work by a team of two to three weavers, followed by river washing, sun drying, and meticulous hand-shearing.',
+      'Depending on the knot density (ranging from 60 to 180 KPSI) and the scale of the rug, weaving a standard 8×10 ft piece takes anywhere from 90 to 180 days of patient, uninterrupted loom work by a team of two to three weavers, followed by gentle soft-water washing, natural sun curing, and meticulous hand-shearing.',
   },
   {
     id: 'care-1',

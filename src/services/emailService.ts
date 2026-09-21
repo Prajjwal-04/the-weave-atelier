@@ -488,7 +488,7 @@ Carrier Assigned: ${order.carrier}
               <h2 style="font-family: Georgia, serif; font-size: 20px; color: #1A1918; margin: 0 0 15px 0;">Your Rug Has Dispatched From Bhadohi</h2>
               <p style="font-size: 13px; line-height: 1.6; color: #5C4D43;">
                 Dear ${order.customer.firstName},<br/><br/>
-                Your order <strong>${order.orderNumber}</strong> has completed final river washing, open-air sun curing, and hand-shearing inspection. It has now been handed over to <strong>${order.carrier}</strong>.
+                Your order <strong>${order.orderNumber}</strong> has completed final artisanal gentle washing, open-air sun curing, and hand-shearing inspection. It has now been handed over to <strong>${order.carrier}</strong>.
               </p>
               <div style="background: #F4EFEA; padding: 20px; text-align: center; margin: 25px 0; border: 1px solid #EDE6DD;">
                 <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #8A7B6E; margin-bottom: 5px;">Courier Tracking / AWB Code</div>

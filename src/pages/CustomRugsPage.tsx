@@ -90,7 +90,7 @@ export const CustomRugsPage: React.FC = () => {
     { num: '03', title: 'Receive quotation', desc: 'Transparent pricing, production timetable, and CAD rendering.' },
     { num: '04', title: 'Approve the details', desc: 'Sign off on yarn color swatches and loom schedule.' },
     { num: '05', title: 'Rug enters production', desc: 'Hand-knotted or hand-tufted knot-by-knot in Bhadohi.' },
-    { num: '06', title: 'Final inspection', desc: 'Meticulous river washing, sun drying, and pile shearing.' },
+    { num: '06', title: 'Final inspection', desc: 'Meticulous gentle washing, natural sun curing, and hand-pile shearing.' },
     { num: '07', title: 'International delivery', desc: 'Insured air courier dispatch directly to your doorstep.' },
   ];
 

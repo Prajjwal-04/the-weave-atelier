@@ -38,7 +38,7 @@ export const COLLECTIONS: CollectionInfo[] = [
     slug: 'heritage-reimagined',
     name: 'Heritage Reimagined',
     tagline: 'Traditional influences interpreted for contemporary spaces.',
-    description: 'Centuries of Indian weaving heritage filtered through modern restraint. Deconstructed borders, softened motifs, and antique river-washed finishes.',
+    description: 'Centuries of Indian weaving heritage filtered through modern restraint. Deconstructed borders, softened motifs, and antique artisan-washed finishes.',
     heroImage: '/images/collections/heritage-reimagined.jpg',
     curatedTechniques: ['Hand-Knotted', 'Flatweave']
   },

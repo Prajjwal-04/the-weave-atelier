@@ -584,7 +584,7 @@ export const AdminDashboardPage: React.FC = () => {
     setProdOrigin('Bhadohi, Uttar Pradesh, India');
     setProdDescription('An exquisite contemporary composition handcrafted knot-by-knot in Bhadohi. Features organic textural depths and tonal restraint.');
     setProdDesignStory('Rooted in centuries of eastern Uttar Pradesh weaving heritage, translated into modern architectural living spaces.');
-    setProdCraftNotes('Warped with long-staple cotton foundation. Paddle washed in sweet Bhadohi river waters and open sun dried.');
+    setProdCraftNotes('Warped with long-staple cotton foundation. Purified soft-water wash with natural open-air sun curing.');
     setProdCareSummary('Rotate quarterly. Vacuum without rotating beater bar. Spot clean with wool-safe mild detergent.');
     setProdFeatured(true);
     setProdBestSeller(false);
@@ -2890,7 +2890,7 @@ VITE_RAZORPAY_KEY_ID=rzp_live_...`}
                         rows={2}
                         value={prodCraftNotes}
                         onChange={(e) => setProdCraftNotes(e.target.value)}
-                        placeholder="e.g. River washed in Bhadohi, open sun dried, hand-sheared..."
+                        placeholder="e.g. Purified soft-water wash, open sun dried, hand-sheared..."
                         className="w-full px-3 py-2 bg-atelier-ivory border border-atelier-parchment text-xs text-atelier-softblack focus:outline-none focus:border-black"
                       />
                     </div>

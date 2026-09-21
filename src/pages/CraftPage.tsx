@@ -97,17 +97,17 @@ export const CraftPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Finishing Process: River Washing & Sun Drying */}
+        {/* Finishing Process: Purified Soft-Water Washing & Natural Sun Curing */}
         <div className="bg-atelier-cream border border-atelier-parchment p-8 sm:p-12 space-y-6">
           <div className="max-w-2xl space-y-2">
             <span className="text-[10px] tracking-widest text-atelier-taupe uppercase font-mono">
               The Finishing Touch
             </span>
             <h3 className="font-serif text-2xl sm:text-3xl text-atelier-softblack font-normal">
-              Fresh Water Washing & Rooftop Sun Curing
+              Purified Soft-Water Washing & Natural Sun Curing
             </h3>
             <p className="text-xs sm:text-sm text-atelier-charcoal font-light leading-relaxed">
-              Once taken off the loom, rugs are thoroughly washed using fresh local groundwater and wide wooden paddles to cleanse loose fibers and bring out the natural luster of the wool. The rugs are then laid across rooftop terraces under the Indian sun to dry naturally, allowing the fibers to lock into place before final hand-binding.
+              Once taken off the loom, rugs undergo a gentle conditioning wash using purified soft water and natural plant-based cleansers to cleanse loose fibers and bring out the rich organic luster of the virgin wool. The rugs are then laid across rooftop terraces under natural sunlight to dry naturally, allowing the fibers to lock into place before final hand-binding.
             </p>
           </div>
         </div>
