@@ -461,7 +461,7 @@ Carrier Assigned: ${order.carrier}
           <tr>
             <td align="center" style="border-top: 1px solid #EDE6DD; padding-top: 20px; font-size: 11px; color: #8A7B6E;">
               Prasri Rugs, G.T. Road, Gopiganj, Bhadohi, UP 221303, India · ${ATELIER_PRIMARY_EMAIL}<br/>
-              WhatsApp Concierge: +91 98394 18038
+              WhatsApp Concierge: Available via Direct Website Support
             </td>
           </tr>
         </table>

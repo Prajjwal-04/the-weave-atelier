@@ -47,11 +47,13 @@ export const ShippingReturnsPage: React.FC = () => {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         {/* Header */}
         <div className="border-b border-atelier-parchment pb-8 max-w-3xl">
-          <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase text-atelier-taupe font-medium mb-2">
-            Global Logistics
+          <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase font-medium mb-2 flex items-center space-x-2">
+            <span className="text-atelier-agedgold">GLOBAL TRANSIT</span>
+            <span className="text-atelier-taupe/40">·</span>
+            <span className="text-atelier-taupe">LOGISTICS & COMPLIANCE</span>
           </div>
           <h1 className="font-serif text-4xl sm:text-6xl text-atelier-softblack font-light tracking-tight">
-            International Shipping & Returns
+            International Shipping & <span className="italic font-normal text-atelier-agedgold">Returns</span>
           </h1>
           <p className="text-sm sm:text-base text-atelier-charcoal font-light mt-3 leading-relaxed">
             Every rug is dispatched directly from our Bhadohi studio in India via premium insured express air freight with door-to-door tracking.
@@ -71,8 +73,8 @@ export const ShippingReturnsPage: React.FC = () => {
 
         {/* International Transit Times Table */}
         <div className="space-y-4">
-          <h2 className="font-serif text-2xl sm:text-3xl text-atelier-softblack font-normal">
-            Destination Transit Timetables
+          <h2 className="font-serif text-2xl sm:text-3xl text-atelier-softblack font-light">
+            Destination Transit <span className="italic font-normal text-atelier-agedgold">Timetables</span>
           </h2>
           <div className="overflow-x-auto border border-atelier-parchment bg-atelier-ivory">
             <table className="w-full text-left text-xs border-collapse">
@@ -123,8 +125,8 @@ export const ShippingReturnsPage: React.FC = () => {
 
         {/* Packaging, Insurance & Damage in Transit */}
         <div className="space-y-6 pt-4">
-          <h2 className="font-serif text-2xl sm:text-3xl text-atelier-softblack font-normal">
-            Packaging & Transit Protection
+          <h2 className="font-serif text-2xl sm:text-3xl text-atelier-softblack font-light">
+            Packaging & <span className="italic font-normal text-atelier-agedgold">Transit Protection</span>
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-atelier-charcoal font-light leading-relaxed">
             <div className="p-6 bg-atelier-cream border border-atelier-parchment space-y-2">
@@ -148,8 +150,8 @@ export const ShippingReturnsPage: React.FC = () => {
             <RotateCcw size={16} className="text-atelier-gold" />
             <span>14-Day Atelier Return Policy</span>
           </div>
-          <h3 className="font-serif text-2xl text-atelier-softblack font-normal">
-            Rethink It in Your Home
+          <h3 className="font-serif text-2xl text-atelier-softblack font-light">
+            Rethink It in <span className="italic font-normal text-atelier-agedgold">Your Home</span>
           </h3>
           <p className="text-xs sm:text-sm text-atelier-charcoal font-light leading-relaxed">
             We understand that seeing a rug in your unique daylight and alongside your furniture is the ultimate test. You may initiate a return for standard catalog rugs within <strong>14 calendar days</strong> of confirmed courier delivery.

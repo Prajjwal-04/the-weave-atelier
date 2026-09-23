@@ -1,13 +1,23 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Clock } from 'lucide-react';
 import { JOURNAL_ARTICLES } from '../../data/journal';
 
 export const EditorialJournalPreview: React.FC = () => {
   const articles = JOURNAL_ARTICLES.slice(0, 3);
+  const [activeIdx, setActiveIdx] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const handleScroll = () => {
+    if (!scrollRef.current) return;
+    const { scrollLeft, clientWidth } = scrollRef.current;
+    const itemWidth = clientWidth * 0.82;
+    const index = Math.round(scrollLeft / itemWidth);
+    setActiveIdx(Math.min(articles.length - 1, Math.max(0, index)));
+  };
 
   return (
-    <section className="py-20 sm:py-28 bg-atelier-ivory border-b border-atelier-parchment/60">
+    <section className="py-20 sm:py-28 bg-atelier-ivory border-b border-atelier-parchment/60 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 sm:mb-16 space-y-4 md:space-y-0">
           <div className="space-y-2">
@@ -29,12 +39,17 @@ export const EditorialJournalPreview: React.FC = () => {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* Responsive Hybrid: Mobile Swipe Rail | Desktop 3-Column Grid */}
+        <div
+          ref={scrollRef}
+          onScroll={handleScroll}
+          className="flex md:grid md:grid-cols-3 gap-5 md:gap-8 overflow-x-auto md:overflow-visible scrollbar-none snap-x snap-mandatory -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 pb-4 md:pb-0"
+        >
           {articles.map((article) => (
             <Link
               key={article.id}
               to={`/journal/${article.slug}`}
-              className="group flex flex-col space-y-4"
+              className="flex-shrink-0 w-[82vw] sm:w-[50vw] md:w-auto snap-start group flex flex-col space-y-4 bg-atelier-cream/40 md:bg-transparent p-4 md:p-0 border md:border-0 border-atelier-parchment/70"
             >
               <div className="aspect-[16/10] overflow-hidden bg-atelier-cream border border-atelier-parchment">
                 <img
@@ -72,6 +87,18 @@ export const EditorialJournalPreview: React.FC = () => {
                 </div>
               </div>
             </Link>
+          ))}
+        </div>
+
+        {/* Mobile Swipe Pagination Dots Indicator */}
+        <div className="flex md:hidden items-center justify-center space-x-1.5 mt-6">
+          {articles.map((_, idx) => (
+            <span
+              key={idx}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                activeIdx === idx ? 'w-6 bg-atelier-softblack' : 'w-1.5 bg-atelier-parchment'
+              }`}
+            />
           ))}
         </div>
       </div>

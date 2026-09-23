@@ -69,11 +69,13 @@ export const SizeGuidePage: React.FC = () => {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto space-y-3">
-          <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase text-atelier-taupe font-medium">
-            Spatial Architecture
+          <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase font-medium flex items-center justify-center space-x-2">
+            <span className="text-atelier-agedgold">ROOM EQUILIBRIUM</span>
+            <span className="text-atelier-taupe/40">·</span>
+            <span className="text-atelier-taupe">SPATIAL ARCHITECTURE</span>
           </div>
           <h1 className="font-serif text-4xl sm:text-5xl text-atelier-softblack font-light tracking-tight">
-            Rug Size & Placement Guide
+            Rug Size & <span className="italic font-normal text-atelier-agedgold">Placement Guide</span>
           </h1>
           <p className="text-xs sm:text-sm text-atelier-charcoal font-light leading-relaxed">
             The right rug frames your room and creates equilibrium. Explore our interactive architectural placement diagrams below.
@@ -183,8 +185,8 @@ export const SizeGuidePage: React.FC = () => {
               <span className="text-[10px] tracking-widest uppercase text-atelier-taupe font-mono">
                 Architectural Recommendation
               </span>
-              <h3 className="font-serif text-2xl sm:text-3xl text-atelier-softblack font-normal">
-                {activeSize} in the {rooms.find((r) => r.id === activeRoom)?.name}
+              <h3 className="font-serif text-2xl sm:text-3xl text-atelier-softblack font-light">
+                {activeSize} in the <span className="italic font-normal text-atelier-agedgold">{rooms.find((r) => r.id === activeRoom)?.name}</span>
               </h3>
             </div>
 

@@ -88,8 +88,8 @@ export const JournalPage: React.FC = () => {
 
           {/* More Articles */}
           <div className="pt-16 border-t border-atelier-parchment space-y-8">
-            <h3 className="font-serif text-2xl text-atelier-softblack">
-              Further Notes from the Atelier
+            <h3 className="font-serif text-2xl text-atelier-softblack font-light">
+              Further Notes from the <span className="italic font-normal text-atelier-agedgold">Atelier</span>
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {otherArticles.map((other) => (
@@ -125,11 +125,13 @@ export const JournalPage: React.FC = () => {
     <div className="pt-20 sm:pt-24 pb-24 bg-atelier-ivory min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         <div className="border-b border-atelier-parchment pb-8 max-w-3xl">
-          <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase text-atelier-taupe font-medium mb-2">
-            Prasri Rugs Magazine & Knowledge
+          <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase font-medium mb-2 flex items-center space-x-2">
+            <span className="text-atelier-agedgold">SLOW ESSAYS</span>
+            <span className="text-atelier-taupe/40">·</span>
+            <span className="text-atelier-taupe">MAGAZINE & KNOWLEDGE</span>
           </div>
           <h1 className="font-serif text-4xl sm:text-6xl text-atelier-softblack font-light tracking-tight">
-            The Journal & Inquiries
+            The Journal & <span className="italic font-normal text-atelier-agedgold">Inquiries</span>
           </h1>
           <p className="text-sm sm:text-base text-atelier-charcoal font-light mt-3 leading-relaxed">
             Essays on Indian carpet heritage, natural living fibers, sizing principles, and answers to common atelier questions.
@@ -247,8 +249,8 @@ export const JournalPage: React.FC = () => {
             {/* Inquiries / FAQ Prompt Banner */}
             <div className="p-8 sm:p-10 bg-atelier-cream/60 border border-atelier-parchment flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
               <div className="space-y-1 max-w-xl">
-                <h3 className="font-serif text-xl text-atelier-softblack font-normal">
-                  Questions about wool shedding, sizing, or loom commissions?
+                <h3 className="font-serif text-xl text-atelier-softblack font-light">
+                  Questions about wool shedding, sizing, or <span className="italic font-normal text-atelier-agedgold">loom commissions?</span>
                 </h3>
                 <p className="text-xs text-atelier-charcoal/80 font-light leading-relaxed">
                   Browse our curated Atelier FAQ for answers directly from our weaving masters and studio experts.

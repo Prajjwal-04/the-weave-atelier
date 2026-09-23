@@ -438,7 +438,14 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
               G.T. Road, Gopiganj, Bhadohi, Uttar Pradesh 221303, India
             </div>
             <div className="text-xs text-atelier-taupe mt-1">
-              WhatsApp Concierge: +91 98394 18038
+              <a
+                href="https://wa.me/919839418038?text=Hello%2C%20I%20am%20inquiring%20about%20a%20handcrafted%20rug%20from%20Prasri%20Rugs"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-atelier-softblack transition-colors"
+              >
+                WhatsApp Concierge: Direct Studio Chat
+              </a>
             </div>
           </div>
         </div>

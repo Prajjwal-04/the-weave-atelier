@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { Sparkles, Shield, Feather, Wind } from 'lucide-react';
 
 export const MaterialsSection: React.FC = () => {
+  const [activeIdx, setActiveIdx] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
   const materials = [
     {
       title: 'Blended & Pure Virgin Wool',
@@ -33,10 +36,18 @@ export const MaterialsSection: React.FC = () => {
     },
   ];
 
+  const handleScroll = () => {
+    if (!scrollRef.current) return;
+    const { scrollLeft, clientWidth } = scrollRef.current;
+    const itemWidth = clientWidth * 0.82;
+    const index = Math.round(scrollLeft / itemWidth);
+    setActiveIdx(Math.min(materials.length - 1, Math.max(0, index)));
+  };
+
   return (
-    <section className="py-20 sm:py-28 bg-atelier-cream/30 border-b border-atelier-parchment/60">
+    <section className="py-20 sm:py-28 bg-atelier-cream/30 border-b border-atelier-parchment/60 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mb-14 space-y-3">
+        <div className="max-w-3xl mb-12 sm:mb-14 space-y-3">
           <span className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase font-medium flex items-center space-x-2">
             <span className="text-atelier-agedgold">AUTHENTIC FIBERS</span>
             <span className="text-atelier-taupe/40">·</span>
@@ -50,11 +61,16 @@ export const MaterialsSection: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Responsive Hybrid: Mobile Swipe Rail | Desktop 4-Column Grid */}
+        <div
+          ref={scrollRef}
+          onScroll={handleScroll}
+          className="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6 overflow-x-auto md:overflow-visible scrollbar-none snap-x snap-mandatory -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 pb-4 md:pb-0"
+        >
           {materials.map((m) => (
             <div
               key={m.title}
-              className="bg-atelier-ivory border border-atelier-parchment p-6 sm:p-7 flex flex-col justify-between space-y-4 hover:border-atelier-taupe transition-colors"
+              className="flex-shrink-0 w-[82vw] sm:w-[50vw] md:w-auto snap-start bg-atelier-ivory border border-atelier-parchment p-6 sm:p-7 flex flex-col justify-between space-y-4 hover:border-atelier-taupe transition-colors"
             >
               <div className="space-y-2">
                 <span className="inline-block text-[9px] tracking-wider uppercase text-atelier-darkbrown bg-atelier-parchment/80 px-2 py-0.5 font-medium">
@@ -75,6 +91,18 @@ export const MaterialsSection: React.FC = () => {
                 {m.composition}
               </div>
             </div>
+          ))}
+        </div>
+
+        {/* Mobile Swipe Pagination Dots Indicator */}
+        <div className="flex md:hidden items-center justify-center space-x-1.5 mt-6">
+          {materials.map((_, idx) => (
+            <span
+              key={idx}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                activeIdx === idx ? 'w-6 bg-atelier-softblack' : 'w-1.5 bg-atelier-parchment'
+              }`}
+            />
           ))}
         </div>
       </div>

@@ -49,8 +49,6 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
     'Hand-Knotted',
     'Quiet Neutrals',
     'Blended Wool',
-    'Terralis',
-    'Arbor Flow',
     'Flatweave',
   ];
 
@@ -156,7 +154,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-xs text-atelier-taupe font-mono">
+                        <div className="font-sans text-xs sm:text-sm text-atelier-softblack font-medium">
                           From {formatPrice(startingPrice)}
                         </div>
                         <span

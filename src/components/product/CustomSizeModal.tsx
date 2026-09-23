@@ -67,7 +67,7 @@ export const CustomSizeModal: React.FC<CustomSizeModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const ref = `TWA-CUS-${Math.floor(1000 + Math.random() * 9000)}`;
+    const ref = `PR-CUS-${Math.floor(1000 + Math.random() * 9000)}`;
     setReferenceCode(ref);
 
     const quoteData: CustomQuoteRequest = {

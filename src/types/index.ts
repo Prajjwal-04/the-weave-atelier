@@ -144,7 +144,7 @@ export interface OrderTimelineEvent {
 
 export interface Order {
   id: string;
-  orderNumber: string; // e.g. "TWA-2026-8491"
+  orderNumber: string; // e.g. "PR-2026-8491"
   date: string;
   customer: {
     firstName: string;

@@ -51,11 +51,13 @@ export const RugCarePage: React.FC = () => {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         {/* Header */}
         <div className="border-b border-atelier-parchment pb-8 max-w-3xl">
-          <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase text-atelier-taupe font-medium mb-2">
-            Preservation & Stewardship
+          <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase font-medium mb-2 flex items-center space-x-2">
+            <span className="text-atelier-agedgold">STEWARDSHIP</span>
+            <span className="text-atelier-taupe/40">·</span>
+            <span className="text-atelier-taupe">PRESERVATION & LONGEVITY</span>
           </div>
           <h1 className="font-serif text-4xl sm:text-6xl text-atelier-softblack font-light tracking-tight">
-            Rug Care & Maintenance
+            Rug Care & <span className="italic font-normal text-atelier-agedgold">Maintenance</span>
           </h1>
           <p className="text-sm sm:text-base text-atelier-charcoal font-light mt-3 leading-relaxed">
             A handmade wool rug is a living textile. With simple, considerate stewardship, your piece will soften, develop a subtle patina, and endure for decades.
@@ -64,8 +66,8 @@ export const RugCarePage: React.FC = () => {
 
         {/* Natural Variation Callout */}
         <div className="p-8 bg-atelier-cream border border-atelier-parchment space-y-3">
-          <h3 className="font-serif text-2xl text-atelier-softblack font-normal">
-            The Character of the Human Hand
+          <h3 className="font-serif text-2xl text-atelier-softblack font-light">
+            The Character of the <span className="italic font-normal text-atelier-agedgold">Human Hand</span>
           </h3>
           <p className="text-xs sm:text-sm text-atelier-charcoal font-light leading-relaxed">
             Unlike machine-loomed factory carpets, handmade rugs carry subtle, beautiful nuances. Minor shifts in yarn dye absorption (abrash), subtle line variations, and slight dimensional tolerance (±1–2 inches) are the hallmark of authentic Indian craftsmanship. They verify that your piece was shaped knot by knot and tuft by tuft by master weavers in Bhadohi.
@@ -99,8 +101,8 @@ export const RugCarePage: React.FC = () => {
 
         {/* Contact Concierge Assistance */}
         <div className="text-center pt-8 border-t border-atelier-parchment space-y-4">
-          <h3 className="font-serif text-2xl text-atelier-softblack">
-            Have a Specific Care Question?
+          <h3 className="font-serif text-2xl text-atelier-softblack font-light">
+            Have a Specific <span className="italic font-normal text-atelier-agedgold">Care Question?</span>
           </h3>
           <p className="text-xs text-atelier-charcoal max-w-md mx-auto font-light">
             Our Bhadohi studio team is available to advise on spot cleaning, pad recommendations, and certified professional washes.

@@ -56,15 +56,15 @@ export const SizeSelector: React.FC<SizeSelectorProps> = ({
               <div className="text-[10px] text-atelier-taupe truncate">
                 {variant.size.split('(')[1]?.replace(')', '') || ''}
               </div>
-              <div className="mt-1 flex items-center justify-between text-[11px]">
-                <span className="font-mono text-atelier-charcoal font-medium">
+              <div className="mt-1.5 flex items-baseline justify-between">
+                <span className="font-sans text-xs sm:text-sm text-atelier-softblack font-medium">
                   {formatPrice(variant.priceUSD)}
                 </span>
                 {variant.inventory === 1 && (
-                  <span className="text-[9px] text-amber-800 font-medium">1 left</span>
+                  <span className="text-[10px] text-amber-900 font-medium bg-amber-50 px-1.5 py-0.5 rounded-sm">1 left</span>
                 )}
                 {variant.inventory === 0 && (
-                  <span className="text-[9px] text-atelier-taupe">Made to order</span>
+                  <span className="text-[10px] text-atelier-taupe font-normal">Made to order</span>
                 )}
               </div>
             </button>

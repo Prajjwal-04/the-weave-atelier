@@ -46,7 +46,7 @@ export const CustomRugsPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const ref = `TWA-CUS-${Math.floor(1000 + Math.random() * 9000)}`;
+    const ref = `PR-CUS-${Math.floor(1000 + Math.random() * 9000)}`;
     setReferenceCode(ref);
 
     const quoteData: CustomQuoteRequest = {
@@ -99,11 +99,13 @@ export const CustomRugsPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Hero Banner */}
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-          <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase text-atelier-taupe font-medium">
-            Bespoke Atelier Service
+          <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase font-medium flex items-center justify-center space-x-2">
+            <span className="text-atelier-agedgold">ARCHITECTURAL BESPOKE</span>
+            <span className="text-atelier-taupe/40">·</span>
+            <span className="text-atelier-taupe">CUSTOM RUG SERVICE</span>
           </div>
           <h1 className="font-serif text-4xl sm:text-6xl text-atelier-softblack font-light tracking-tight">
-            Made for your space.
+            Made for <span className="italic font-normal text-atelier-agedgold">your space</span>.
           </h1>
           <p className="text-sm sm:text-base text-atelier-charcoal font-light leading-relaxed">
             When standard dimensions cannot frame your room, we build one-of-a-kind rugs to your exact architectural specifications. Direct from the looms of Bhadohi, India.
@@ -113,11 +115,13 @@ export const CustomRugsPage: React.FC = () => {
         {/* 7-Step Process Diagram */}
         <div className="mb-20 bg-atelier-cream border border-atelier-parchment p-8 sm:p-12">
           <div className="text-center max-w-xl mx-auto mb-12 space-y-2">
-            <span className="text-[10px] tracking-widest uppercase text-atelier-taupe font-mono">
-              The Atelier Process
-            </span>
-            <h2 className="font-serif text-2xl sm:text-3xl text-atelier-softblack font-normal">
-              From Inquiry to Floor in Seven Steps
+            <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase font-medium flex items-center justify-center space-x-2">
+              <span className="text-atelier-agedgold">THE ATELIER PROTOCOL</span>
+              <span className="text-atelier-taupe/40">·</span>
+              <span className="text-atelier-taupe">SEVEN STAGES</span>
+            </div>
+            <h2 className="font-serif text-2xl sm:text-3xl text-atelier-softblack font-light">
+              From Inquiry to Floor in <span className="italic font-normal text-atelier-agedgold">Seven Steps</span>
             </h2>
           </div>
 
@@ -145,8 +149,8 @@ export const CustomRugsPage: React.FC = () => {
               <div className="w-16 h-16 mx-auto bg-emerald-100 text-emerald-800 rounded-full flex items-center justify-center">
                 <Check size={32} />
               </div>
-              <h2 className="font-serif text-3xl text-atelier-softblack font-normal">
-                Bespoke Inquiry Dispatched
+              <h2 className="font-serif text-3xl text-atelier-softblack font-light">
+                Bespoke Inquiry <span className="italic font-normal text-atelier-agedgold">Dispatched</span>
               </h2>
               <div className="inline-flex items-center space-x-2 bg-atelier-ivory px-5 py-2.5 border border-atelier-parchment font-mono text-xs sm:text-sm text-atelier-softblack font-medium">
                 <span>Inquiry Reference:</span>
@@ -180,8 +184,13 @@ export const CustomRugsPage: React.FC = () => {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-8">
               <div className="border-b border-atelier-parchment pb-4">
-                <h2 className="font-serif text-2xl sm:text-3xl text-atelier-softblack font-normal">
-                  Configure Your Bespoke Rug
+                <div className="text-[10px] tracking-[0.25em] uppercase font-medium flex items-center space-x-2 mb-1">
+                  <span className="text-atelier-agedgold">BESPOKE STUDIO</span>
+                  <span className="text-atelier-taupe/40">·</span>
+                  <span className="text-atelier-taupe">INTERACTIVE CALCULATOR</span>
+                </div>
+                <h2 className="font-serif text-2xl sm:text-3xl text-atelier-softblack font-light">
+                  Configure Your <span className="italic font-normal text-atelier-agedgold">Bespoke Rug</span>
                 </h2>
                 <p className="text-xs text-atelier-charcoal font-light mt-1">
                   Adjust dimensions, construction, and materials to preview preliminary atelier pricing.

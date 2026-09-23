@@ -41,11 +41,13 @@ export const ContactPage: React.FC = () => {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         {/* Header */}
         <div className="border-b border-atelier-parchment pb-8 max-w-3xl">
-          <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase text-atelier-taupe font-medium mb-2">
-            Direct Atelier Correspondence
+          <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase font-medium mb-2 flex items-center space-x-2">
+            <span className="text-atelier-agedgold">CORRESPONDENCE</span>
+            <span className="text-atelier-taupe/40">·</span>
+            <span className="text-atelier-taupe">DIRECT ATELIER CONCIERGE</span>
           </div>
           <h1 className="font-serif text-4xl sm:text-6xl text-atelier-softblack font-light tracking-tight">
-            Contact & Studio
+            Contact & <span className="italic font-normal text-atelier-agedgold">Studio</span>
           </h1>
           <p className="text-sm sm:text-base text-atelier-charcoal font-light mt-3 leading-relaxed">
             Whether inquiring about custom rug dimensions, tracking an international dispatch, or consulting on yarn selections, our Bhadohi studio is at your service.
@@ -56,8 +58,8 @@ export const ContactPage: React.FC = () => {
           {/* Left Column: Coordinates & Direct WhatsApp */}
           <div className="lg:col-span-5 space-y-8">
             <div className="bg-atelier-cream border border-atelier-parchment p-8 space-y-6">
-              <h2 className="font-serif text-2xl text-atelier-softblack font-normal">
-                Bhadohi Studio Coordinates
+              <h2 className="font-serif text-2xl text-atelier-softblack font-light">
+                Bhadohi Studio <span className="italic font-normal text-atelier-agedgold">Coordinates</span>
               </h2>
 
               <div className="space-y-4 text-xs text-atelier-charcoal font-light">
@@ -88,7 +90,14 @@ export const ContactPage: React.FC = () => {
                   <MessageCircle size={16} className="text-atelier-agedgold flex-shrink-0 mt-0.5" />
                   <div>
                     <strong className="font-medium text-atelier-softblack block">WhatsApp Concierge</strong>
-                    <span>+91 98394 18038 (Direct studio messaging)</span>
+                    <a
+                      href="https://wa.me/919839418038?text=Hello%20Prasri%20Rugs%2C%20I%20have%20an%20inquiry%20regarding%20your%20handmade%20rugs."
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-atelier-softblack hover:text-atelier-darkbrown underline font-medium transition-colors"
+                    >
+                      Direct Studio Messaging (Chat via WhatsApp)
+                    </a>
                   </div>
                 </div>
 
@@ -144,8 +153,8 @@ export const ContactPage: React.FC = () => {
                 <div className="w-14 h-14 mx-auto bg-emerald-100 text-emerald-800 rounded-full flex items-center justify-center">
                   <Check size={28} />
                 </div>
-                <h3 className="font-serif text-2xl sm:text-3xl text-atelier-softblack font-normal">
-                  Message Transmitted
+                <h3 className="font-serif text-2xl sm:text-3xl text-atelier-softblack font-light">
+                  Message <span className="italic font-normal text-atelier-agedgold">Transmitted</span>
                 </h3>
                 <div className="inline-block bg-atelier-cream border border-atelier-parchment px-4 py-2 font-mono text-xs text-atelier-softblack">
                   Delivered to: <span className="font-semibold text-atelier-darkbrown">{ATELIER_PRIMARY_EMAIL}</span>
@@ -186,8 +195,8 @@ export const ContactPage: React.FC = () => {
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <h2 className="font-serif text-2xl text-atelier-softblack font-normal">
-                    Send a Message to the Atelier
+                  <h2 className="font-serif text-2xl text-atelier-softblack font-light">
+                    Send a Message to the <span className="italic font-normal text-atelier-agedgold">Atelier</span>
                   </h2>
                   <p className="text-xs text-atelier-charcoal font-light mt-1">
                     Direct communication with the artisans and studio directors at{' '}

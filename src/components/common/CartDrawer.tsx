@@ -195,11 +195,11 @@ export const CartDrawer: React.FC = () => {
                       </div>
 
                       <div className="text-right">
-                        <div className="text-xs font-medium text-atelier-softblack font-mono">
+                        <div className="font-sans text-xs sm:text-sm text-atelier-softblack font-medium">
                           {formatPrice(item.priceUSD * item.quantity)}
                         </div>
                         {item.quantity > 1 && (
-                          <div className="text-[10px] text-atelier-taupe font-mono">
+                          <div className="text-[10px] text-atelier-taupe font-sans font-normal">
                             {formatPrice(item.priceUSD)} each
                           </div>
                         )}
@@ -258,9 +258,9 @@ export const CartDrawer: React.FC = () => {
                   <span>Duties & Local Taxes</span>
                   <span>Calculated at checkout</span>
                 </div>
-                <div className="border-t border-atelier-parchment pt-2 flex justify-between font-medium text-sm text-atelier-softblack">
+                <div className="border-t border-atelier-parchment pt-2 flex justify-between items-baseline font-medium text-sm text-atelier-softblack">
                   <span>Estimated Total</span>
-                  <span className="font-mono text-base">{formatPrice(totalUSD)}</span>
+                  <span className="font-sans text-base font-medium text-atelier-softblack">{formatPrice(totalUSD)}</span>
                 </div>
               </div>
 

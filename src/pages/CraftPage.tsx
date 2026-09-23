@@ -8,11 +8,13 @@ export const CraftPage: React.FC = () => {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-20">
         {/* Header */}
         <div className="space-y-4 max-w-3xl">
-          <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase text-atelier-taupe font-medium">
-            Loom & Technique
+          <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase font-medium flex items-center space-x-2">
+            <span className="text-atelier-agedgold">SLOW DISCIPLINE</span>
+            <span className="text-atelier-taupe/40">·</span>
+            <span className="text-atelier-taupe">LOOM & TECHNIQUE</span>
           </div>
           <h1 className="font-serif text-4xl sm:text-6xl text-atelier-softblack font-light tracking-tight leading-tight">
-            The Craft of the Loom
+            The Craft of the <span className="italic font-normal text-atelier-agedgold">Loom</span>
           </h1>
           <p className="text-sm sm:text-base text-atelier-charcoal font-light leading-relaxed">
             In an era of industrial speed, we honor the deliberate pace of handmade carpet weaving. Discover how our artisans in Bhadohi transform raw fleece into enduring architectural foundations.
@@ -26,8 +28,8 @@ export const CraftPage: React.FC = () => {
               <span className="font-mono text-xs text-atelier-agedgold uppercase tracking-widest">
                 Technique 01 · Generational Heritage
               </span>
-              <h2 className="font-serif text-3xl sm:text-4xl text-atelier-softblack font-normal">
-                Hand-Knotting
+              <h2 className="font-serif text-3xl sm:text-4xl text-atelier-softblack font-light">
+                Hand-<span className="italic font-normal text-atelier-agedgold">Knotting</span>
               </h2>
               <p className="text-xs sm:text-sm text-atelier-charcoal font-light leading-relaxed">
                 Hand-knotting is the most ancient and durable form of carpet construction. Master weavers work on an upright timber loom, tying individual knots of yarn around vertical cotton warp strands. Each row of knots is secured by inserting a horizontal weft thread and beating it down firmly with a heavy iron comb.
@@ -73,8 +75,8 @@ export const CraftPage: React.FC = () => {
               <span className="font-mono text-xs text-atelier-agedgold uppercase tracking-widest">
                 Technique 02 · Modern Textural Relief
               </span>
-              <h2 className="font-serif text-3xl sm:text-4xl text-atelier-softblack font-normal">
-                Hand-Tufting & Carving
+              <h2 className="font-serif text-3xl sm:text-4xl text-atelier-softblack font-light">
+                Hand-Tufting & <span className="italic font-normal text-atelier-agedgold">Carving</span>
               </h2>
               <p className="text-xs sm:text-sm text-atelier-charcoal font-light leading-relaxed">
                 Hand-tufting brings modern sculptural possibilities to life. The rug pattern is stenciled onto a primary cotton canvas stretched tightly on a vertical frame. Using a hand-operated tufting gun, artisans shoot blended wool strands through the canvas. The reverse is sealed with natural latex and a protective secondary cotton backing.
@@ -100,11 +102,13 @@ export const CraftPage: React.FC = () => {
         {/* Finishing Process: Purified Soft-Water Washing & Natural Sun Curing */}
         <div className="bg-atelier-cream border border-atelier-parchment p-8 sm:p-12 space-y-6">
           <div className="max-w-2xl space-y-2">
-            <span className="text-[10px] tracking-widest text-atelier-taupe uppercase font-mono">
-              The Finishing Touch
-            </span>
-            <h3 className="font-serif text-2xl sm:text-3xl text-atelier-softblack font-normal">
-              Purified Soft-Water Washing & Natural Sun Curing
+            <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase font-medium flex items-center space-x-2">
+              <span className="text-atelier-agedgold">THE FINISHING TOUCH</span>
+              <span className="text-atelier-taupe/40">·</span>
+              <span className="text-atelier-taupe">POST-LOOM REFINEMENT</span>
+            </div>
+            <h3 className="font-serif text-2xl sm:text-3xl text-atelier-softblack font-light">
+              Purified Soft-Water Washing & <span className="italic font-normal text-atelier-agedgold">Natural Sun Curing</span>
             </h3>
             <p className="text-xs sm:text-sm text-atelier-charcoal font-light leading-relaxed">
               Once taken off the loom, rugs undergo a gentle conditioning wash using purified soft water and natural plant-based cleansers to cleanse loose fibers and bring out the rich organic luster of the virgin wool. The rugs are then laid across rooftop terraces under natural sunlight to dry naturally, allowing the fibers to lock into place before final hand-binding.
@@ -114,8 +118,8 @@ export const CraftPage: React.FC = () => {
 
         {/* Call to action */}
         <div className="text-center pt-8 border-t border-atelier-parchment space-y-4">
-          <h3 className="font-serif text-2xl text-atelier-softblack">
-            Explore Handcrafted Rugs
+          <h3 className="font-serif text-2xl text-atelier-softblack font-light">
+            Explore Handcrafted <span className="italic font-normal text-atelier-agedgold">Rugs</span>
           </h3>
           <p className="text-xs text-atelier-charcoal max-w-sm mx-auto font-light">
             Discover our active catalog of ready-to-ship pieces and custom bespoke designs.

@@ -8,11 +8,13 @@ export const AboutPage: React.FC = () => {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         {/* Header */}
         <div className="space-y-4 max-w-3xl">
-          <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase text-atelier-taupe font-medium">
-            About Prasri Rugs
+          <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase font-medium flex items-center space-x-2">
+            <span className="text-atelier-agedgold">OUR IDENTITY</span>
+            <span className="text-atelier-taupe/40">·</span>
+            <span className="text-atelier-taupe">ABOUT PRASRI RUGS</span>
           </div>
           <h1 className="font-serif text-4xl sm:text-6xl text-atelier-softblack font-light tracking-tight leading-tight">
-            An independent rug atelier rooted in Bhadohi.
+            An independent rug atelier rooted in <span className="italic font-normal text-atelier-agedgold">Bhadohi</span>.
           </h1>
           <p className="text-sm sm:text-base text-atelier-charcoal font-light leading-relaxed">
             We started with a simple belief: that handmade rugs should be designed thoughtfully for contemporary spaces, without losing their human soul.
@@ -34,8 +36,8 @@ export const AboutPage: React.FC = () => {
             <span className="font-mono text-xs uppercase tracking-widest text-atelier-taupe">
               Our Foundations
             </span>
-            <div className="font-serif text-2xl text-atelier-softblack">
-              Craft + Material + Design + Longevity
+            <div className="font-serif text-2xl text-atelier-softblack font-light">
+              Craft + <span className="italic font-normal text-atelier-agedgold">Material</span> + Design + <span className="italic font-normal text-atelier-agedgold">Longevity</span>
             </div>
           </div>
 
@@ -54,8 +56,10 @@ export const AboutPage: React.FC = () => {
 
         {/* Founder's Reflection */}
         <div className="p-8 sm:p-12 bg-atelier-cream border border-atelier-parchment space-y-4">
-          <div className="text-[10px] tracking-widest uppercase text-atelier-taupe font-mono">
-            Founder & Master Weavers' Note
+          <div className="text-[10px] tracking-widest uppercase font-medium flex items-center space-x-2">
+            <span className="text-atelier-agedgold">DIRECT REFLECTION</span>
+            <span className="text-atelier-taupe/40">·</span>
+            <span className="text-atelier-taupe">FOUNDER & MASTER WEAVERS' NOTE</span>
           </div>
           <p className="font-serif text-lg sm:text-2xl text-atelier-softblack font-light leading-relaxed italic">
             “When someone discovers us from thousands of miles away and trusts us to make a rug for their home, we take that responsibility seriously. We are not trying to be the biggest company—we are trying to make beautiful rugs, thoughtfully.”
@@ -67,8 +71,8 @@ export const AboutPage: React.FC = () => {
 
         {/* Call to Action */}
         <div className="text-center pt-8 border-t border-atelier-parchment space-y-4">
-          <h3 className="font-serif text-2xl text-atelier-softblack">
-            Discover Our Work
+          <h3 className="font-serif text-2xl text-atelier-softblack font-light">
+            Discover Our <span className="italic font-normal text-atelier-agedgold">Work</span>
           </h3>
           <div className="flex justify-center space-x-4 pt-2">
             <Link

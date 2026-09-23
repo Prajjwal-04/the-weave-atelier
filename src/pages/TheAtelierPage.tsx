@@ -8,11 +8,13 @@ export const TheAtelierPage: React.FC = () => {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-20">
         {/* Header */}
         <div className="space-y-4 max-w-3xl">
-          <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase text-atelier-taupe font-medium">
-            Origin & Philosophy
+          <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase font-medium flex items-center space-x-2">
+            <span className="text-atelier-agedgold">ORIGIN & PHILOSOPHY</span>
+            <span className="text-atelier-taupe/40">·</span>
+            <span className="text-atelier-taupe">THE BHADOHI ATELIER</span>
           </div>
           <h1 className="font-serif text-4xl sm:text-6xl text-atelier-softblack font-light tracking-tight leading-tight">
-            Rooted in Bhadohi. Crafted for contemporary spaces.
+            Rooted in Bhadohi. <span className="italic font-normal text-atelier-agedgold">Crafted for contemporary spaces.</span>
           </h1>
           <p className="text-sm sm:text-base text-atelier-charcoal font-light leading-relaxed">
             Prasri Rugs was created around a simple conviction: that traditional Indian craftsmanship and modern interior design do not belong in separate worlds.
@@ -34,8 +36,8 @@ export const TheAtelierPage: React.FC = () => {
             <span className="font-mono text-xs uppercase tracking-widest text-atelier-taupe">
               The Four Principles
             </span>
-            <div className="font-serif text-2xl text-atelier-softblack font-normal">
-              Craft · Material · Design · Longevity
+            <div className="font-serif text-2xl text-atelier-softblack font-light">
+              Craft · <span className="italic font-normal text-atelier-agedgold">Material</span> · Design · <span className="italic font-normal text-atelier-agedgold">Longevity</span>
             </div>
           </div>
 
@@ -54,9 +56,11 @@ export const TheAtelierPage: React.FC = () => {
 
         {/* Founder / Atelier Note (Personal & Grounded) */}
         <div className="p-8 sm:p-12 bg-atelier-cream border border-atelier-parchment space-y-6">
-          <div className="flex items-center space-x-2 text-[10px] tracking-widest uppercase text-atelier-taupe font-medium">
+          <div className="flex items-center space-x-2 text-[10px] tracking-widest uppercase font-medium">
             <MapPin size={12} className="text-atelier-agedgold" />
-            <span>A Note from the Atelier Studio</span>
+            <span className="text-atelier-agedgold">NOTE FROM ATELIER</span>
+            <span className="text-atelier-taupe/40">·</span>
+            <span className="text-atelier-taupe">BHADOHI STUDIO</span>
           </div>
 
           <blockquote className="font-serif italic text-lg sm:text-2xl text-atelier-softblack font-light leading-relaxed">
@@ -70,8 +74,8 @@ export const TheAtelierPage: React.FC = () => {
 
         {/* Call to action */}
         <div className="text-center space-y-4 pt-8 border-t border-atelier-parchment">
-          <h3 className="font-serif text-2xl text-atelier-softblack">
-            Experience Our Collections
+          <h3 className="font-serif text-2xl text-atelier-softblack font-light">
+            Experience Our <span className="italic font-normal text-atelier-agedgold">Collections</span>
           </h3>
           <p className="text-xs text-atelier-charcoal max-w-md mx-auto font-light">
             Explore ready-to-ship designs or speak with our Bhadohi studio about crafting a custom rug for your home.

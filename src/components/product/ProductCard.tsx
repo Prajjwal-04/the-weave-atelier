@@ -119,27 +119,34 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       </div>
 
       {/* Card Info */}
-      <div className="pt-4 pb-2 space-y-1.5">
-        <div className="flex items-center justify-between text-[11px] text-atelier-taupe tracking-wider uppercase">
-          <span>{product.technique}</span>
-          <span className="font-mono text-atelier-charcoal font-medium">
-            From {formatPrice(startingPrice)}
+      <div className="pt-4 pb-2 space-y-2">
+        {/* Eyebrow: Technique & Material */}
+        <div className="flex items-center space-x-2 text-[11px] tracking-wider uppercase font-medium">
+          <span className="text-atelier-agedgold">{product.technique}</span>
+          <span className="text-atelier-taupe/40">·</span>
+          <span className="text-atelier-taupe truncate max-w-[170px] font-normal">
+            {product.material.split('&')[0]}
           </span>
         </div>
 
-        <h3 className="font-serif text-lg text-atelier-softblack font-normal tracking-wide group-hover:text-atelier-darkbrown transition-colors">
+        {/* Product Title */}
+        <h3 className="font-serif text-lg sm:text-xl text-atelier-softblack font-light tracking-wide group-hover:text-atelier-darkbrown transition-colors leading-snug">
           <Link to={`/product/${product.slug}`}>
             {product.name}
           </Link>
         </h3>
 
-        <div className="flex items-center justify-between text-xs text-atelier-charcoal/70 font-light">
-          <span className="truncate">{product.material}</span>
-          {product.pileHeight && (
-            <span className="text-[10px] text-atelier-taupe tracking-wider uppercase flex-shrink-0 ml-2 border border-atelier-parchment px-1.5 py-0.5 rounded-sm bg-atelier-ivory/70">
-              {product.pileHeight}
+        {/* Price & Dimension Footnote */}
+        <div className="flex items-baseline justify-between pt-1.5 border-t border-atelier-parchment/60">
+          <div className="flex items-baseline space-x-1.5">
+            <span className="text-[11px] uppercase tracking-wider text-atelier-taupe font-normal">From</span>
+            <span className="font-sans text-sm sm:text-base text-atelier-softblack font-medium tracking-normal">
+              {formatPrice(startingPrice)}
             </span>
-          )}
+          </div>
+          <span className="text-[11px] font-sans text-atelier-taupe font-normal">
+            {product.variants[0]?.dimensionsFt || product.variants[0]?.size || "8' × 10'"}
+          </span>
         </div>
 
         {/* Subtle bottom info with size count & view link */}
@@ -149,7 +156,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </span>
           <Link
             to={`/product/${product.slug}`}
-            className="text-atelier-charcoal/80 hover:text-atelier-softblack transition-colors inline-flex items-center group/cta"
+            className="text-atelier-charcoal/80 hover:text-atelier-softblack transition-colors inline-flex items-center group/cta font-medium"
           >
             <span>Explore</span>
             <span className="inline-block transition-transform duration-200 group-hover/cta:translate-x-1 ml-1 font-sans">

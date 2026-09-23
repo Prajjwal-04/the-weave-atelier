@@ -47,7 +47,7 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
         id: `var-${product?.slug || 'rug'}-1`,
         size: '8 x 10 ft (240 x 300 cm)',
         dimensionsFt: '8 x 10 ft',
-        sku: `TWA-${(product?.slug || 'RUG').replace(/[^a-zA-Z0-9]/g, '').slice(0, 4).toUpperCase() || 'RUG'}-0810`,
+        sku: `PR-${(product?.slug || 'RUG').replace(/[^a-zA-Z0-9]/g, '').slice(0, 4).toUpperCase() || 'RUG'}-0810`,
         priceUSD: 1850,
         inventory: 1,
         isReadyToShip: true,
@@ -165,7 +165,7 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
               <h2 className="font-serif text-2xl text-atelier-softblack font-medium">
                 {product.name}
               </h2>
-              <div className="font-serif text-xl text-atelier-darkbrown mt-1">
+              <div className="font-sans text-xl sm:text-2xl text-atelier-softblack font-medium mt-1.5 tracking-normal">
                 {formatPrice(activeVariant.priceUSD)}
               </div>
             </div>

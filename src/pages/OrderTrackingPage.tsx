@@ -76,11 +76,13 @@ export const OrderTrackingPage: React.FC = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         {/* Header */}
         <div className="border-b border-atelier-parchment pb-8 max-w-3xl">
-          <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase text-atelier-taupe font-medium mb-2">
-            Real-Time Atelier Tracking
+          <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase font-medium mb-2 flex items-center space-x-2">
+            <span className="text-atelier-agedgold">REAL-TIME LOGISTICS</span>
+            <span className="text-atelier-taupe/40">·</span>
+            <span className="text-atelier-taupe">ATELIER TRACKING</span>
           </div>
           <h1 className="font-serif text-4xl sm:text-5xl text-atelier-softblack font-light tracking-tight">
-            Order & Production Tracking
+            Order & <span className="italic font-normal text-atelier-agedgold">Production Tracking</span>
           </h1>
           <p className="text-xs sm:text-sm text-atelier-charcoal font-light mt-2 leading-relaxed">
             Monitor every phase of your piece from yarn dyeing and hand-weaving in Bhadohi to international express air courier delivery.
@@ -98,7 +100,7 @@ export const OrderTrackingPage: React.FC = () => {
                 <input
                   type="text"
                   required
-                  placeholder="Order Number (e.g. TWA-2026-8491)"
+                  placeholder="Order Number (e.g. PR-2026-8491)"
                   value={inputOrderNumber}
                   onChange={(e) => setInputOrderNumber(e.target.value)}
                   className="w-full bg-atelier-ivory border border-atelier-parchment px-4 py-2.5 text-xs font-mono text-atelier-softblack focus:outline-none"

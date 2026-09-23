@@ -86,11 +86,13 @@ export const AtelierFaqSection: React.FC<{ className?: string; hideHeader?: bool
         {/* Editorial Section Header */}
         {!hideHeader && (
           <div className="text-center space-y-3 mb-12 sm:mb-16">
-            <span className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase text-atelier-taupe font-medium block">
-              Atelier Knowledge & Inquiries
-            </span>
-            <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-atelier-softblack font-normal tracking-tight">
-              Frequently Asked Questions
+            <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase font-medium flex items-center justify-center space-x-2">
+              <span className="text-atelier-agedgold">KNOWLEDGE BASE</span>
+              <span className="text-atelier-taupe/40">·</span>
+              <span className="text-atelier-taupe">ATELIER KNOWLEDGE & INQUIRIES</span>
+            </div>
+            <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-atelier-softblack font-light tracking-tight">
+              Frequently Asked <span className="italic font-normal text-atelier-agedgold">Questions</span>
             </h2>
             <p className="text-xs sm:text-sm text-atelier-charcoal/80 font-light max-w-xl mx-auto leading-relaxed">
               Guidance on Bhadohi loom heritage, natural fleece behavior, sizing, and atelier logistics.
@@ -159,8 +161,8 @@ export const AtelierFaqSection: React.FC<{ className?: string; hideHeader?: bool
         {/* Concierge Assistance Footer */}
         <div className="mt-14 p-6 sm:p-8 bg-atelier-ivory border border-atelier-parchment flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
           <div className="space-y-1">
-            <h4 className="font-serif text-base text-atelier-softblack font-medium">
-              Have a specific room size or design query?
+            <h4 className="font-serif text-base text-atelier-softblack font-light">
+              Have a specific room size or <span className="italic font-normal text-atelier-agedgold">design query?</span>
             </h4>
             <p className="text-xs text-atelier-taupe font-light">
               Our studio specialists in Bhadohi are available to advise on custom dimensions, yarn palettes, and loom schedules.
@@ -176,7 +178,7 @@ export const AtelierFaqSection: React.FC<{ className?: string; hideHeader?: bool
               <span>Contact Studio</span>
             </Link>
             <a
-              href="https://wa.me/919839418038?text=Hello%20The%20Weave%20Atelier,%20I%20have%20an%20inquiry%20regarding%20handcrafted%20rugs."
+              href="https://wa.me/919839418038?text=Hello%20Prasri%20Rugs,%20I%20have%20an%20inquiry%20regarding%20handcrafted%20rugs."
               target="_blank"
               rel="noopener noreferrer"
               className="px-4 py-2.5 bg-[#25D366] text-white text-xs uppercase tracking-wider font-medium hover:bg-[#20ba59] transition-colors inline-flex items-center space-x-2 shadow-sm"

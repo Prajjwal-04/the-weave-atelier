@@ -259,7 +259,7 @@ export const AccountPage: React.FC = () => {
     const defaultVariant = product.variants?.[0] || {
       id: `var-${product.slug || 'wish'}-1`,
       size: 'Standard Dimensions',
-      sku: `TWA-${(product.slug || 'RUG').replace(/[^a-zA-Z0-9]/g, '').slice(0, 4).toUpperCase() || 'RUG'}-0810`,
+      sku: `PR-${(product.slug || 'RUG').replace(/[^a-zA-Z0-9]/g, '').slice(0, 4).toUpperCase() || 'RUG'}-0810`,
       priceUSD: 1500,
       isReadyToShip: true,
     };
@@ -291,11 +291,17 @@ export const AccountPage: React.FC = () => {
         {/* Header */}
         <div className="border-b border-atelier-parchment pb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
-            <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase text-atelier-taupe font-medium mb-2">
-              Customer Portal
+            <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase font-medium mb-2 flex items-center space-x-2">
+              <span className="text-atelier-agedgold">CLIENT CONCIERGE</span>
+              <span className="text-atelier-taupe/40">·</span>
+              <span className="text-atelier-taupe">ATELIER PORTAL</span>
             </div>
             <h1 className="font-serif text-3xl sm:text-5xl text-atelier-softblack font-light tracking-tight">
-              {isLoggedIn ? `Welcome, ${user?.firstName}` : 'Atelier Account'}
+              {isLoggedIn ? (
+                <>Welcome, <span className="italic font-normal text-atelier-agedgold">{user?.firstName}</span></>
+              ) : (
+                <>Atelier <span className="italic font-normal text-atelier-agedgold">Account</span></>
+              )}
             </h1>
           </div>
 
@@ -977,7 +983,7 @@ export const AccountPage: React.FC = () => {
                             <h4 className="font-serif text-lg text-atelier-softblack font-medium">
                               {p.name}
                             </h4>
-                            <div className="text-xs font-mono text-atelier-darkbrown font-medium">
+                            <div className="font-sans text-xs sm:text-sm text-atelier-softblack font-medium">
                               From {formatPrice(p.variants[0]?.priceUSD || 0)}
                             </div>
                           </div>

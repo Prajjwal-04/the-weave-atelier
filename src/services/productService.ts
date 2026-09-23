@@ -104,7 +104,9 @@ export const sanitizeProductVariant = (v: any, index: number, productSlug: strin
     id: v?.id || `var-${safeSlug.toLowerCase()}-${index + 1}`,
     size: sizeStr,
     dimensionsFt: v?.dimensionsFt || v?.dimensions_ft || '8 x 10 ft',
-    sku: v?.sku || `TWA-${safeSlug}-${sizeDigits.padStart(4, '0')}`,
+    sku: v?.sku
+      ? v.sku.replace(/^TWA-/i, 'PR-')
+      : `PR-${safeSlug}-${sizeDigits.padStart(4, '0')}`,
     priceUSD,
     inventory,
     isReadyToShip: v?.isReadyToShip ?? v?.is_ready_to_ship ?? true,
@@ -244,7 +246,7 @@ export const productService = {
 
   // 3. Add a new product (from Admin Portal)
   async addProduct(newProduct: Omit<Product, 'id'>): Promise<Product> {
-    let assignedId = `twa-prod-${Date.now()}`;
+    let assignedId = `pr-prod-${Date.now()}`;
 
     // If Supabase is connected, insert into database
     if (isSupabaseConfigured() && supabase) {

@@ -245,7 +245,7 @@ export const AdminDashboardPage: React.FC = () => {
       id: 'v-1',
       size: "5' × 8'",
       dimensionsFt: "5' × 8' (152 × 244 cm)",
-      sku: 'TWA-NEW-0508',
+      sku: 'PR-NEW-0508',
       priceUSD: 1650,
       inventory: 2,
       isReadyToShip: true,
@@ -256,7 +256,7 @@ export const AdminDashboardPage: React.FC = () => {
       id: 'v-2',
       size: "8' × 10'",
       dimensionsFt: "8' × 10' (244 × 305 cm)",
-      sku: 'TWA-NEW-0810',
+      sku: 'PR-NEW-0810',
       priceUSD: 3150,
       inventory: 1,
       isReadyToShip: true,
@@ -509,7 +509,7 @@ export const AdminDashboardPage: React.FC = () => {
           const sizePart = v.size.replace(/[^0-9]/g, '');
           return {
             ...v,
-            sku: `TWA-${prefix}-${sizePart.padStart(4, '0')}`,
+            sku: `PR-${prefix}-${sizePart.padStart(4, '0')}`,
           };
         })
       );
@@ -596,7 +596,7 @@ export const AdminDashboardPage: React.FC = () => {
         id: `var-${Date.now()}-1`,
         size: "5' × 8'",
         dimensionsFt: "5' × 8' (152 × 244 cm)",
-        sku: 'TWA-NEW-0508',
+        sku: 'PR-NEW-0508',
         priceUSD: 1850,
         inventory: 2,
         isReadyToShip: true,
@@ -607,7 +607,7 @@ export const AdminDashboardPage: React.FC = () => {
         id: `var-${Date.now()}-2`,
         size: "8' × 10'",
         dimensionsFt: "8' × 10' (244 × 305 cm)",
-        sku: 'TWA-NEW-0810',
+        sku: 'PR-NEW-0810',
         priceUSD: 3400,
         inventory: 1,
         isReadyToShip: true,
@@ -618,7 +618,7 @@ export const AdminDashboardPage: React.FC = () => {
         id: `var-${Date.now()}-3`,
         size: "9' × 12'",
         dimensionsFt: "9' × 12' (274 × 366 cm)",
-        sku: 'TWA-NEW-0912',
+        sku: 'PR-NEW-0912',
         priceUSD: 4600,
         inventory: 0,
         isReadyToShip: false,
@@ -751,7 +751,7 @@ export const AdminDashboardPage: React.FC = () => {
       id: `var-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
       size: sizeLabel,
       dimensionsFt: dimensions,
-      sku: `TWA-${skuCode}-${sizeNumber.padStart(4, '0')}`,
+      sku: `PR-${skuCode}-${sizeNumber.padStart(4, '0')}`,
       priceUSD: defaultPrice,
       inventory: 1,
       isReadyToShip: true,

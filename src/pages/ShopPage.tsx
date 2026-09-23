@@ -137,13 +137,15 @@ export const ShopPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Page Header */}
         <div className="border-b border-atelier-parchment pb-8 mb-8">
-          <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase text-atelier-taupe font-medium mb-2">
-            Catalog & Archive
+          <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase font-medium mb-2 flex items-center space-x-2">
+            <span className="text-atelier-agedgold">COMPLETE CATALOG</span>
+            <span className="text-atelier-taupe/40">·</span>
+            <span className="text-atelier-taupe">CATALOG & ARCHIVE</span>
           </div>
           <div className="flex flex-col md:flex-row md:items-end justify-between space-y-4 md:space-y-0">
             <div>
               <h1 className="font-serif text-3xl sm:text-5xl text-atelier-softblack font-light tracking-tight">
-                Handmade Rugs
+                Handmade <span className="italic font-normal text-atelier-agedgold">Rugs</span>
               </h1>
               <p className="text-xs sm:text-sm text-atelier-charcoal font-light mt-2 max-w-xl">
                 Every piece is individually handcrafted in Bhadohi, India using pure and blended wools, traditional timber looms, and artisan hand-shearing.

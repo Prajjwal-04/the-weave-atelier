@@ -147,7 +147,7 @@ export const CheckoutPage: React.FC = () => {
     setIsProcessing(true);
 
     try {
-      const orderNum = `TWA-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+      const orderNum = `PR-2026-${Math.floor(1000 + Math.random() * 9000)}`;
       const hasMadeToOrder = effectiveItems.some((i) => !i.isReadyToShip);
 
       // 1. Process payment via Razorpay All-In-One Checkout
@@ -1039,7 +1039,7 @@ export const CheckoutPage: React.FC = () => {
                     rel="noopener noreferrer"
                     className="text-emerald-800 hover:text-emerald-950 font-medium font-mono text-[11px] underline flex items-center self-start sm:self-auto"
                   >
-                    WhatsApp Concierge (+91 98394 18038)
+                    WhatsApp Concierge (Live Chat)
                   </a>
                 </div>
 

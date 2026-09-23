@@ -41,6 +41,19 @@ export const ProductDetailPage: React.FC = () => {
   const [showStickyBar, setShowStickyBar] = useState(false);
   const purchaseRef = useRef<HTMLDivElement>(null);
 
+  // Mobile slider tracking for complementary works
+  const [relatedScrollIdx, setRelatedScrollIdx] = useState(0);
+  const relatedScrollRef = useRef<HTMLDivElement>(null);
+
+  const handleRelatedScroll = () => {
+    if (!relatedScrollRef.current) return;
+    const { scrollLeft, clientWidth } = relatedScrollRef.current;
+    if (clientWidth > 0) {
+      const idx = Math.round(scrollLeft / (clientWidth * 0.78));
+      setRelatedScrollIdx(Math.min(idx, Math.max(0, relatedProducts.length - 1)));
+    }
+  };
+
   // Accordion tabs
   const [openAccordion, setOpenAccordion] = useState<string | null>('specs');
 
@@ -84,7 +97,7 @@ export const ProductDetailPage: React.FC = () => {
         id: `var-${product?.slug || 'rug'}-1`,
         size: '8 x 10 ft (240 x 300 cm)',
         dimensionsFt: '8 x 10 ft',
-        sku: `TWA-${(product?.slug || 'RUG').replace(/[^a-zA-Z0-9]/g, '').slice(0, 4).toUpperCase() || 'RUG'}-0810`,
+        sku: `PR-${(product?.slug || 'RUG').replace(/[^a-zA-Z0-9]/g, '').slice(0, 4).toUpperCase() || 'RUG'}-0810`,
         priceUSD: 1850,
         inventory: 1,
         isReadyToShip: true,
@@ -186,7 +199,7 @@ export const ProductDetailPage: React.FC = () => {
   };
 
   // Related products from same collection or technique
-  const relatedProducts = (products || []).filter((p) => product && p.id !== product.id).slice(0, 3);
+  const relatedProducts = (products || []).filter((p) => product && p.id !== product.id).slice(0, 4);
 
   return (
     <div className="pt-20 sm:pt-24 pb-20 bg-atelier-ivory min-h-screen">
@@ -230,9 +243,11 @@ export const ProductDetailPage: React.FC = () => {
           <div className="lg:col-span-5 space-y-6">
             {/* Collection & Technique header */}
             <div className="flex items-center justify-between">
-              <span className="text-[11px] tracking-[0.25em] text-atelier-taupe uppercase font-medium">
-                {product.collection} · {product.technique}
-              </span>
+              <div className="text-[11px] tracking-[0.25em] uppercase font-medium flex items-center space-x-2">
+                <span className="text-atelier-agedgold">{product.collection}</span>
+                <span className="text-atelier-taupe/40">·</span>
+                <span className="text-atelier-taupe">{product.technique}</span>
+              </div>
               <StockBadge
                 isReadyToShip={activeVariant.isReadyToShip}
                 inventory={currentStock}
@@ -245,7 +260,7 @@ export const ProductDetailPage: React.FC = () => {
                 {product.name}
               </h1>
               <div className="flex items-baseline space-x-3">
-                <span className="font-serif text-2xl sm:text-3xl text-atelier-darkbrown font-medium">
+                <span className="font-sans text-2xl sm:text-3xl text-atelier-softblack font-medium tracking-normal">
                   {formatPrice(activeVariant.priceUSD)}
                 </span>
                 <span className="text-xs text-atelier-taupe font-mono">
@@ -558,18 +573,38 @@ export const ProductDetailPage: React.FC = () => {
         {/* Complete the Space: Related Rugs */}
         <div className="pt-16">
           <div className="flex items-baseline justify-between mb-8">
-            <h3 className="font-serif text-2xl text-atelier-softblack font-normal">
-              Complementary Works from the Atelier
+            <h3 className="font-serif text-2xl text-atelier-softblack font-light">
+              Complementary Works from the <span className="italic font-normal text-atelier-agedgold">Atelier</span>
             </h3>
             <Link to="/shop" className="text-xs text-atelier-taupe hover:text-black underline uppercase tracking-wider">
               View Catalog
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div
+            ref={relatedScrollRef}
+            onScroll={handleRelatedScroll}
+            className="flex sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 overflow-x-auto sm:overflow-visible scrollbar-none snap-x snap-mandatory -mx-4 px-4 sm:mx-0 sm:px-0 pb-4 sm:pb-0"
+          >
             {relatedProducts.map((p) => (
-              <ProductCard key={p.id} product={p} />
+              <div key={p.id} className="flex-shrink-0 w-[78vw] sm:w-auto snap-start">
+                <ProductCard product={p} />
+              </div>
             ))}
           </div>
+
+          {/* Mobile Swipe Pagination Dots Indicator */}
+          {relatedProducts.length > 1 && (
+            <div className="flex sm:hidden items-center justify-center space-x-1.5 mt-6">
+              {relatedProducts.map((_, idx) => (
+                <span
+                  key={idx}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    relatedScrollIdx === idx ? 'w-6 bg-atelier-softblack' : 'w-1.5 bg-atelier-parchment'
+                  }`}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -600,8 +635,12 @@ export const ProductDetailPage: React.FC = () => {
               <div className="font-serif text-sm sm:text-base text-atelier-softblack truncate font-normal">
                 {product?.name}
               </div>
-              <div className="text-[11px] text-atelier-taupe font-mono truncate">
-                {activeVariant.dimensionsFt || activeVariant.size} · {formatPrice(activeVariant.priceUSD)}
+              <div className="text-xs text-atelier-taupe truncate flex items-center space-x-1.5">
+                <span>{activeVariant.dimensionsFt || activeVariant.size}</span>
+                <span>·</span>
+                <span className="font-sans text-sm text-atelier-softblack font-medium">
+                  {formatPrice(activeVariant.priceUSD)}
+                </span>
               </div>
             </div>
           </div>

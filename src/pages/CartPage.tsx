@@ -53,7 +53,7 @@ export const CartPage: React.FC = () => {
         <div className="border-b border-atelier-parchment pb-6 flex items-baseline justify-between">
           <div>
             <h1 className="font-serif text-3xl sm:text-4xl text-atelier-softblack font-light tracking-tight">
-              Your Shopping Bag
+              Your Shopping <span className="italic font-normal text-atelier-agedgold">Bag</span>
             </h1>
             <p className="text-xs text-atelier-taupe mt-1 font-mono">
               {items.reduce((acc, i) => acc + i.quantity, 0)} {items.length === 1 ? 'piece' : 'pieces'} from Prasri Rugs
@@ -127,7 +127,7 @@ export const CartPage: React.FC = () => {
                         >
                           {item.productName}
                         </Link>
-                        <span className="font-mono text-sm font-medium text-atelier-softblack">
+                        <span className="font-sans text-sm sm:text-base font-medium text-atelier-softblack">
                           {formatPrice(item.priceUSD * item.quantity)}
                         </span>
                       </div>
@@ -240,7 +240,7 @@ export const CartPage: React.FC = () => {
               {/* Total */}
               <div className="flex justify-between items-baseline font-serif text-xl text-atelier-softblack font-medium">
                 <span>Estimated Total</span>
-                <span className="font-mono text-2xl text-atelier-darkbrown">{formatPrice(totalUSD)}</span>
+                <span className="font-sans text-lg sm:text-xl font-medium text-atelier-softblack">{formatPrice(totalUSD)}</span>
               </div>
 
               {/* Checkout Button */}
