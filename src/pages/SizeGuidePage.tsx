@@ -145,7 +145,7 @@ export const SizeGuidePage: React.FC = () => {
               <span className="font-mono text-xs text-atelier-darkbrown font-medium tracking-wider">
                 {activeSize}
               </span>
-              <span className="text-[9px] text-atelier-taupe">The Weave Atelier</span>
+              <span className="text-[9px] text-atelier-taupe">Prasri Rugs</span>
 
               {/* Simulated Furniture overlay depending on room */}
               {activeRoom === 'living' && (

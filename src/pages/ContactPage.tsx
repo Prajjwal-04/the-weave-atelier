@@ -88,7 +88,7 @@ export const ContactPage: React.FC = () => {
                   <MessageCircle size={16} className="text-atelier-agedgold flex-shrink-0 mt-0.5" />
                   <div>
                     <strong className="font-medium text-atelier-softblack block">WhatsApp Concierge</strong>
-                    <span>+91 94500 00000 (Direct studio messaging)</span>
+                    <span>+91 98394 18038 (Direct studio messaging)</span>
                   </div>
                 </div>
 
@@ -96,7 +96,7 @@ export const ContactPage: React.FC = () => {
                   <Instagram size={16} className="text-atelier-agedgold flex-shrink-0 mt-0.5" />
                   <div>
                     <strong className="font-medium text-atelier-softblack block">Instagram Dispatch</strong>
-                    <span>@theweaveatelier</span>
+                    <span>@prasrirugs</span>
                   </div>
                 </div>
 
@@ -112,7 +112,7 @@ export const ContactPage: React.FC = () => {
               {/* Direct WhatsApp Callout */}
               <div className="pt-2">
                 <a
-                  href="https://wa.me/919450000000?text=Hello%20The%20Weave%20Atelier%2C%20I%20have%20an%20inquiry%20regarding%20your%20handmade%20rugs."
+                  href="https://wa.me/919839418038?text=Hello%20Prasri%20Rugs%2C%20I%20have%20an%20inquiry%20regarding%20your%20handmade%20rugs."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full py-3.5 px-4 bg-atelier-softblack text-atelier-parchment text-xs tracking-widest uppercase hover:bg-atelier-darkbrown transition-colors flex items-center justify-center font-medium"

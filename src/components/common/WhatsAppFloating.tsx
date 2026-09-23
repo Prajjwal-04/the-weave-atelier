@@ -4,9 +4,9 @@ import { MessageCircle, X } from 'lucide-react';
 export const WhatsAppFloating: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const whatsappNumber = '919450000000'; // Bhadohi Atelier Concierge
+  const whatsappNumber = '919839418038'; // Bhadohi Atelier Direct Concierge
   const defaultMessage = encodeURIComponent(
-    'Hello The Weave Atelier, I am interested in your handcrafted rugs and custom sizing options.'
+    'Hello Prasri Rugs, I am interested in your handcrafted rugs and custom sizing options.'
   );
 
   return (

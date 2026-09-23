@@ -189,7 +189,7 @@ export const RoomScaleVisualizer: React.FC<RoomScaleVisualizerProps> = ({
                   {currentDim}
                 </div>
                 <div className="text-[8px] tracking-widest text-atelier-taupe uppercase font-mono mt-0.5">
-                  The Weave Atelier
+                  Prasri Rugs
                 </div>
               </div>
 

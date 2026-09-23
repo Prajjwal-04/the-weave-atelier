@@ -325,7 +325,7 @@ export const CheckoutPage: React.FC = () => {
           // Customer confirmation
           emailService.sendTransactionalEmail({
             to: email,
-            subject: `Order Confirmed: ${newOrder.orderNumber} · The Weave Atelier`,
+            subject: `Order Confirmed: ${newOrder.orderNumber} · Prasri Rugs`,
             html: emailService.generateOrderConfirmationHtml(newOrder),
             type: 'order_confirmation',
           }),
@@ -353,7 +353,7 @@ export const CheckoutPage: React.FC = () => {
         <div className="flex items-center justify-between border-b border-atelier-parchment pb-6">
           <Link to="/" className="inline-block">
             <span className="font-serif text-2xl tracking-[0.24em] text-atelier-softblack font-normal">
-              THE WEAVE ATELIER
+              PRASRI RUGS
             </span>
             <div className="text-[8px] tracking-[0.35em] text-atelier-taupe uppercase">
               BHADOHI · SECURE CHECKOUT
@@ -1034,12 +1034,12 @@ export const CheckoutPage: React.FC = () => {
                     <span>Need assistance with payment limits or corporate GST invoices?</span>
                   </div>
                   <a
-                    href="https://wa.me/919415226500"
+                    href="https://wa.me/919839418038"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-emerald-800 hover:text-emerald-950 font-medium font-mono text-[11px] underline flex items-center self-start sm:self-auto"
                   >
-                    WhatsApp Concierge (+91 94152 26500)
+                    WhatsApp Concierge (+91 98394 18038)
                   </a>
                 </div>
 

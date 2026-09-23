@@ -47,11 +47,13 @@ export const BhadohiNarrative: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Editorial Heading */}
         <div className="max-w-3xl mb-16 space-y-4">
-          <span className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase text-atelier-taupe font-medium block">
-            Origin & Lineage
+          <span className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase font-medium flex items-center space-x-2">
+            <span className="text-atelier-agedgold">THE CARPET CITY</span>
+            <span className="text-atelier-taupe/40">·</span>
+            <span className="text-atelier-taupe">ORIGIN & LINEAGE</span>
           </span>
           <h2 className="font-serif text-3xl sm:text-5xl text-atelier-softblack font-light tracking-tight">
-            From Bhadohi, India.
+            From Bhadohi, <span className="italic font-normal text-atelier-agedgold">India</span>.
           </h2>
           <p className="text-xs sm:text-base text-atelier-charcoal/80 font-light leading-relaxed">
             Known worldwide as India’s carpet city, Bhadohi’s identity is inextricably tied to the loom. Here, carpet making is not an industrial spectacle—it is an art of patience, quiet dignity, and tactile precision practiced in tranquil village workshops.
@@ -94,7 +96,7 @@ export const BhadohiNarrative: React.FC = () => {
             “We don’t measure our craft in units per hour. We measure it by how a finished rug settles into a home, softens over a decade, and endures as a quiet foundation for everyday life.”
           </p>
           <div className="text-[10px] tracking-[0.25em] uppercase text-atelier-taupe font-medium">
-            — The Weave Atelier, Bhadohi
+            — Prasri Rugs, Bhadohi
           </div>
         </div>
       </div>

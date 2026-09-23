@@ -19,7 +19,7 @@ const perspectiveBadgeMap: Record<string, string> = {
   'artisan-loom': 'Artisan Loom',
 };
 const NEUTRAL_PLACEHOLDER =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 1000' fill='%23F6F3EE'%3E%3Crect width='800' height='1000' fill='%23F6F3EE'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='serif' font-size='20' fill='%23A4998E' letter-spacing='0.25em'%3ETHE WEAVE ATELIER%3C/text%3E%3C/svg%3E";
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 1000' fill='%23F6F3EE'%3E%3Crect width='800' height='1000' fill='%23F6F3EE'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='serif' font-size='20' fill='%23A4998E' letter-spacing='0.25em'%3EPRASRI RUGS%3C/text%3E%3C/svg%3E";
 
 export const sanitizeProductImage = (img: any): any => {
   if (!img) {

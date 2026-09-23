@@ -1,5 +1,5 @@
 -- ==============================================================================
--- THE WEAVE ATELIER — COMPLETE SUPABASE BACKEND READY MIGRATION
+-- PRASRI RUGS — COMPLETE SUPABASE BACKEND READY MIGRATION
 -- Run this in your Supabase Dashboard -> SQL Editor
 -- It configures tables, permissive RLS policies, Realtime, and seeds all products.
 -- ==============================================================================

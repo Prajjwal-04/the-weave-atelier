@@ -37,7 +37,7 @@ async function dispatchToInbox(payload: {
         subject: payload.subject,
         html: payload.html,
         text: payload.text,
-        fromName: payload.fromName || 'The Weave Atelier',
+        fromName: payload.fromName || 'Prasri Rugs',
       }),
     });
 
@@ -73,7 +73,7 @@ async function dispatchToInbox(payload: {
           Authorization: `Bearer ${resendApiKey}`,
         },
         body: JSON.stringify({
-          from: `The Weave Atelier <${fromEmail}>`,
+          from: `Prasri Rugs <${fromEmail}>`,
           to: targetEmail,
           reply_to: payload.replyTo || ATELIER_PRIMARY_EMAIL,
           subject: payload.subject,
@@ -271,7 +271,7 @@ ${quote.notes || 'None provided'}
       .join('\n');
 
     const textBody = `
-New Order Received at The Weave Atelier:
+New Order Received at Prasri Rugs:
 ----------------------------------------
 Order Number: ${order.orderNumber}
 Date: ${order.date}
@@ -415,7 +415,7 @@ Carrier Assigned: ${order.carrier}
         <table align="center" width="600" style="background: #FFFFFF; border: 1px solid #EDE6DD; padding: 40px; margin: 0 auto;">
           <tr>
             <td align="center" style="padding-bottom: 30px; border-bottom: 1px solid #EDE6DD;">
-              <h1 style="font-family: Georgia, serif; font-size: 24px; letter-spacing: 0.25em; color: #1A1918; margin: 0; text-transform: uppercase;">THE WEAVE ATELIER</h1>
+              <h1 style="font-family: Georgia, serif; font-size: 24px; letter-spacing: 0.25em; color: #1A1918; margin: 0; text-transform: uppercase;">PRASRI RUGS</h1>
               <div style="font-size: 9px; letter-spacing: 0.35em; color: #8A7B6E; margin-top: 4px;">BHADOHI · INDIA</div>
             </td>
           </tr>
@@ -424,7 +424,7 @@ Carrier Assigned: ${order.carrier}
               <h2 style="font-family: Georgia, serif; font-size: 20px; color: #1A1918; margin: 0 0 10px 0;">Order Confirmed: ${order.orderNumber}</h2>
               <p style="font-size: 13px; line-height: 1.6; color: #5C4D43; margin: 0 0 20px 0;">
                 Dear ${order.customer.firstName},<br/><br/>
-                Thank you for choosing The Weave Atelier. Your handcrafted rug order has been verified and registered at our studio in Bhadohi, Uttar Pradesh, India.
+                Thank you for choosing Prasri Rugs. Your handcrafted rug order has been verified and registered at our studio in Bhadohi, Uttar Pradesh, India.
               </p>
               <table width="100%" style="border-collapse: collapse; margin-bottom: 25px;">
                 <thead>
@@ -461,7 +461,7 @@ Carrier Assigned: ${order.carrier}
           <tr>
             <td align="center" style="border-top: 1px solid #EDE6DD; padding-top: 20px; font-size: 11px; color: #8A7B6E;">
               Prasri Rugs, G.T. Road, Gopiganj, Bhadohi, UP 221303, India · ${ATELIER_PRIMARY_EMAIL}<br/>
-              WhatsApp Concierge: +91 94500 00000
+              WhatsApp Concierge: +91 98394 18038
             </td>
           </tr>
         </table>
@@ -480,7 +480,7 @@ Carrier Assigned: ${order.carrier}
         <table align="center" width="600" style="background: #FFFFFF; border: 1px solid #EDE6DD; padding: 40px; margin: 0 auto;">
           <tr>
             <td align="center" style="padding-bottom: 25px; border-bottom: 1px solid #EDE6DD;">
-              <h1 style="font-family: Georgia, serif; font-size: 24px; letter-spacing: 0.25em; color: #1A1918; margin: 0;">THE WEAVE ATELIER</h1>
+              <h1 style="font-family: Georgia, serif; font-size: 24px; letter-spacing: 0.25em; color: #1A1918; margin: 0;">PRASRI RUGS</h1>
             </td>
           </tr>
           <tr>
@@ -518,7 +518,7 @@ Carrier Assigned: ${order.carrier}
       replyTo: ATELIER_PRIMARY_EMAIL,
       subject: payload.subject,
       html: payload.html,
-      fromName: 'The Weave Atelier',
+      fromName: 'Prasri Rugs',
     });
   },
 };

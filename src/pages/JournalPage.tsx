@@ -80,7 +80,7 @@ export const JournalPage: React.FC = () => {
 
           {/* Author attribution */}
           <div className="max-w-2xl mx-auto pt-8 border-t border-atelier-parchment text-xs text-atelier-taupe flex items-center justify-between">
-            <div>The Weave Atelier Journal · Bhadohi, India</div>
+            <div>Prasri Rugs Journal · Bhadohi, India</div>
             <Link to="/shop" className="hover:underline text-atelier-softblack">
               Explore Handmade Rugs →
             </Link>
@@ -126,7 +126,7 @@ export const JournalPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         <div className="border-b border-atelier-parchment pb-8 max-w-3xl">
           <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase text-atelier-taupe font-medium mb-2">
-            The Weave Atelier Magazine & Knowledge
+            Prasri Rugs Magazine & Knowledge
           </div>
           <h1 className="font-serif text-4xl sm:text-6xl text-atelier-softblack font-light tracking-tight">
             The Journal & Inquiries

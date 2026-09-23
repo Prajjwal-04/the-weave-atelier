@@ -176,7 +176,7 @@ export const AtelierFaqSection: React.FC<{ className?: string; hideHeader?: bool
               <span>Contact Studio</span>
             </Link>
             <a
-              href="https://wa.me/919450000000?text=Hello%20The%20Weave%20Atelier,%20I%20have%20an%20inquiry%20regarding%20handcrafted%20rugs."
+              href="https://wa.me/919839418038?text=Hello%20The%20Weave%20Atelier,%20I%20have%20an%20inquiry%20regarding%20handcrafted%20rugs."
               target="_blank"
               rel="noopener noreferrer"
               className="px-4 py-2.5 bg-[#25D366] text-white text-xs uppercase tracking-wider font-medium hover:bg-[#20ba59] transition-colors inline-flex items-center space-x-2 shadow-sm"

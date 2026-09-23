@@ -15,7 +15,7 @@ export const TheAtelierPage: React.FC = () => {
             Rooted in Bhadohi. Crafted for contemporary spaces.
           </h1>
           <p className="text-sm sm:text-base text-atelier-charcoal font-light leading-relaxed">
-            The Weave Atelier was created around a simple conviction: that traditional Indian craftsmanship and modern interior design do not belong in separate worlds.
+            Prasri Rugs was created around a simple conviction: that traditional Indian craftsmanship and modern interior design do not belong in separate worlds.
           </p>
         </div>
 
@@ -23,7 +23,7 @@ export const TheAtelierPage: React.FC = () => {
         <div className="aspect-[16/9] overflow-hidden bg-atelier-parchment border border-atelier-parchment shadow-subtle">
           <img
             src="/images/atelier/the-atelier-studio.jpg"
-            alt="Master artisan knotting carpet on loom in Bhadohi at The Weave Atelier"
+            alt="Master artisan knotting carpet on loom in Bhadohi at Prasri Rugs"
             className="w-full h-full object-cover filter brightness-[0.98]"
           />
         </div>
@@ -41,13 +41,13 @@ export const TheAtelierPage: React.FC = () => {
 
           <div className="md:col-span-8 space-y-6 text-sm text-atelier-charcoal font-light leading-relaxed">
             <p>
-              Based in Bhadohi—one of India’s most historic carpet-making regions—The Weave Atelier began not as a mass-production factory, but as a small studio dedicated to making rugs thoughtfully. For generations, Bhadohi’s artisan families have possessed an unrivaled mastery of warp, weft, and knotting. Yet much of this heritage was channeled into loud ornamental patterns that felt out of place in modern architectural spaces.
+              Based in Bhadohi—one of India’s most historic carpet-making regions—Prasri Rugs began not as a mass-production factory, but as a small studio dedicated to making rugs thoughtfully. For generations, Bhadohi’s artisan families have possessed an unrivaled mastery of warp, weft, and knotting. Yet much of this heritage was channeled into loud ornamental patterns that felt out of place in modern architectural spaces.
             </p>
             <p>
               We wanted to do something quieter. We stripped away excess ornamentation, focused on natural undyed and earthy mineral-dyed fleeces, and introduced restrained contemporary geometry. The result is a collection of rugs that ground a room with warmth, texture, and quiet character.
             </p>
             <p>
-              We believe our smaller scale is an advantage. We know every loom, we inspect every dye lot, and we coordinate directly with homeowners, architects, and designers across the world. When you choose a rug from The Weave Atelier, you are supporting a direct, human-made process.
+              We believe our smaller scale is an advantage. We know every loom, we inspect every dye lot, and we coordinate directly with homeowners, architects, and designers across the world. When you choose a rug from Prasri Rugs, you are supporting a direct, human-made process.
             </p>
           </div>
         </div>
@@ -64,7 +64,7 @@ export const TheAtelierPage: React.FC = () => {
           </blockquote>
 
           <div className="pt-2 text-xs text-atelier-taupe font-sans">
-            — The Weave Atelier Founder & Master Weavers, Bhadohi
+            — Prasri Rugs Founder & Master Weavers, Bhadohi
           </div>
         </div>
 

@@ -345,8 +345,8 @@ export const CustomRugsPage: React.FC = () => {
                 <div className="font-serif text-3xl text-atelier-softblack font-medium">
                   {formatPrice(estMin)} – {formatPrice(estMax)}
                 </div>
-                <div className="text-[11px] text-atelier-taupe font-light">
-                  Includes personalized digital CAD layout, yarn sample approvals, door-to-door insured air courier, and all transit packaging.
+                <div className="text-[11px] text-atelier-taupe font-light leading-relaxed">
+                  *Please note: These figures are preliminary estimates only. Actual rates may vary depending on design intricacies, fiber blends, and loom specifications, and will be confirmed in our direct reply after discussion with our design and weaving team.
                 </div>
               </div>
 

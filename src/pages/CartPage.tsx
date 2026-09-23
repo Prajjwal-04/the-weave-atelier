@@ -56,7 +56,7 @@ export const CartPage: React.FC = () => {
               Your Shopping Bag
             </h1>
             <p className="text-xs text-atelier-taupe mt-1 font-mono">
-              {items.reduce((acc, i) => acc + i.quantity, 0)} {items.length === 1 ? 'piece' : 'pieces'} from The Weave Atelier
+              {items.reduce((acc, i) => acc + i.quantity, 0)} {items.length === 1 ? 'piece' : 'pieces'} from Prasri Rugs
             </p>
           </div>
           <Link

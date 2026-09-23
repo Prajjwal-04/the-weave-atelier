@@ -102,7 +102,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
                         : 'text-atelier-softblack group-hover:text-atelier-darkbrown'
                     }`}
                   >
-                    THE WEAVE ATELIER
+                    PRASRI RUGS
                   </span>
                   <span
                     className={`text-[8px] tracking-[0.35em] uppercase font-sans mt-0.5 transition-colors ${
@@ -301,7 +301,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
           <div className="p-4 flex items-center justify-between border-b border-atelier-parchment">
             <Link to="/" onClick={() => setMobileMenuOpen(false)}>
               <span className="font-serif text-lg tracking-[0.24em] text-atelier-softblack">
-                THE WEAVE ATELIER
+                PRASRI RUGS
               </span>
             </Link>
             <button
@@ -438,7 +438,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
               G.T. Road, Gopiganj, Bhadohi, Uttar Pradesh 221303, India
             </div>
             <div className="text-xs text-atelier-taupe mt-1">
-              WhatsApp Concierge: +91 94500 00000
+              WhatsApp Concierge: +91 98394 18038
             </div>
           </div>
         </div>

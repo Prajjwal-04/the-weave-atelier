@@ -1,4 +1,4 @@
-# The Weave Atelier
+# Prasri Rugs
 
 An artisanal luxury handcrafted rug e-commerce and catalog platform, honoring the century-old weaving heritage of Bhadohi, India. Designed with architectural restraint, editorial typography, and high-performance digital craftsmanship.
 
@@ -6,7 +6,7 @@ An artisanal luxury handcrafted rug e-commerce and catalog platform, honoring th
 
 ## Overview
 
-**The Weave Atelier** combines contemporary digital commerce with authentic Eastern Uttar Pradesh weaving traditions. The platform features:
+**Prasri Rugs** combines contemporary digital commerce with authentic Eastern Uttar Pradesh weaving traditions. The platform features:
 
 - **Bespoke Product Catalog & Detail Perspectives**: Multiple viewpoints (Full Overhead, Living Room, Bedroom, Reading Nook, Dining Room, Texture & Pile, Loom Backing, and Artisan Loom).
 - **Custom Size Estimator & Tiered Quotes**: Interactive sizing calculator for custom dimensions with lead-time estimation and real-time quotes.
@@ -131,4 +131,4 @@ npm run preview
 
 ## License
 
-Private & Confidential © The Weave Atelier. All rights reserved.
+Private & Confidential © Prasri Rugs. All rights reserved.

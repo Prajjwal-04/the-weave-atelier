@@ -11,11 +11,13 @@ export const EditorialJournalPreview: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 sm:mb-16 space-y-4 md:space-y-0">
           <div className="space-y-2">
-            <span className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase text-atelier-taupe font-medium block">
-              Notes on Craft & Living
+            <span className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase font-medium flex items-center space-x-2">
+              <span className="text-atelier-agedgold">SLOW ESSAYS</span>
+              <span className="text-atelier-taupe/40">·</span>
+              <span className="text-atelier-taupe">NOTES ON CRAFT & LIVING</span>
             </span>
             <h2 className="font-serif text-3xl sm:text-4xl text-atelier-softblack font-normal tracking-tight">
-              The Atelier Journal
+              The Atelier <span className="italic font-normal text-atelier-agedgold">Journal</span>
             </h2>
           </div>
           <Link

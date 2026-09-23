@@ -10,7 +10,7 @@ export const JOURNAL_ARTICLES: JournalArticle[] = [
     readTime: '6 min read',
     publishedDate: 'September 2026',
     heroImage: '/images/journal/knotted-vs-tufted.jpg',
-    author: 'The Weave Atelier',
+    author: 'Prasri Rugs',
     authorRole: 'Studio Insights',
     excerpt: 'Both techniques are genuinely human-made, yet they serve distinct design intentions. Here is an honest examination of how each is made and where each belongs.',
     sections: [
@@ -48,7 +48,7 @@ export const JOURNAL_ARTICLES: JournalArticle[] = [
     readTime: '7 min read',
     publishedDate: 'August 2026',
     heroImage: '/images/journal/bhadohi-heritage.jpg',
-    author: 'The Weave Atelier',
+    author: 'Prasri Rugs',
     authorRole: 'Bhadohi Studio',
     excerpt: 'Tucked along the fertile plains of the Ganges between Varanasi and Mirzapur lies Bhadohi. We explore what makes this small region the beating heart of handmade carpets.',
     sections: [
@@ -62,7 +62,7 @@ export const JOURNAL_ARTICLES: JournalArticle[] = [
       {
         heading: 'The Philosophy of the Small Atelier',
         body: [
-          'Rather than operating as a sprawling mass exporter, The Weave Atelier maintains an intimate scale. We work directly with master weavers, overseeing every phase—from raw wool selection and small-batch dyeing to the final purified artisanal washing and edge binding.',
+          'Rather than operating as a sprawling mass exporter, Prasri Rugs maintains an intimate scale. We work directly with master weavers, overseeing every phase—from raw wool selection and small-batch dyeing to the final purified artisanal washing and edge binding.',
           'By connecting homeowners directly with the workshop in Bhadohi, we preserve the intimacy of the maker-to-owner relationship. When you step onto one of our rugs, you are feeling the work of real hands in Bhadohi.'
         ]
       }
@@ -77,7 +77,7 @@ export const JOURNAL_ARTICLES: JournalArticle[] = [
     readTime: '5 min read',
     publishedDate: 'July 2026',
     heroImage: '/images/journal/rug-sizing-guide.jpg',
-    author: 'The Weave Atelier',
+    author: 'Prasri Rugs',
     authorRole: 'Interior Architecture',
     excerpt: 'The most common interior mistake is selecting a rug that is too small. Here are the spatial principles for choosing a rug that expands and unifies your room.',
     sections: [

@@ -1,5 +1,5 @@
 -- ==============================================================================
--- THE WEAVE ATELIER — PRODUCTION SEED DATA
+-- PRASRI RUGS — PRODUCTION SEED DATA
 -- Populate collections, products, variants, and initial demo orders
 -- ==============================================================================
 

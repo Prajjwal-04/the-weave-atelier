@@ -19,11 +19,13 @@ export const CustomRugsPreview: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Left: Text & CTA */}
           <div className="lg:col-span-5 space-y-6">
-            <span className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase text-atelier-gold font-medium block">
-              Bespoke Atelier Service
+            <span className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase font-medium flex items-center space-x-2">
+              <span className="text-atelier-gold">ARCHITECTURAL BESPOKE</span>
+              <span className="text-atelier-parchment/40">·</span>
+              <span className="text-atelier-parchment/70">CUSTOM RUG SERVICE</span>
             </span>
             <h2 className="font-serif text-3xl sm:text-5xl font-light text-atelier-cream tracking-tight leading-tight">
-              Made for your space.
+              Made for <span className="italic font-normal text-atelier-gold">your space</span>.
             </h2>
             <p className="text-xs sm:text-sm text-atelier-parchment/80 font-light leading-relaxed">
               Standard sizes don’t always suit unique floor plans, curved walls, or expansive open layouts. We build one-of-a-kind rugs to your exact architectural dimensions, shapes, and color palettes directly from our Bhadohi studio.

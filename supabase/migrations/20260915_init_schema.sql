@@ -1,5 +1,5 @@
 -- ==============================================================================
--- THE WEAVE ATELIER — PRODUCTION DATABASE SCHEMA
+-- PRASRI RUGS — PRODUCTION DATABASE SCHEMA
 -- Bhadohi Handmade Rugs Ecommerce Platform
 -- PostgreSQL / Supabase Schema Definition
 -- ==============================================================================

@@ -1028,7 +1028,7 @@ export const AdminDashboardPage: React.FC = () => {
         subject: `[PraSri Rugs Atelier] Diagnostic Pipeline Test - ${new Date().toLocaleTimeString()}`,
         html: `
           <div style="font-family: Georgia, serif; padding: 30px; background: #FAF8F5; color: #2D2B2A;">
-            <h2 style="letter-spacing: 0.2em; text-transform: uppercase; color: #1A1918;">The Weave Atelier System Test</h2>
+            <h2 style="letter-spacing: 0.2em; text-transform: uppercase; color: #1A1918;">Prasri Rugs System Test</h2>
             <p>This is an automated diagnostic ping confirming that your transactional email relay is active.</p>
             <p><strong>Primary Atelier Destination:</strong> ${ATELIER_PRIMARY_EMAIL}</p>
             <p><strong>Timestamp:</strong> ${new Date().toISOString()}</p>
@@ -1163,7 +1163,7 @@ export const AdminDashboardPage: React.FC = () => {
         <div className="max-w-md w-full bg-atelier-cream border border-atelier-parchment p-8 sm:p-10 shadow-sm space-y-6">
           <div className="text-center space-y-2">
             <span className="font-serif text-2xl tracking-[0.24em] text-atelier-softblack font-normal block">
-              THE WEAVE ATELIER
+              PRASRI RUGS
             </span>
             <div className="text-[9px] tracking-[0.35em] text-atelier-taupe uppercase">
               BHADOHI · PRIVATE ATELIER PORTAL
@@ -1303,7 +1303,7 @@ export const AdminDashboardPage: React.FC = () => {
           <div className="flex items-center space-x-4">
             <Link to="/" className="inline-block group">
               <span className="font-serif text-lg tracking-[0.2em] text-atelier-softblack font-normal">
-                THE WEAVE ATELIER
+                PRASRI RUGS
               </span>
               <span className="block text-[8px] tracking-[0.35em] text-atelier-taupe uppercase">
                 BHADOHI · MANAGEMENT CONSOLE
@@ -2481,7 +2481,7 @@ export const AdminDashboardPage: React.FC = () => {
                 Backend Infrastructure & Services Status
               </h2>
               <p className="text-xs text-atelier-charcoal/80 font-light leading-relaxed">
-                The Weave Atelier is architected with complete dual-mode resilience. When live credentials are supplied in your environment variables, the platform seamlessly runs on PostgreSQL and real gateways. If credentials are empty, the atelier runs in a secure, persistent local sandbox without any runtime disruption.
+                Prasri Rugs is architected with complete dual-mode resilience. When live credentials are supplied in your environment variables, the platform seamlessly runs on PostgreSQL and real gateways. If credentials are empty, the atelier runs in a secure, persistent local sandbox without any runtime disruption.
               </p>
             </div>
 

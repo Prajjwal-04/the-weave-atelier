@@ -235,7 +235,7 @@ export const paymentService = {
           key: keyId,
           amount: backendOrder.amount,
           currency: backendOrder.currency,
-          name: 'The Weave Atelier',
+          name: 'Prasri Rugs',
           description: `Handcrafted Rug Order (${params.orderNumber})`,
           image: '/favicon.svg',
           order_id: backendOrder.order_id,

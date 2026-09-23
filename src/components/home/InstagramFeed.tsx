@@ -30,22 +30,24 @@ export const InstagramFeed: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 space-y-3 sm:space-y-0">
           <div className="space-y-1">
-            <span className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase text-atelier-taupe font-medium block">
-              Direct from the Studio
+            <span className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase font-medium flex items-center space-x-2">
+              <span className="text-atelier-agedgold">@PRASRIRUGS</span>
+              <span className="text-atelier-taupe/40">·</span>
+              <span className="text-atelier-taupe">DIRECT FROM THE STUDIO</span>
             </span>
             <h2 className="font-serif text-2xl sm:text-3xl text-atelier-softblack font-normal tracking-tight">
-              Atelier Moments
+              Atelier <span className="italic font-normal text-atelier-agedgold">Moments</span>
             </h2>
           </div>
 
           <a
-            href="https://instagram.com/theweaveatelier"
+            href="https://instagram.com/prasrirugs"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center text-xs tracking-widest text-atelier-charcoal hover:text-atelier-softblack uppercase font-medium border-b border-atelier-taupe/40 pb-0.5 group transition-colors"
           >
             <Instagram size={14} className="mr-1.5 text-atelier-taupe" />
-            <span>Follow The Atelier @theweaveatelier</span>
+            <span>Follow The Atelier @prasrirugs</span>
             <ArrowUpRight size={13} className="ml-1 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
           </a>
         </div>
@@ -55,7 +57,7 @@ export const InstagramFeed: React.FC = () => {
           {instagramMoments.map((item) => (
             <a
               key={item.id}
-              href="https://instagram.com/theweaveatelier"
+              href="https://instagram.com/prasrirugs"
               target="_blank"
               rel="noopener noreferrer"
               className="group block relative aspect-square overflow-hidden bg-atelier-parchment border border-atelier-parchment/80"

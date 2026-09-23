@@ -24,7 +24,7 @@ export const Footer: React.FC = () => {
           <div className="lg:col-span-6 space-y-4">
             <Link to="/" className="inline-block">
               <span className="font-serif text-2xl sm:text-3xl tracking-[0.28em] text-atelier-cream">
-                THE WEAVE ATELIER
+                PRASRI RUGS
               </span>
               <div className="text-[9px] tracking-[0.4em] text-atelier-taupe uppercase mt-1">
                 BHADOHI · INDIA
@@ -207,7 +207,7 @@ export const Footer: React.FC = () => {
               </li>
               <li>
                 <a
-                  href="https://wa.me/919450000000?text=Hello%2C%20I%20am%20inquiring%20about%20a%20handcrafted%20rug%20from%20The%20Weave%20Atelier"
+                  href="https://wa.me/919839418038?text=Hello%2C%20I%20am%20inquiring%20about%20a%20handcrafted%20rug%20from%20Prasri%20Rugs"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-atelier-parchment/80 hover:text-white transition-colors"
@@ -217,12 +217,12 @@ export const Footer: React.FC = () => {
               </li>
               <li>
                 <a
-                  href="https://instagram.com/theweaveatelier"
+                  href="https://instagram.com/prasrirugs"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-atelier-parchment/80 hover:text-white transition-colors"
                 >
-                  Instagram @theweaveatelier
+                  Instagram @prasrirugs
                 </a>
               </li>
             </ul>
@@ -248,10 +248,6 @@ export const Footer: React.FC = () => {
                   ))}
                 </select>
               </div>
-
-              <div className="text-[11px] text-atelier-taupe leading-relaxed">
-                Handcrafted at Prasri Rugs, G.T. Road, Gopiganj, Bhadohi, Uttar Pradesh 221303, India. All rugs certified handmade.
-              </div>
             </div>
           </div>
         </div>
@@ -259,7 +255,7 @@ export const Footer: React.FC = () => {
         {/* Bottom: Legal & Copyright */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-[11px] text-atelier-taupe space-y-4 sm:space-y-0">
           <div>
-            © {new Date().getFullYear()} The Weave Atelier. All rights reserved. Handcrafted in Bhadohi, India.
+            © {new Date().getFullYear()} Prasri Rugs. All rights reserved. Handcrafted in Bhadohi, India.
           </div>
           <div className="flex flex-wrap items-center space-x-6">
             <Link to="/shipping-returns#terms" className="hover:text-atelier-parchment transition-colors">

@@ -8,14 +8,16 @@ export const CraftsmanshipSection: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="max-w-3xl mb-14 space-y-3">
-          <span className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase text-atelier-taupe font-medium block">
-            Construction & Technique
+          <span className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase font-medium flex items-center space-x-2">
+            <span className="text-atelier-agedgold">CRAFT DISCIPLINE</span>
+            <span className="text-atelier-taupe/40">·</span>
+            <span className="text-atelier-taupe">CONSTRUCTION & TECHNIQUE</span>
           </span>
           <h2 className="font-serif text-3xl sm:text-5xl text-atelier-softblack font-light tracking-tight">
-            The beauty of the human hand.
+            The beauty of the <span className="italic font-normal text-atelier-agedgold">human hand</span>.
           </h2>
           <p className="text-xs sm:text-base text-atelier-charcoal/80 font-light leading-relaxed">
-            Every rug from The Weave Atelier is shaped without automated weaving machinery. We practice time-honored Indian traditions calibrated by human patience, muscle memory, and generational touch.
+            Every rug from Prasri Rugs is shaped without automated weaving machinery. We practice time-honored Indian traditions calibrated by human patience, muscle memory, and generational touch.
           </p>
         </div>
 

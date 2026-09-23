@@ -9,7 +9,7 @@ export const AboutPage: React.FC = () => {
         {/* Header */}
         <div className="space-y-4 max-w-3xl">
           <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase text-atelier-taupe font-medium">
-            About The Weave Atelier
+            About Prasri Rugs
           </div>
           <h1 className="font-serif text-4xl sm:text-6xl text-atelier-softblack font-light tracking-tight leading-tight">
             An independent rug atelier rooted in Bhadohi.
@@ -23,7 +23,7 @@ export const AboutPage: React.FC = () => {
         <div className="aspect-[16/9] overflow-hidden bg-atelier-parchment border border-atelier-parchment shadow-subtle">
           <img
             src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1800&q=85"
-            alt="The Weave Atelier contemporary rug in architectural interior"
+            alt="Prasri Rugs contemporary rug in architectural interior"
             className="w-full h-full object-cover filter brightness-[0.92]"
           />
         </div>
@@ -41,7 +41,7 @@ export const AboutPage: React.FC = () => {
 
           <div className="md:col-span-8 space-y-6 text-sm text-atelier-charcoal font-light leading-relaxed">
             <p>
-              The Weave Atelier was created around a love for traditional Indian craftsmanship and modern interior design. Based in Bhadohi—one of India’s most celebrated carpet-weaving districts—we work directly with master artisans who have inherited centuries of loom knowledge.
+              Prasri Rugs was created around a love for traditional Indian craftsmanship and modern interior design. Based in Bhadohi—one of India’s most celebrated carpet-weaving districts—we work directly with master artisans who have inherited centuries of loom knowledge.
             </p>
             <p>
               Growing from our early beginnings on artisan platforms into an independent atelier, our focus has always stayed the same: we do not mass produce. We make rugs slowly, piece by piece, using genuine New Zealand and Indian virgin wools, unbleached cotton foundations, and non-toxic dyes.
@@ -61,7 +61,7 @@ export const AboutPage: React.FC = () => {
             “When someone discovers us from thousands of miles away and trusts us to make a rug for their home, we take that responsibility seriously. We are not trying to be the biggest company—we are trying to make beautiful rugs, thoughtfully.”
           </p>
           <div className="text-xs text-atelier-taupe pt-2">
-            The Weave Atelier Team · Bhadohi, India
+            Prasri Rugs Team · Bhadohi, India
           </div>
         </div>
 

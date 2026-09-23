@@ -1,5 +1,5 @@
 -- ==============================================================================
--- THE WEAVE ATELIER — PRODUCTION ROW LEVEL SECURITY (RLS) HARDENING
+-- PRASRI RUGS — PRODUCTION ROW LEVEL SECURITY (RLS) HARDENING
 -- Migration: 20260918_harden_admin_security_rls.sql
 -- Safe Migration: No custom functions or schema DDL privileges required.
 -- Run this in your Supabase Dashboard -> SQL Editor

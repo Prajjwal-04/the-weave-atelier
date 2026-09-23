@@ -301,8 +301,8 @@ export const CustomSizeModal: React.FC<CustomSizeModalProps> = ({
                 <div className="font-serif text-xl text-atelier-softblack font-medium">
                   {formatPrice(estimatedMin)} – {formatPrice(estimatedMax)}
                 </div>
-                <div className="text-[10px] text-atelier-taupe">
-                  *Preliminary estimate. Final quotation includes digital CAD render, yarn sample swatches, and insured worldwide delivery.
+                <div className="text-[10px] text-atelier-taupe leading-relaxed">
+                  *Please note: These figures are indicative estimates only. Actual rates may vary and will be confirmed in our direct reply after discussion with our design and weaving team.
                 </div>
               </div>
 

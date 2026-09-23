@@ -57,7 +57,7 @@ export async function handleSendEmail(req, res) {
     }
 
     const gmailUser = process.env.GMAIL_USER || process.env.VITE_ADMIN_EMAIL || 'prasrirugs@gmail.com';
-    const senderName = fromName || 'The Weave Atelier';
+    const senderName = fromName || 'Prasri Rugs';
     const transporter = getTransporter();
 
     // If Google App Password is not yet provided, log simulation & return graceful instructions

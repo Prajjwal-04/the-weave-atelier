@@ -126,7 +126,7 @@ export const AccountPage: React.FC = () => {
         if (res.error) {
           setAuthError(res.error);
         } else if (res.sessionEstablished) {
-          setAuthSuccess('Account created successfully! Welcome to The Weave Atelier.');
+          setAuthSuccess('Account created successfully! Welcome to Prasri Rugs.');
         }
       } else {
         // Sign In
@@ -351,7 +351,7 @@ export const AccountPage: React.FC = () => {
                 <p className="text-xs text-atelier-charcoal font-light leading-relaxed">
                   {authMode === 'signin'
                     ? 'Track orders in production, review custom sizing quotes, and sync saved items.'
-                    : 'Join The Weave Atelier to save bespoke dimensions, manage deliveries, and receive artisan updates.'}
+                    : 'Join Prasri Rugs to save bespoke dimensions, manage deliveries, and receive artisan updates.'}
                 </p>
               </div>
             )}
