@@ -37,10 +37,6 @@ export const CustomRugsPreview: React.FC = () => {
               </div>
               <div className="flex items-center space-x-2">
                 <CheckCircle2 size={14} className="text-atelier-gold flex-shrink-0" />
-                <span>Complimentary digital CAD layout and yarn color matching</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <CheckCircle2 size={14} className="text-atelier-gold flex-shrink-0" />
                 <span>Delivered worldwide with door-to-door courier tracking</span>
               </div>
             </div>
