@@ -5,7 +5,7 @@ export const ATELIER_PRIMARY_EMAIL = import.meta.env.VITE_ADMIN_EMAIL || 'prasri
 export interface EmailDispatchResult {
   success: boolean;
   message: string;
-  deliveredVia?: 'gmail_smtp' | 'resend' | 'simulated' | 'sandbox';
+  deliveredVia?: 'gmail_smtp' | 'resend' | 'simulated' | 'sandbox' | 'failed';
 }
 
 /**
@@ -24,6 +24,8 @@ async function dispatchToInbox(payload: {
 }): Promise<EmailDispatchResult> {
   const targetEmail = payload.toEmail || ATELIER_PRIMARY_EMAIL;
 
+  let lastError = '';
+
   // 1. Direct Real Gmail SMTP via our backend (/api/send-email)
   try {
     const response = await fetch('/api/send-email', {
@@ -41,8 +43,9 @@ async function dispatchToInbox(payload: {
       }),
     });
 
-    if (response.ok) {
-      const data = await response.json();
+    const data = await response.json().catch(() => null);
+
+    if (response.ok && data?.success) {
       auditLogEmail({
         targetEmail,
         subject: payload.subject,
@@ -55,8 +58,12 @@ async function dispatchToInbox(payload: {
         message: data.message || `Dispatched to ${targetEmail} via official Gmail servers.`,
         deliveredVia: data.deliveredVia || 'gmail_smtp',
       };
+    } else {
+      lastError = data?.error || `Email dispatch failed (HTTP ${response.status})`;
+      console.warn('[EmailService] Backend /api/send-email returned error:', lastError);
     }
-  } catch (err) {
+  } catch (err: any) {
+    lastError = err?.message || 'Network error reaching email dispatch service';
     console.warn('[EmailService] Backend /api/send-email call failed, attempting fallback:', err);
   }
 
@@ -86,26 +93,31 @@ async function dispatchToInbox(payload: {
           message: `Dispatched directly to ${targetEmail} via Resend.`,
           deliveredVia: 'resend',
         };
+      } else {
+        const resErr = await res.json().catch(() => null);
+        lastError = resErr?.message || `Resend API failed (HTTP ${res.status})`;
       }
-    } catch (err) {
+    } catch (err: any) {
+      lastError = err?.message || 'Resend dispatch failed';
       console.warn('[EmailService] Resend dispatch failed:', err);
     }
   }
 
-  // 3. Fallback: Local Audit Log & Console Sandbox
+  // 3. Fallback: Log failed transmission to audit log and return explicit failure
   auditLogEmail({
     targetEmail,
     subject: payload.subject,
-    success: true,
+    success: false,
     timestamp: new Date().toISOString(),
-    deliveredVia: 'sandbox',
+    deliveredVia: 'failed',
+    error: lastError,
     payload,
   });
 
   return {
-    success: true,
-    message: `Message safely routed and registered for ${targetEmail}.`,
-    deliveredVia: 'sandbox',
+    success: false,
+    message: lastError || `Failed to dispatch email to ${targetEmail}.`,
+    deliveredVia: 'failed',
   };
 }
 

@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Filter, X, ChevronDown, SlidersHorizontal } from 'lucide-react';
+import { Filter, X, ChevronDown, SlidersHorizontal, ChevronLeft, ChevronRight } from 'lucide-react';
 import { COLLECTIONS } from '../data/collections';
 import { Product, Technique, Material } from '../types';
 import { ProductCard } from '../components/product/ProductCard';
@@ -18,6 +18,11 @@ export const ShopPage: React.FC = () => {
   const initialCollection = searchParams.get('collection') || 'all';
   const initialAvailability = searchParams.get('availability') || 'all';
   const searchQuery = searchParams.get('search') || '';
+
+  // Pagination Configuration (12 rugs per page)
+  const ITEMS_PER_PAGE = 12;
+  const [currentPage, setCurrentPage] = useState(1);
+  const catalogTopRef = useRef<HTMLDivElement>(null);
 
   // Filter States
   const [selectedCollection, setSelectedCollection] = useState<string>(initialCollection);
@@ -110,7 +115,37 @@ export const ShopPage: React.FC = () => {
     selectedSize,
     selectedAvailability,
     sortBy,
+    products,
   ]);
+
+  // Reset pagination to page 1 whenever any filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [
+    searchQuery,
+    selectedCollection,
+    selectedTechnique,
+    selectedMaterial,
+    selectedColor,
+    selectedSize,
+    selectedAvailability,
+    sortBy,
+  ]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / ITEMS_PER_PAGE));
+
+  const paginatedProducts = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredProducts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredProducts, currentPage]);
+
+  const handlePageChange = (newPage: number) => {
+    const targetPage = Math.max(1, Math.min(newPage, totalPages));
+    setCurrentPage(targetPage);
+    if (catalogTopRef.current) {
+      catalogTopRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
 
   const clearAllFilters = () => {
     setSelectedCollection('all');
@@ -120,6 +155,7 @@ export const ShopPage: React.FC = () => {
     setSelectedSize('all');
     setSelectedAvailability('all');
     setSortBy('featured');
+    setCurrentPage(1);
     setSearchParams({});
   };
 
@@ -134,7 +170,7 @@ export const ShopPage: React.FC = () => {
 
   return (
     <div className="pt-20 sm:pt-24 pb-20 bg-atelier-ivory min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div ref={catalogTopRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Page Header */}
         <div className="border-b border-atelier-parchment pb-8 mb-8">
           <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase font-medium mb-2 flex items-center space-x-2">
@@ -358,14 +394,68 @@ export const ShopPage: React.FC = () => {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
-            {filteredProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onQuickView={(p) => setQuickViewProduct(p)}
-              />
-            ))}
+          <div className="space-y-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+              {paginatedProducts.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onQuickView={(p) => setQuickViewProduct(p)}
+                />
+              ))}
+            </div>
+
+            {/* Pagination Controls */}
+            <div className="pt-8 border-t border-atelier-parchment flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="text-xs text-atelier-taupe font-mono">
+                Showing{' '}
+                <span className="font-semibold text-atelier-softblack">
+                  {filteredProducts.length === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1}
+                </span>
+                –
+                <span className="font-semibold text-atelier-softblack">
+                  {Math.min(currentPage * ITEMS_PER_PAGE, filteredProducts.length)}
+                </span>{' '}
+                of <span className="font-semibold text-atelier-softblack">{filteredProducts.length}</span> pieces
+                {filteredProducts.length > ITEMS_PER_PAGE && ` · 12 rugs per page`}
+              </div>
+
+              {totalPages > 1 && (
+                <div className="flex items-center space-x-1.5">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="p-2 border border-atelier-parchment text-atelier-softblack hover:bg-atelier-parchment/60 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                    aria-label="Previous page"
+                  >
+                    <ChevronLeft size={15} />
+                  </button>
+
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                    <button
+                      key={pageNum}
+                      onClick={() => handlePageChange(pageNum)}
+                      className={`w-9 h-9 text-xs font-mono transition-colors ${
+                        currentPage === pageNum
+                          ? 'bg-atelier-softblack text-atelier-parchment font-medium'
+                          : 'border border-atelier-parchment text-atelier-softblack hover:bg-atelier-parchment/60'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  ))}
+
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="p-2 border border-atelier-parchment text-atelier-softblack hover:bg-atelier-parchment/60 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                    aria-label="Next page"
+                  >
+                    <ChevronRight size={15} />
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         )}
 

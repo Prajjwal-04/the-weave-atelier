@@ -60,16 +60,14 @@ export async function handleSendEmail(req, res) {
     const senderName = fromName || 'Prasri Rugs';
     const transporter = getTransporter();
 
-    // If Google App Password is not yet provided, log simulation & return graceful instructions
+    // If Google App Password is not yet provided, return error with instructions
     if (!transporter) {
-      console.log(`\n[Gmail SMTP Simulation] To: ${to} | Subject: "${subject}"`);
-      console.log(`[Gmail SMTP Notice] GMAIL_APP_PASSWORD is not set in .env. Once set, this email will send directly from ${gmailUser} via Google's official mail servers.\n`);
+      console.warn(`[Gmail SMTP Warning] GMAIL_APP_PASSWORD is not set. Cannot dispatch email to: ${to}`);
 
-      return sendJsonResponse(res, 200, {
-        success: true,
-        deliveredVia: 'simulated',
-        message: `Direct Gmail dispatcher ready for ${gmailUser}. Add GMAIL_APP_PASSWORD to .env to activate live Google SMTP delivery.`,
-        details: { to, subject, timestamp: new Date().toISOString() },
+      return sendJsonResponse(res, 503, {
+        success: false,
+        deliveredVia: 'unconfigured',
+        error: `Gmail dispatcher not configured on server. Add GMAIL_APP_PASSWORD to environment variables to activate live delivery.`,
       });
     }
 

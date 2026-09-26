@@ -49,9 +49,13 @@ export const paymentService = {
    * Retrieves Key ID for client-side checkout modal
    */
   getRazorpayKeyId(): string {
-    const envKey = import.meta.env.VITE_RAZORPAY_KEY_ID || '';
-    const storedKey = typeof window !== 'undefined' ? localStorage.getItem('twa_razorpay_key_id') || '' : '';
-    return (envKey || storedKey || 'rzp_test_Td1Mb3cvIhQdLW').trim();
+    const envKey = (import.meta.env.VITE_RAZORPAY_KEY_ID || '').trim();
+    const storedKey = typeof window !== 'undefined' ? (localStorage.getItem('twa_razorpay_key_id') || '').trim() : '';
+    // If a live key is configured via admin settings / localStorage, prioritize it
+    if (storedKey.startsWith('rzp_live_')) return storedKey;
+    if (envKey) return envKey;
+    if (storedKey) return storedKey;
+    return 'rzp_test_Td1Mb3cvIhQdLW';
   },
 
   setRazorpayKeyId(key: string): void {
@@ -65,13 +69,19 @@ export const paymentService = {
     return Boolean(key && (key.startsWith('rzp_test_') || key.startsWith('rzp_live_')));
   },
 
+  isLive(): boolean {
+    return this.getRazorpayKeyId().startsWith('rzp_live_');
+  },
+
   getStatus() {
     const key = this.getRazorpayKeyId();
     const isConfig = this.isConfigured();
+    const isLiveMode = key.startsWith('rzp_live_');
     return {
       razorpayConfigured: isConfig,
+      isLiveMode,
       razorpayKeyPrefix: isConfig ? key.substring(0, 8) + '...' : 'Not configured',
-      isSandboxMode: false,
+      isSandboxMode: !isLiveMode,
     };
   },
 

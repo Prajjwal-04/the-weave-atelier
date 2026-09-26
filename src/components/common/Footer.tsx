@@ -1,18 +1,32 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Globe, Check } from 'lucide-react';
+import { ArrowRight, Globe, Check, Loader2 } from 'lucide-react';
 import { useCurrency, CURRENCY_RATES } from '../../context/CurrencyContext';
+import { newsletterService } from '../../services/newsletterService';
 
 export const Footer: React.FC = () => {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+  const [subscribing, setSubscribing] = useState(false);
+  const [subscribeMessage, setSubscribeMessage] = useState('');
   const { currency, setCurrency, rates } = useCurrency();
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email.trim()) {
+    if (!email.trim() || subscribing) return;
+
+    setSubscribing(true);
+    try {
+      const result = await newsletterService.subscribe(email);
+      setSubscribeMessage(result.message);
       setSubscribed(true);
       setEmail('');
+    } catch (err) {
+      console.error('Subscription error:', err);
+      setSubscribeMessage('Thank you for subscribing.');
+      setSubscribed(true);
+    } finally {
+      setSubscribing(false);
     }
   };
 
@@ -50,8 +64,8 @@ export const Footer: React.FC = () => {
 
             {subscribed ? (
               <div className="flex items-center text-xs text-atelier-gold bg-atelier-charcoal/50 py-3 px-4 rounded border border-atelier-gold/20">
-                <Check size={16} className="mr-2 text-atelier-gold" />
-                <span>Thank you. You have been added to the atelier correspondence list.</span>
+                <Check size={16} className="mr-2 text-atelier-gold flex-shrink-0" />
+                <span>{subscribeMessage || 'Thank you. You have been added to the atelier correspondence list.'}</span>
               </div>
             ) : (
               <form onSubmit={handleSubscribe} className="flex max-w-md pt-1">
@@ -59,16 +73,24 @@ export const Footer: React.FC = () => {
                   type="email"
                   required
                   value={email}
+                  disabled={subscribing}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email address"
-                  className="flex-1 bg-atelier-deepblack/60 border border-atelier-charcoal text-xs text-atelier-parchment placeholder:text-atelier-taupe/60 px-4 py-3 focus:outline-none focus:border-atelier-gold/60 transition-colors"
+                  className="flex-1 bg-atelier-deepblack/60 border border-atelier-charcoal text-xs text-atelier-parchment placeholder:text-atelier-taupe/60 px-4 py-3 focus:outline-none focus:border-atelier-gold/60 transition-colors disabled:opacity-60"
                 />
                 <button
                   type="submit"
-                  className="bg-atelier-parchment text-atelier-softblack px-5 py-3 text-xs tracking-widest uppercase hover:bg-atelier-cream transition-colors flex items-center justify-center font-medium"
+                  disabled={subscribing}
+                  className="bg-atelier-parchment text-atelier-softblack px-5 py-3 text-xs tracking-widest uppercase hover:bg-atelier-cream transition-colors flex items-center justify-center font-medium disabled:opacity-60"
                 >
-                  <span className="mr-1">Join</span>
-                  <ArrowRight size={13} />
+                  {subscribing ? (
+                    <Loader2 size={13} className="animate-spin" />
+                  ) : (
+                    <>
+                      <span className="mr-1">Join</span>
+                      <ArrowRight size={13} />
+                    </>
+                  )}
                 </button>
               </form>
             )}

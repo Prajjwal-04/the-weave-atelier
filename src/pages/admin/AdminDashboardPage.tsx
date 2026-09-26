@@ -62,6 +62,7 @@ import { paymentService } from '../../services/paymentService';
 import { emailService, ATELIER_PRIMARY_EMAIL } from '../../services/emailService';
 import { supabase, isSupabaseConfigured } from '../../services/supabase';
 import { isStoreOwnerEmail } from '../../context/AuthContext';
+import { storageService } from '../../services/storageService';
 
 // Helper to optimize and convert local file to high-res data URL
 const processLocalImageFile = (file: File): Promise<string> => {
@@ -539,15 +540,21 @@ export const AdminDashboardPage: React.FC = () => {
 
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        const dataUrl = await processLocalImageFile(file);
         const sequenceIndex = imagesList.length + i;
         const assignedViewType: ImageViewType =
           defaultPerspectiveSequence[sequenceIndex % defaultPerspectiveSequence.length] || 'living-room';
         const cleanBadge = getPerspectiveBadge(assignedViewType);
 
+        // Upload to Cloud Storage / server filesystem to prevent database text bloat
+        const uploadRes = await storageService.uploadProductImage(
+          file,
+          prodSlug || 'new-rug',
+          assignedViewType
+        );
+
         newImages.push({
           id: `img-upload-${Date.now()}-${i}`,
-          url: dataUrl,
+          url: uploadRes.url,
           alt: `${prodName || 'Handcrafted rug'} - ${cleanBadge}`,
           viewType: assignedViewType,
           label: cleanBadge,
@@ -697,6 +704,17 @@ export const AdminDashboardPage: React.FC = () => {
       .map((c) => c.trim())
       .filter(Boolean);
 
+    // Sanitize images to ensure no Base64 strings are saved into the database
+    const sanitizedImages = await Promise.all(
+      imagesList.map(async (img) => {
+        if (img.url && img.url.startsWith('data:image/')) {
+          const res = await storageService.uploadProductImage(img.url, prodSlug.trim(), img.viewType);
+          return { ...img, url: res.url };
+        }
+        return img;
+      })
+    );
+
     const productPayload: Omit<Product, 'id'> = {
       name: prodName.trim(),
       slug: prodSlug.trim(),
@@ -719,7 +737,7 @@ export const AdminDashboardPage: React.FC = () => {
       bestSeller: prodBestSeller,
       isNew: prodIsNew,
       isReadyToShip: prodIsReadyToShip,
-      images: imagesList,
+      images: sanitizedImages,
       variants: variantsList,
     };
 

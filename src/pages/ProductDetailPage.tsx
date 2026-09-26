@@ -28,7 +28,7 @@ import { RoomScaleVisualizer } from '../components/product/RoomScaleVisualizer';
 export const ProductDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const { products, getInventory, notifyMeBackInStock } = useInventory();
+  const { products, isLoading, getInventory, notifyMeBackInStock } = useInventory();
 
   const product = products.find((p) => p.slug === slug);
 
@@ -111,6 +111,48 @@ export const ProductDetailPage: React.FC = () => {
     }
     return product.variants[0];
   }, [product, selectedVariant]);
+
+  if (!product && isLoading) {
+    return (
+      <div className="pt-24 sm:pt-28 pb-24 bg-atelier-ivory min-h-screen">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 animate-pulse space-y-8">
+          {/* Breadcrumb skeleton */}
+          <div className="h-4 w-48 bg-atelier-parchment/60 rounded" />
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+            {/* Gallery Skeleton */}
+            <div className="lg:col-span-7 space-y-4">
+              <div className="aspect-[4/5] sm:aspect-[4/3] w-full bg-atelier-parchment/50 border border-atelier-parchment/70" />
+              <div className="flex gap-2">
+                <div className="w-20 h-20 bg-atelier-parchment/40 border border-atelier-parchment/60" />
+                <div className="w-20 h-20 bg-atelier-parchment/40 border border-atelier-parchment/60" />
+                <div className="w-20 h-20 bg-atelier-parchment/40 border border-atelier-parchment/60" />
+              </div>
+            </div>
+
+            {/* Buy Box Skeleton */}
+            <div className="lg:col-span-5 space-y-6">
+              <div className="space-y-2">
+                <div className="h-3 w-28 bg-atelier-parchment/60 rounded" />
+                <div className="h-8 w-3/4 bg-atelier-parchment/80 rounded" />
+                <div className="h-4 w-1/2 bg-atelier-parchment/40 rounded" />
+              </div>
+              <div className="h-6 w-32 bg-atelier-parchment/70 rounded" />
+              <div className="space-y-3 pt-4 border-t border-atelier-parchment/60">
+                <div className="h-4 w-24 bg-atelier-parchment/60 rounded" />
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="h-12 bg-atelier-parchment/40 rounded" />
+                  <div className="h-12 bg-atelier-parchment/40 rounded" />
+                  <div className="h-12 bg-atelier-parchment/40 rounded" />
+                </div>
+              </div>
+              <div className="h-12 w-full bg-atelier-parchment/70 rounded" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!product) {
     return (

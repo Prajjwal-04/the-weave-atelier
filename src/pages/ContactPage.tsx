@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, MessageCircle, MapPin, Instagram, Check, ArrowRight, Clock, Loader2, ExternalLink } from 'lucide-react';
+import { Mail, MessageCircle, MapPin, Instagram, Check, ArrowRight, Clock, Loader2, ExternalLink, AlertCircle } from 'lucide-react';
 import { emailService, ATELIER_PRIMARY_EMAIL } from '../services/emailService';
 
 export const ContactPage: React.FC = () => {
@@ -13,19 +13,24 @@ export const ContactPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [deliveryStatus, setDeliveryStatus] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setErrorMessage(null);
 
     try {
       const result = await emailService.sendContactInquiry(formData);
-      setDeliveryStatus(result.message);
-      setSubmitted(true);
-    } catch (err) {
+      if (result.success) {
+        setDeliveryStatus(result.message);
+        setSubmitted(true);
+      } else {
+        setErrorMessage(result.message || 'Message dispatch failed. Please use direct email or WhatsApp.');
+      }
+    } catch (err: any) {
       console.error('Inquiry transmission error:', err);
-      // Still show success as local fallback is active
-      setSubmitted(true);
+      setErrorMessage(err?.message || 'Transmission error. Please reach us directly via email or WhatsApp.');
     } finally {
       setIsSubmitting(false);
     }
@@ -203,6 +208,29 @@ export const ContactPage: React.FC = () => {
                     <span className="font-medium text-atelier-softblack">{ATELIER_PRIMARY_EMAIL}</span>.
                   </p>
                 </div>
+
+                {errorMessage && (
+                  <div className="p-4 bg-amber-50/90 border border-amber-200 text-xs text-amber-900 space-y-2">
+                    <div className="flex items-start">
+                      <AlertCircle size={16} className="mr-2 text-amber-700 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <span className="font-medium">{errorMessage}</span>
+                        <p className="text-[11px] text-amber-800 mt-1">
+                          You can still send your message directly using your email app or WhatsApp:
+                        </p>
+                      </div>
+                    </div>
+                    <div className="pt-1 flex flex-wrap gap-2">
+                      <a
+                        href={mailtoLink}
+                        className="inline-flex items-center px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-950 font-medium text-[11px] transition-colors"
+                      >
+                        <Mail size={12} className="mr-1.5 text-amber-800" />
+                        Send via Email App ({ATELIER_PRIMARY_EMAIL})
+                      </a>
+                    </div>
+                  </div>
+                )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
