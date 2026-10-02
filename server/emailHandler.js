@@ -24,10 +24,8 @@ function cleanOldRateLimits() {
   }
 }
 
-// Periodically clean rate limit cache
-setInterval(cleanOldRateLimits, 5 * 60 * 1000);
-
 function checkRateLimit(ip, maxLimit) {
+  cleanOldRateLimits();
   const now = Date.now();
   const timestamps = (rateLimitMap.get(ip) || []).filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
   if (timestamps.length >= maxLimit) {

@@ -42,16 +42,33 @@ function razorpayApiPlugin(): Plugin {
 }
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ command, mode }) => {
   // Load all environment variables (including non-VITE_ ones) into process.env for the dev server
   const env = loadEnv(mode, process.cwd(), '');
   process.env = { ...process.env, ...env };
 
+  const plugins: Plugin[] = [react()];
+  if (command === 'serve') {
+    plugins.push(razorpayApiPlugin());
+  }
+
   return {
-    plugins: [react(), razorpayApiPlugin()],
+    plugins,
     server: {
       port: 3000,
       open: false,
+    },
+    build: {
+      chunkSizeWarningLimit: 1200,
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+            'vendor-icons': ['lucide-react'],
+            'vendor-supabase': ['@supabase/supabase-js'],
+          },
+        },
+      },
     },
   };
 });
