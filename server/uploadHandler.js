@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { parseRequestBody, sendJsonResponse } from './razorpayHandlers.js';
+import { parseRequestBody, sendJsonResponse, verifyAdminAuthorization } from './razorpayHandlers.js';
 
 /**
  * Handles image file upload to public/images/products/<slug>/
@@ -13,6 +13,14 @@ import { parseRequestBody, sendJsonResponse } from './razorpayHandlers.js';
  * }
  */
 export async function handleUploadImage(req, res) {
+  // Enforce administrative authorization
+  if (!verifyAdminAuthorization(req)) {
+    return sendJsonResponse(res, 401, {
+      success: false,
+      error: 'Unauthorized: Administrator authentication required to upload images.',
+    });
+  }
+
   try {
     const body = await parseRequestBody(req);
     const { slug, dataUrl, filename, viewType } = body;

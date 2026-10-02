@@ -27,6 +27,13 @@ export function parseRequestBody(req) {
     if (req.body && typeof req.body === 'object') {
       return resolve(req.body);
     }
+    if (typeof req.body === 'string' && req.body.trim()) {
+      try {
+        return resolve(JSON.parse(req.body));
+      } catch (err) {
+        return reject(new Error('Invalid JSON string in request body'));
+      }
+    }
     let data = '';
     req.on('data', (chunk) => {
       data += chunk;
@@ -43,9 +50,12 @@ export function parseRequestBody(req) {
 }
 
 export function sendJsonResponse(res, statusCode, payload) {
+  if (typeof res.status === 'function' && typeof res.json === 'function') {
+    return res.status(statusCode).json(payload);
+  }
   res.statusCode = statusCode;
   res.setHeader('Content-Type', 'application/json');
-  res.end(JSON.stringify(payload));
+  return res.end(JSON.stringify(payload));
 }
 
 /**
@@ -209,7 +219,7 @@ function saveVerifiedOrder(order) {
 /**
  * Verify administrative authorization from Bearer token or Supabase JWT
  */
-function verifyAdminAuthorization(req) {
+export function verifyAdminAuthorization(req) {
   const authHeader = req.headers['authorization'] || req.headers['Authorization'];
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return false;

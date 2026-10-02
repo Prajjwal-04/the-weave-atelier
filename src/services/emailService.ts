@@ -1,4 +1,5 @@
 import { Order, CustomQuoteRequest } from '../types';
+import { supabase, isSupabaseConfigured } from './supabase';
 
 export const ATELIER_PRIMARY_EMAIL = import.meta.env.VITE_ADMIN_EMAIL || 'prasrirugs@gmail.com';
 
@@ -28,11 +29,22 @@ async function dispatchToInbox(payload: {
 
   // 1. Direct Real Gmail SMTP via our backend (/api/send-email)
   try {
+    let token = '';
+    if (isSupabaseConfigured() && supabase) {
+      const { data: { session } } = await supabase.auth.getSession();
+      token = session?.access_token || '';
+    }
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const response = await fetch('/api/send-email', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify({
         to: targetEmail,
         replyTo: payload.replyTo,

@@ -94,11 +94,22 @@ export const storageService = {
       }
 
       if (resolvedDataUrl && resolvedDataUrl.startsWith('data:image/')) {
+        let token = '';
+        if (isSupabaseConfigured() && supabase) {
+          const { data: { session } } = await supabase.auth.getSession();
+          token = session?.access_token || '';
+        }
+
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/json',
+        };
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+
         const response = await fetch('/api/upload-image', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers,
           body: JSON.stringify({
             slug: cleanSlug,
             dataUrl: resolvedDataUrl,

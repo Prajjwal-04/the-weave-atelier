@@ -55,7 +55,7 @@ export const paymentService = {
     if (storedKey.startsWith('rzp_live_')) return storedKey;
     if (envKey) return envKey;
     if (storedKey) return storedKey;
-    return 'rzp_test_Td1Mb3cvIhQdLW';
+    return envKey;
   },
 
   setRazorpayKeyId(key: string): void {
