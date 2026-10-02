@@ -1,6 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Search, Heart, ShoppingBag, User, Menu, X, Globe, ChevronDown } from 'lucide-react';
+import {
+  Search,
+  Heart,
+  ShoppingBag,
+  User,
+  Menu,
+  X,
+  Globe,
+  ChevronDown,
+  ArrowRight,
+  Sparkles,
+  Layers,
+  Compass,
+} from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
 import { useCurrency, CURRENCY_RATES } from '../../context/CurrencyContext';
@@ -13,9 +26,15 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileCollectionsOpen, setMobileCollectionsOpen] = useState(false);
   const [currencyDropdownOpen, setCurrencyDropdownOpen] = useState(false);
-  const [collectionsDropdownOpen, setCollectionsDropdownOpen] = useState(false);
-  
+  const [collectionsHovered, setCollectionsHovered] = useState(false);
+  const [studioHovered, setStudioHovered] = useState(false);
+
+  const currencyRef = useRef<HTMLDivElement>(null);
+  const collectionsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const studioTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const { toggleCart, totalItemCount } = useCart();
   const { wishlistCount } = useWishlist();
   const { currency, setCurrency, rates } = useCurrency();
@@ -23,181 +42,372 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 25) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+      setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close mobile menu on route change
+  // Close menus on route change
   useEffect(() => {
     setMobileMenuOpen(false);
-    setCollectionsDropdownOpen(false);
+    setMobileCollectionsOpen(false);
+    setCollectionsHovered(false);
+    setStudioHovered(false);
+    setCurrencyDropdownOpen(false);
   }, [location.pathname]);
 
-  const navLinks = [
-    { label: 'SHOP', path: '/shop' },
-    { label: 'COLLECTIONS', path: '/collections', hasDropdown: true },
-    { label: 'THE ATELIER', path: '/the-atelier' },
-    { label: 'CRAFT', path: '/craft' },
-    { label: 'CUSTOM RUGS', path: '/custom-rugs' },
-    { label: 'JOURNAL', path: '/journal' },
-    { label: 'ABOUT', path: '/about' },
-    { label: 'CONTACT', path: '/contact' },
-  ];
+  // Click outside listener for currency dropdown
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (currencyRef.current && !currencyRef.current.contains(e.target as Node)) {
+        setCurrencyDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleCollectionsEnter = () => {
+    if (collectionsTimeoutRef.current) clearTimeout(collectionsTimeoutRef.current);
+    setCollectionsHovered(true);
+  };
+
+  const handleCollectionsLeave = () => {
+    collectionsTimeoutRef.current = setTimeout(() => {
+      setCollectionsHovered(false);
+    }, 140);
+  };
+
+  const handleStudioEnter = () => {
+    if (studioTimeoutRef.current) clearTimeout(studioTimeoutRef.current);
+    setStudioHovered(true);
+  };
+
+  const handleStudioLeave = () => {
+    studioTimeoutRef.current = setTimeout(() => {
+      setStudioHovered(false);
+    }, 140);
+  };
 
   const collections = [
-    { name: 'Modern Forms', path: '/collections/modern-forms', desc: 'Abstract and contemporary designs' },
-    { name: 'Quiet Neutrals', path: '/collections/quiet-neutrals', desc: 'Soft, restrained rugs for calm interiors' },
-    { name: 'Botanical Studies', path: '/collections/botanical-studies', desc: 'Abstracted nature-inspired motifs' },
-    { name: 'Heritage Reimagined', path: '/collections/heritage-reimagined', desc: 'Traditional roots through a modern lens' },
-    { name: 'Texture & Sculpture', path: '/collections/texture-sculpture', desc: 'High-low carved dimensional surfaces' },
-    { name: 'Hand-Knotted Collection', path: '/collections/hand-knotted-collection', desc: 'Generational loom-woven master craft' },
+    {
+      name: 'Modern Forms',
+      path: '/collections/modern-forms',
+      tagline: 'Architectural geometries & organic contours',
+      image: 'https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=400&q=80',
+    },
+    {
+      name: 'Quiet Neutrals',
+      path: '/collections/quiet-neutrals',
+      tagline: 'Soft, restrained earth tones for serene spaces',
+      image: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=400&q=80',
+    },
+    {
+      name: 'Botanical Studies',
+      path: '/collections/botanical-studies',
+      tagline: 'Abstracted flora & nature-dyed pigments',
+      image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=400&q=80',
+    },
+    {
+      name: 'Texture & Sculpture',
+      path: '/collections/texture-sculpture',
+      tagline: 'High-low carved pile and variable reliefs',
+      image: 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=400&q=80',
+    },
+    {
+      name: 'Heritage Reimagined',
+      path: '/collections/heritage-reimagined',
+      tagline: 'Centuries of Indian weaving reimagined',
+      image: 'https://images.unsplash.com/photo-1579656381226-5fc0f0100c3b?auto=format&fit=crop&w=400&q=80',
+    },
+    {
+      name: 'Hand-Knotted Archive',
+      path: '/collections/hand-knotted-collection',
+      tagline: 'Generational heirloom master craft',
+      image: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=400&q=80',
+    },
+  ];
+
+  const studioLinks = [
+    { title: 'The Atelier', path: '/the-atelier', desc: 'Our story, heritage, and Bhadohi coordinates' },
+    { title: 'The Craft', path: '/craft', desc: 'Step-by-step hand-tufting and knotting traditions' },
+    { title: 'Journal & Stories', path: '/journal', desc: 'Design philosophy, architecture & styling' },
+    { title: 'Size & Styling Guide', path: '/size-guide', desc: 'Room layout proportions and dimensioning' },
+    { title: 'Rug Care Guide', path: '/rug-care', desc: 'Preserving wool pile, cleaning and storage' },
   ];
 
   const isHomePage = location.pathname === '/';
   const isTransparent = isHomePage && !isScrolled;
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-40 transition-all duration-300">
+    <header className="fixed top-0 left-0 right-0 z-40">
       {/* Main Navbar */}
       <nav
-        className={`transition-all duration-300 ${
+        className={`w-full transition-all duration-300 ${
           isTransparent
-            ? 'bg-transparent border-b border-white/15 py-5'
+            ? 'bg-gradient-to-b from-black/85 via-black/45 to-transparent border-b border-white/15 py-4 sm:py-5'
             : isScrolled
-            ? 'bg-atelier-ivory/95 backdrop-blur-md shadow-subtle border-b border-atelier-parchment/60 py-3'
-            : 'bg-atelier-ivory/90 backdrop-blur-sm border-b border-atelier-parchment/40 py-4'
+            ? 'bg-[#FAF8F5] border-b border-[#E6E1D8] shadow-[0_4px_20px_rgba(26,25,24,0.06)] py-3 sm:py-3.5'
+            : 'bg-[#FAF8F5] border-b border-[#E6E1D8] shadow-xs py-4 sm:py-4.5'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
-            {/* Left: Mobile menu button */}
-            <div className="flex items-center lg:hidden">
+        <div className="max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8 xl:px-10">
+          {/* 3-Column Balanced Luxury Grid - Symmetrically Distributed */}
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center h-14 sm:h-16 gap-1 sm:gap-4">
+            
+            {/* COLUMN 1 (LEFT): Curated Desktop Navigation Links Shifted Left & Mobile Toggle */}
+            <div className="flex items-center space-x-1 sm:space-x-2 min-w-0 lg:-ml-2 xl:-ml-4">
+              {/* Mobile Menu Button - Shown on all screens < lg (mobile & tablets) */}
               <button
                 onClick={() => setMobileMenuOpen(true)}
-                className={`p-1.5 transition-colors ${
+                className={`lg:hidden p-1.5 sm:p-2 -ml-1 sm:-ml-2 rounded-full transition-colors flex-shrink-0 ${
                   isTransparent
-                    ? 'text-white hover:text-atelier-parchment'
-                    : 'text-atelier-softblack hover:text-atelier-brown'
+                    ? 'text-white hover:bg-white/10'
+                    : 'text-atelier-softblack hover:bg-atelier-cream'
                 }`}
-                aria-label="Open navigation menu"
+                aria-label="Open Navigation Menu"
               >
-                <Menu size={22} strokeWidth={1.5} />
+                <Menu size={20} strokeWidth={1.5} />
               </button>
+
+              {/* Desktop Left Navigation - Anchored to the left */}
+              <div className="hidden lg:flex items-center space-x-3 xl:space-x-5.5 min-w-0">
+                <Link
+                  to="/shop"
+                  className={`text-[10px] xl:text-[11px] font-semibold tracking-[0.14em] xl:tracking-[0.2em] uppercase transition-colors relative py-1 whitespace-nowrap group ${
+                    isTransparent
+                      ? 'text-white/95 hover:text-white'
+                      : 'text-atelier-softblack hover:text-atelier-darkbrown'
+                  }`}
+                >
+                  <span>Shop</span>
+                  <span
+                    className={`absolute bottom-0 left-0 w-0 h-[1.5px] transition-all duration-300 group-hover:w-full ${
+                      isTransparent ? 'bg-white' : 'bg-atelier-softblack'
+                    }`}
+                  />
+                </Link>
+
+                {/* Collections Mega Menu Trigger */}
+                <div
+                  className="relative py-1"
+                  onMouseEnter={handleCollectionsEnter}
+                  onMouseLeave={handleCollectionsLeave}
+                >
+                  <Link
+                    to="/collections"
+                    className={`flex items-center text-[10px] xl:text-[11px] font-semibold tracking-[0.14em] xl:tracking-[0.2em] uppercase transition-colors whitespace-nowrap group ${
+                      isTransparent
+                        ? 'text-white/95 hover:text-white'
+                        : 'text-atelier-softblack hover:text-atelier-darkbrown'
+                    }`}
+                  >
+                    <span>Collections</span>
+                    <ChevronDown
+                      size={11}
+                      className={`ml-1 transition-transform duration-300 ${
+                        collectionsHovered ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </Link>
+
+                  {/* Collections Dropdown Card */}
+                  <div
+                    className={`absolute top-full -left-4 pt-3 w-[580px] transition-all duration-300 ${
+                      collectionsHovered
+                        ? 'opacity-100 translate-y-0 pointer-events-auto'
+                        : 'opacity-0 -translate-y-2 pointer-events-none'
+                    }`}
+                  >
+                    <div className="bg-atelier-ivory border border-atelier-parchment shadow-[0_20px_60px_-15px_rgba(26,25,24,0.15)] p-5 rounded-none">
+                      <div className="flex items-center justify-between pb-3 border-b border-atelier-parchment mb-3.5">
+                        <span className="text-[10px] tracking-[0.25em] uppercase font-mono text-atelier-taupe font-medium">
+                          Curated Collections
+                        </span>
+                        <Link
+                          to="/collections"
+                          className="text-[10px] tracking-wider uppercase text-atelier-darkbrown hover:text-black font-medium flex items-center group/all"
+                        >
+                          <span>View All</span>
+                          <ArrowRight size={11} className="ml-1 group-hover/all:translate-x-1 transition-transform" />
+                        </Link>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        {collections.map((c) => (
+                          <Link
+                            key={c.name}
+                            to={c.path}
+                            className="group/item flex items-center space-x-3 p-2 rounded hover:bg-atelier-cream/70 transition-colors"
+                          >
+                            <div className="w-12 h-12 rounded-sm overflow-hidden bg-atelier-parchment flex-shrink-0 border border-atelier-parchment">
+                              <img
+                                src={c.image}
+                                alt={c.name}
+                                className="w-full h-full object-cover group-hover/item:scale-105 transition-transform duration-500"
+                                loading="lazy"
+                              />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="font-serif text-sm text-atelier-softblack group-hover/item:text-atelier-darkbrown font-normal transition-colors">
+                                {c.name}
+                              </div>
+                              <p className="text-[10px] text-atelier-taupe font-light truncate mt-0.5">
+                                {c.tagline}
+                              </p>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bespoke Rugs */}
+                <Link
+                  to="/custom-rugs"
+                  className={`text-[10px] xl:text-[11px] font-semibold tracking-[0.14em] xl:tracking-[0.2em] uppercase transition-colors relative py-1 whitespace-nowrap group ${
+                    isTransparent
+                      ? 'text-white/95 hover:text-white'
+                      : 'text-atelier-softblack hover:text-atelier-darkbrown'
+                  }`}
+                >
+                  <span>Bespoke</span>
+                  <span
+                    className={`absolute bottom-0 left-0 w-0 h-[1.5px] transition-all duration-300 group-hover:w-full ${
+                      isTransparent ? 'bg-white' : 'bg-atelier-softblack'
+                    }`}
+                  />
+                </Link>
+
+                {/* Studio & Craft Dropdown */}
+                <div
+                  className="relative py-1"
+                  onMouseEnter={handleStudioEnter}
+                  onMouseLeave={handleStudioLeave}
+                >
+                  <button
+                    className={`flex items-center text-[10px] xl:text-[11px] font-semibold tracking-[0.14em] xl:tracking-[0.2em] uppercase transition-colors whitespace-nowrap group ${
+                      isTransparent
+                        ? 'text-white/95 hover:text-white'
+                        : 'text-atelier-softblack hover:text-atelier-darkbrown'
+                    }`}
+                  >
+                    <span>Studio</span>
+                    <ChevronDown
+                      size={11}
+                      className={`ml-1 transition-transform duration-300 ${
+                        studioHovered ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+
+                  <div
+                    className={`absolute top-full -left-4 pt-3 w-64 transition-all duration-300 ${
+                      studioHovered
+                        ? 'opacity-100 translate-y-0 pointer-events-auto'
+                        : 'opacity-0 -translate-y-2 pointer-events-none'
+                    }`}
+                  >
+                    <div className="bg-atelier-ivory border border-atelier-parchment shadow-[0_20px_60px_-15px_rgba(26,25,24,0.15)] p-3">
+                      <div className="text-[9px] tracking-[0.25em] uppercase font-mono text-atelier-taupe px-3 py-1.5 border-b border-atelier-parchment/60 mb-1">
+                        Atelier & Guides
+                      </div>
+                      {studioLinks.map((item) => (
+                        <Link
+                          key={item.title}
+                          to={item.path}
+                          className="block px-3 py-2 rounded hover:bg-atelier-cream/70 transition-colors group/item"
+                        >
+                          <div className="text-xs font-serif text-atelier-softblack group-hover/item:text-atelier-darkbrown">
+                            {item.title}
+                          </div>
+                          <div className="text-[10px] text-atelier-taupe font-light line-clamp-1 mt-0.5">
+                            {item.desc}
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Contact */}
+                <Link
+                  to="/contact"
+                  className={`text-[10px] xl:text-[11px] font-semibold tracking-[0.14em] xl:tracking-[0.2em] uppercase transition-colors relative py-1 whitespace-nowrap group ${
+                    isTransparent
+                      ? 'text-white/95 hover:text-white'
+                      : 'text-atelier-softblack hover:text-atelier-darkbrown'
+                  }`}
+                >
+                  <span>Contact</span>
+                  <span
+                    className={`absolute bottom-0 left-0 w-0 h-[1.5px] transition-all duration-300 group-hover:w-full ${
+                      isTransparent ? 'bg-white' : 'bg-atelier-softblack'
+                    }`}
+                  />
+                </Link>
+              </div>
             </div>
 
-            {/* Brand Logo */}
-            <div className="flex-1 lg:flex-initial text-center lg:text-left">
-              <Link to="/" className="inline-block group">
-                <div className="flex flex-col items-center lg:items-start">
+            {/* COLUMN 2 (CENTER): Prominent Architectural Brand Identity (Enhanced Scale) */}
+            <div className="flex flex-col items-center justify-center text-center px-1 sm:px-4 flex-shrink-0">
+              <Link to="/" className="inline-block group focus:outline-none text-center">
+                <div className="flex flex-col items-center leading-tight">
                   <span
-                    className={`font-serif text-xl sm:text-2xl tracking-[0.24em] sm:tracking-[0.28em] font-normal transition-colors ${
+                    className={`font-serif text-[16px] xs:text-[17px] sm:text-[22px] md:text-[25px] lg:text-[28px] xl:text-[31px] tracking-[0.16em] sm:tracking-[0.22em] lg:tracking-[0.25em] font-medium transition-colors duration-300 whitespace-nowrap ${
                       isTransparent
-                        ? 'text-white group-hover:text-atelier-parchment'
+                        ? 'text-white group-hover:text-atelier-parchment drop-shadow-md'
                         : 'text-atelier-softblack group-hover:text-atelier-darkbrown'
                     }`}
                   >
                     PRASRI RUGS
                   </span>
                   <span
-                    className={`text-[8px] tracking-[0.35em] uppercase font-sans mt-0.5 transition-colors ${
-                      isTransparent ? 'text-white/70' : 'text-atelier-taupe'
+                    className={`text-[7.5px] sm:text-[9px] lg:text-[10px] tracking-[0.28em] sm:tracking-[0.36em] font-sans font-semibold mt-0.5 sm:mt-1 transition-colors duration-300 whitespace-nowrap ${
+                      isTransparent ? 'text-white/90 drop-shadow-sm' : 'text-[#5A544D]'
                     }`}
+                    style={{ fontVariant: 'all-small-caps' }}
                   >
-                    BHADOHI · INDIA
+                    bhadohi, india
                   </span>
                 </div>
               </Link>
             </div>
 
-            {/* Desktop Navigation Links */}
-            <div className="hidden lg:flex items-center space-x-7">
-              {navLinks.map((link) => {
-                const isActive = location.pathname === link.path;
-                return (
-                  <div key={link.label} className="relative group">
-                    <Link
-                      to={link.path}
-                      className={`relative text-[12px] tracking-[0.2em] font-medium transition-colors duration-300 py-1 inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-[1px] after:transition-all after:duration-300 ${
-                        isTransparent
-                          ? isActive
-                            ? 'text-white after:w-full after:bg-white'
-                            : 'text-white/80 hover:text-white after:w-0 hover:after:w-full after:bg-white'
-                          : isActive
-                          ? 'text-atelier-softblack after:w-full after:bg-atelier-softblack'
-                          : 'text-atelier-charcoal/80 hover:text-atelier-softblack after:w-0 hover:after:w-full after:bg-atelier-softblack'
-                      }`}
-                    >
-                      {link.label}
-                    </Link>
-
-                    {/* Mega dropdown for Collections */}
-                    {link.hasDropdown && (
-                      <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 w-80 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 z-50">
-                        <div className="bg-atelier-ivory border border-atelier-parchment shadow-luxury p-4 space-y-1 text-left">
-                          <div className="text-[10px] tracking-widest text-atelier-taupe uppercase pb-2 border-b border-atelier-parchment font-medium">
-                            Curated Rug Collections
-                          </div>
-                          {collections.map((c) => (
-                            <Link
-                              key={c.name}
-                              to={c.path}
-                              className="block px-2 py-2 hover:bg-atelier-cream/70 transition-colors"
-                            >
-                              <div className="text-xs font-serif tracking-wider text-atelier-softblack font-medium">
-                                {c.name}
-                              </div>
-                              <div className="text-[11px] text-atelier-taupe line-clamp-1">
-                                {c.desc}
-                              </div>
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Right: Currency, Search, Wishlist, Account, Cart */}
-            <div className="flex items-center space-x-3 sm:space-x-4">
-              {/* Currency Selector */}
-              <div className="relative">
+            {/* COLUMN 3 (RIGHT): Currency (md+ & desktop), Search, Wishlist, Account (xl+), Bag */}
+            <div className="flex items-center justify-end space-x-1 sm:space-x-1.5 md:space-x-2.5 min-w-0">
+              {/* Currency Selector Pill - Shown on tablets (md+) & desktop where there's zero overlap; kept in drawer on mobile */}
+              <div className="relative hidden md:block flex-shrink-0" ref={currencyRef}>
                 <button
                   onClick={() => setCurrencyDropdownOpen(!currencyDropdownOpen)}
-                  className={`flex items-center text-[11px] tracking-widest transition-colors py-1 px-1.5 border rounded ${
+                  className={`flex items-center text-[10px] sm:text-[11px] font-mono tracking-widest py-1 px-2.5 rounded-full border transition-all duration-300 ${
                     isTransparent
-                      ? 'text-white/85 hover:text-white border-white/20 hover:border-white/40'
-                      : 'text-atelier-charcoal hover:text-atelier-softblack border-transparent hover:border-atelier-parchment'
+                      ? 'text-white bg-black/35 hover:bg-black/50 border-white/25 shadow-sm'
+                      : 'text-atelier-softblack bg-white hover:bg-atelier-cream border-atelier-parchment hover:border-atelier-taupe/60 shadow-xs'
                   }`}
-                  aria-label="Change currency"
+                  aria-label="Select Currency"
                 >
                   <Globe
-                    size={13}
+                    size={11}
                     className={`mr-1 transition-colors ${
                       isTransparent ? 'text-white/80' : 'text-atelier-taupe'
                     }`}
-                    strokeWidth={1.5}
                   />
-                  <span>{currency}</span>
+                  <span className="font-semibold">{currency}</span>
                   <ChevronDown
-                    size={11}
-                    className={`ml-0.5 transition-colors ${
-                      isTransparent ? 'text-white/80' : 'text-atelier-taupe'
+                    size={10}
+                    className={`ml-1 transition-transform duration-200 ${
+                      currencyDropdownOpen ? 'rotate-180' : ''
                     }`}
                   />
                 </button>
 
                 {currencyDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-44 bg-atelier-ivory border border-atelier-parchment shadow-luxury py-1 z-50 text-atelier-softblack text-left">
-                    <div className="px-3 py-1.5 text-[9px] uppercase tracking-widest text-atelier-taupe font-medium border-b border-atelier-parchment">
-                      Select Currency
+                  <div className="absolute right-0 mt-2 w-48 bg-atelier-ivory border border-atelier-parchment shadow-[0_15px_35px_rgba(26,25,24,0.12)] py-1.5 z-50 animate-fadeIn text-left">
+                    <div className="px-3 py-1 text-[9px] uppercase tracking-widest text-atelier-taupe font-mono border-b border-atelier-parchment">
+                      Currency
                     </div>
                     {Object.values(rates || CURRENCY_RATES).map((rate) => (
                       <button
@@ -206,14 +416,14 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
                           setCurrency(rate.code);
                           setCurrencyDropdownOpen(false);
                         }}
-                        className={`w-full text-left px-3 py-1.5 text-xs flex items-center justify-between hover:bg-atelier-cream/80 transition-colors ${
+                        className={`w-full text-left px-3 py-1.5 text-xs flex items-center justify-between hover:bg-atelier-cream transition-colors ${
                           currency === rate.code
-                            ? 'font-semibold text-atelier-softblack bg-atelier-cream/50'
+                            ? 'font-semibold text-atelier-softblack bg-atelier-cream/60'
                             : 'text-atelier-charcoal'
                         }`}
                       >
-                        <span>{rate.name}</span>
-                        <span className="font-mono text-atelier-taupe text-[11px]">
+                        <span className="font-sans">{rate.name}</span>
+                        <span className="font-mono text-[11px] text-atelier-taupe">
                           {rate.code} ({rate.symbol})
                         </span>
                       </button>
@@ -222,67 +432,68 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
                 )}
               </div>
 
-              {/* Search Icon */}
+              {/* Search Trigger */}
               <button
                 onClick={onOpenSearch}
-                className={`p-1.5 transition-colors ${
+                className={`p-1.5 sm:p-2 rounded-full transition-all duration-300 flex-shrink-0 ${
                   isTransparent
-                    ? 'text-white/85 hover:text-white'
-                    : 'text-atelier-charcoal hover:text-atelier-softblack'
+                    ? 'text-white hover:text-white hover:bg-white/15'
+                    : 'text-atelier-softblack hover:text-black hover:bg-atelier-cream'
                 }`}
-                aria-label="Search rugs"
+                aria-label="Search Collection"
+                title="Search (⌘K)"
               >
-                <Search size={18} strokeWidth={1.5} />
+                <Search size={17} className="sm:w-[18px] sm:h-[18px]" strokeWidth={1.5} />
               </button>
 
-              {/* Wishlist */}
+              {/* Wishlist - Active & visible on mobile and tablets in place of currency converter */}
               <Link
                 to="/account?tab=wishlist"
-                className={`relative p-1.5 transition-colors ${
+                className={`relative p-1.5 sm:p-2 rounded-full transition-all duration-300 inline-flex flex-shrink-0 ${
                   isTransparent
-                    ? 'text-white/85 hover:text-white'
-                    : 'text-atelier-charcoal hover:text-atelier-softblack'
+                    ? 'text-white hover:text-white hover:bg-white/15'
+                    : 'text-atelier-softblack hover:text-black hover:bg-atelier-cream'
                 }`}
                 aria-label="Wishlist"
               >
-                <Heart size={18} strokeWidth={1.5} />
+                <Heart size={17} className="sm:w-[18px] sm:h-[18px]" strokeWidth={1.5} />
                 {wishlistCount > 0 && (
-                  <span className="absolute top-0 right-0 w-3.5 h-3.5 bg-atelier-terracotta text-white rounded-full text-[9px] flex items-center justify-center font-mono">
+                  <span className="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 w-3.5 h-3.5 bg-atelier-terracotta text-white rounded-full text-[8px] flex items-center justify-center font-mono font-medium animate-fadeIn">
                     {wishlistCount}
                   </span>
                 )}
               </Link>
 
-              {/* Account */}
+              {/* Account Link - Shown on xl+ to preserve iPad and tablet breathing room */}
               <Link
                 to="/account"
-                className={`p-1.5 transition-colors hidden sm:inline-block ${
+                className={`p-1.5 sm:p-2 rounded-full transition-all duration-300 hidden xl:inline-flex flex-shrink-0 ${
                   isTransparent
-                    ? 'text-white/85 hover:text-white'
-                    : 'text-atelier-charcoal hover:text-atelier-softblack'
+                    ? 'text-white hover:text-white hover:bg-white/15'
+                    : 'text-atelier-softblack hover:text-black hover:bg-atelier-cream'
                 }`}
                 aria-label="Customer Account"
               >
                 <User size={18} strokeWidth={1.5} />
               </Link>
 
-              {/* Cart Button */}
+              {/* Shopping Bag CTA */}
               <button
                 onClick={toggleCart}
-                className={`relative p-1.5 transition-colors ${
+                className={`relative p-1 sm:p-2 rounded-full transition-all duration-300 flex-shrink-0 ${
                   isTransparent
-                    ? 'text-white/85 hover:text-white'
-                    : 'text-atelier-charcoal hover:text-atelier-softblack'
+                    ? 'text-white hover:text-white hover:bg-white/15'
+                    : 'text-atelier-softblack hover:text-black hover:bg-atelier-cream'
                 }`}
                 aria-label="Shopping Bag"
               >
-                <ShoppingBag size={18} strokeWidth={1.5} />
+                <ShoppingBag size={16} className="sm:w-[18px] sm:h-[18px]" strokeWidth={1.5} />
                 {totalItemCount > 0 && (
                   <span
-                    className={`absolute top-0 right-0 w-3.5 h-3.5 rounded-full text-[9px] flex items-center justify-center font-mono ${
+                    className={`absolute top-0.5 right-0.5 sm:top-1 sm:right-1 w-3.5 sm:w-4 h-3.5 sm:h-4 rounded-full text-[8.5px] sm:text-[9px] flex items-center justify-center font-mono font-semibold transition-transform duration-300 ${
                       isTransparent
-                        ? 'bg-atelier-parchment text-atelier-softblack font-semibold'
-                        : 'bg-atelier-darkbrown text-white'
+                        ? 'bg-white text-atelier-softblack'
+                        : 'bg-atelier-softblack text-atelier-ivory'
                     }`}
                   >
                     {totalItemCount}
@@ -294,157 +505,226 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
         </div>
       </nav>
 
-      {/* Mobile Navigation Full-Screen Overlay */}
+      {/* Mobile Drawer (Sleek High-End Slide-In) */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 bg-atelier-ivory flex flex-col overflow-y-auto animate-fadeIn">
-          {/* Mobile Header Top */}
-          <div className="p-4 flex items-center justify-between border-b border-atelier-parchment">
-            <Link to="/" onClick={() => setMobileMenuOpen(false)}>
-              <span className="font-serif text-lg tracking-[0.24em] text-atelier-softblack">
-                PRASRI RUGS
-              </span>
-            </Link>
-            <button
-              onClick={() => setMobileMenuOpen(false)}
-              className="p-2 text-atelier-charcoal hover:text-atelier-softblack"
-              aria-label="Close menu"
-            >
-              <X size={24} strokeWidth={1.5} />
-            </button>
-          </div>
+        <div className="fixed inset-0 z-50 lg:hidden">
+          {/* Backdrop blur overlay */}
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity animate-fadeIn"
+            onClick={() => setMobileMenuOpen(false)}
+          />
 
-          {/* Navigation Links List */}
-          <div className="p-6 space-y-6 flex-1">
-            <div className="space-y-4">
-              <Link
-                to="/shop"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block font-serif text-2xl tracking-wider text-atelier-softblack hover:text-atelier-brown"
-              >
-                Shop All Rugs
-              </Link>
-
+          {/* Drawer Content */}
+          <div className="fixed inset-y-0 left-0 max-w-sm w-full bg-atelier-ivory shadow-2xl flex flex-col z-10 animate-slideRight">
+            {/* Drawer Header */}
+            <div className="p-5 flex items-center justify-between border-b border-atelier-parchment bg-atelier-cream/50">
               <div>
-                <button
-                  onClick={() => setCollectionsDropdownOpen(!collectionsDropdownOpen)}
-                  className="w-full flex items-center justify-between font-serif text-2xl tracking-wider text-atelier-softblack hover:text-atelier-brown"
+                <span className="font-serif text-lg tracking-[0.25em] text-atelier-softblack font-medium">
+                  PRASRI RUGS
+                </span>
+                <span className="block text-[9px] font-sans tracking-[0.3em] text-atelier-taupe uppercase mt-0.5">
+                  BHADOHI, INDIA
+                </span>
+              </div>
+              <button
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-2 text-atelier-charcoal hover:text-atelier-softblack rounded-full hover:bg-atelier-parchment/60 transition-colors"
+                aria-label="Close menu"
+              >
+                <X size={20} strokeWidth={1.5} />
+              </button>
+            </div>
+
+            {/* Navigation Links Scroll Container */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              <div className="space-y-4">
+                <Link
+                  to="/shop"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block font-serif text-2xl tracking-wide text-atelier-softblack hover:text-atelier-brown transition-colors"
                 >
-                  <span>Collections</span>
-                  <ChevronDown
-                    size={20}
-                    className={`transition-transform duration-200 ${
-                      collectionsDropdownOpen ? 'rotate-180' : ''
-                    }`}
-                  />
-                </button>
-                {collectionsDropdownOpen && (
-                  <div className="pl-4 mt-3 space-y-2.5 border-l-2 border-atelier-parchment">
-                    {collections.map((c) => (
+                  Shop All Rugs
+                </Link>
+
+                {/* Collections Dropdown Accordion */}
+                <div className="py-1">
+                  <button
+                    onClick={() => setMobileCollectionsOpen(!mobileCollectionsOpen)}
+                    className="w-full flex items-center justify-between font-serif text-2xl tracking-wide text-atelier-softblack hover:text-atelier-brown transition-colors text-left py-1"
+                    aria-expanded={mobileCollectionsOpen}
+                  >
+                    <span>Collections</span>
+                    <ChevronDown
+                      size={20}
+                      className={`text-atelier-taupe transform transition-transform duration-300 ${
+                        mobileCollectionsOpen ? 'rotate-180 text-atelier-softblack' : ''
+                      }`}
+                    />
+                  </button>
+
+                  {mobileCollectionsOpen && (
+                    <div className="mt-2.5 pl-3 border-l-2 border-atelier-parchment space-y-2.5 animate-fadeIn">
+                      {collections.map((c) => (
+                        <Link
+                          key={c.name}
+                          to={c.path}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="flex items-center space-x-3 py-1.5 group/mitem"
+                        >
+                          <div className="w-9 h-9 rounded-xs overflow-hidden bg-atelier-parchment flex-shrink-0 border border-atelier-parchment">
+                            <img
+                              src={c.image}
+                              alt={c.name}
+                              className="w-full h-full object-cover group-hover/mitem:scale-105 transition-transform"
+                              loading="lazy"
+                            />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="text-sm font-serif text-atelier-softblack group-hover/mitem:text-atelier-darkbrown">
+                              {c.name}
+                            </div>
+                            <div className="text-[10px] text-atelier-taupe truncate">
+                              {c.tagline}
+                            </div>
+                          </div>
+                        </Link>
+                      ))}
+
                       <Link
-                        key={c.name}
-                        to={c.path}
+                        to="/collections"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="block text-sm text-atelier-charcoal hover:text-atelier-softblack"
+                        className="inline-flex items-center text-xs font-semibold uppercase tracking-wider text-atelier-darkbrown hover:text-black pt-1.5"
                       >
-                        {c.name}
+                        <span>View All Collections</span>
+                        <ArrowRight size={12} className="ml-1" />
                       </Link>
-                    ))}
-                  </div>
-                )}
+                    </div>
+                  )}
+                </div>
+
+                <Link
+                  to="/custom-rugs"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block font-serif text-2xl tracking-wide text-atelier-softblack hover:text-atelier-brown transition-colors"
+                >
+                  Bespoke Sizing & Looms
+                </Link>
+
+                <Link
+                  to="/craft"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block font-serif text-2xl tracking-wide text-atelier-softblack hover:text-atelier-brown transition-colors"
+                >
+                  The Craft
+                </Link>
+
+                <Link
+                  to="/the-atelier"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block font-serif text-2xl tracking-wide text-atelier-softblack hover:text-atelier-brown transition-colors"
+                >
+                  The Atelier
+                </Link>
+
+                <Link
+                  to="/journal"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block font-serif text-2xl tracking-wide text-atelier-softblack hover:text-atelier-brown transition-colors"
+                >
+                  Journal & Editorial
+                </Link>
+
+                <Link
+                  to="/contact"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block font-serif text-2xl tracking-wide text-atelier-softblack hover:text-atelier-brown transition-colors"
+                >
+                  Contact & Concierge
+                </Link>
               </div>
 
-              <Link
-                to="/custom-rugs"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block font-serif text-2xl tracking-wider text-atelier-softblack hover:text-atelier-brown"
-              >
-                Custom Rugs
-              </Link>
-              <Link
-                to="/craft"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block font-serif text-2xl tracking-wider text-atelier-softblack hover:text-atelier-brown"
-              >
-                The Craft
-              </Link>
-              <Link
-                to="/the-atelier"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block font-serif text-2xl tracking-wider text-atelier-softblack hover:text-atelier-brown"
-              >
-                The Atelier
-              </Link>
-              <Link
-                to="/journal"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block font-serif text-2xl tracking-wider text-atelier-softblack hover:text-atelier-brown"
-              >
-                Journal
-              </Link>
-              <Link
-                to="/size-guide"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block font-serif text-2xl tracking-wider text-atelier-softblack hover:text-atelier-brown"
-              >
-                Rug Size Guide
-              </Link>
-              <Link
-                to="/rug-care"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block font-serif text-2xl tracking-wider text-atelier-softblack hover:text-atelier-brown"
-              >
-                Rug Care
-              </Link>
-              <Link
-                to="/contact"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block font-serif text-2xl tracking-wider text-atelier-softblack hover:text-atelier-brown"
-              >
-                Contact & Studio
-              </Link>
+              {/* Mobile Quick Account Links */}
+              <div className="pt-4 border-t border-atelier-parchment space-y-2.5">
+                <Link
+                  to="/account?tab=wishlist"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between text-xs text-atelier-charcoal hover:text-atelier-softblack py-1"
+                >
+                  <div className="flex items-center">
+                    <Heart size={15} className="mr-2 text-atelier-taupe" />
+                    <span>Saved Wishlist</span>
+                  </div>
+                  {wishlistCount > 0 && (
+                    <span className="bg-atelier-terracotta text-white rounded-full text-[9px] px-2 py-0.5 font-mono">
+                      {wishlistCount}
+                    </span>
+                  )}
+                </Link>
+
+                <Link
+                  to="/account"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center text-xs text-atelier-charcoal hover:text-atelier-softblack py-1"
+                >
+                  <User size={15} className="mr-2 text-atelier-taupe" />
+                  <span>Customer Account & Orders</span>
+                </Link>
+
+                <Link
+                  to="/order-tracking"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center text-xs text-atelier-charcoal hover:text-atelier-softblack py-1"
+                >
+                  <Compass size={15} className="mr-2 text-atelier-taupe" />
+                  <span>Track Express Shipment</span>
+                </Link>
+              </div>
+
+              {/* Mobile Dedicated Currency Selector */}
+              <div className="pt-4 border-t border-atelier-parchment">
+                <div className="flex items-center justify-between mb-2.5">
+                  <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-atelier-taupe font-medium flex items-center">
+                    <Globe size={12} className="mr-1.5 text-atelier-taupe" />
+                    <span>Currency</span>
+                  </span>
+                  <span className="text-[10px] font-mono text-atelier-darkbrown font-semibold">
+                    {currency} ({rates?.[currency]?.symbol || '₹'})
+                  </span>
+                </div>
+                <div className="grid grid-cols-4 gap-2">
+                  {Object.values(rates || CURRENCY_RATES).map((rate) => (
+                    <button
+                      key={rate.code}
+                      onClick={() => setCurrency(rate.code)}
+                      className={`py-1.5 px-1 rounded text-xs font-mono border text-center transition-all ${
+                        currency === rate.code
+                          ? 'bg-atelier-softblack text-white border-atelier-softblack font-semibold shadow-xs'
+                          : 'bg-white text-atelier-charcoal border-atelier-parchment hover:border-atelier-taupe'
+                      }`}
+                    >
+                      <div className="font-semibold">{rate.code}</div>
+                      <div className="text-[10px] opacity-75">{rate.symbol}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
 
-            {/* Divider */}
-            <hr className="border-atelier-parchment my-6" />
-
-            {/* Quick Actions */}
-            <div className="space-y-3">
-              <Link
-                to="/account"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center text-sm text-atelier-charcoal hover:text-atelier-softblack"
-              >
-                <User size={16} className="mr-2 text-atelier-taupe" />
-                Customer Account / Sign In
-              </Link>
-              <Link
-                to="/order-tracking"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center text-sm text-atelier-charcoal hover:text-atelier-softblack"
-              >
-                <span className="w-4 h-4 mr-2 border border-atelier-taupe flex items-center justify-center text-[10px]">✓</span>
-                Track An Order
-              </Link>
-            </div>
-          </div>
-
-          {/* Mobile Footer */}
-          <div className="p-6 bg-atelier-cream border-t border-atelier-parchment">
-            <div className="text-xs text-atelier-taupe mb-2">Bhadohi Studio Coordinates</div>
-            <div className="text-xs text-atelier-charcoal font-medium">
-              Prasri Rugs
-            </div>
-            <div className="text-xs text-atelier-charcoal">
-              G.T. Road, Gopiganj, Bhadohi, Uttar Pradesh 221303, India
-            </div>
-            <div className="text-xs text-atelier-taupe mt-1">
+            {/* Mobile Footer Drawer Strip */}
+            <div className="p-5 bg-atelier-cream border-t border-atelier-parchment text-xs space-y-2">
+              <div className="text-[10px] font-mono uppercase tracking-widest text-atelier-taupe">
+                Atelier Coordinates
+              </div>
+              <p className="text-atelier-charcoal text-[11px] leading-relaxed">
+                G.T. Road, Gopiganj, Bhadohi, Uttar Pradesh 221303, India
+              </p>
               <a
                 href="https://wa.me/919839418038?text=Hello%2C%20I%20am%20inquiring%20about%20a%20handcrafted%20rug%20from%20Prasri%20Rugs"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-atelier-softblack transition-colors"
+                className="inline-flex items-center text-emerald-800 hover:text-emerald-950 font-medium text-[11px] underline mt-1"
               >
-                WhatsApp Concierge: Direct Studio Chat
+                <span>Live WhatsApp Concierge →</span>
               </a>
             </div>
           </div>

@@ -35,21 +35,37 @@ export const Footer: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Top: Brand Statement & Newsletter */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 pb-16 border-b border-atelier-charcoal/60">
-          <div className="lg:col-span-6 space-y-4">
-            <Link to="/" className="inline-block">
-              <span className="font-serif text-2xl sm:text-3xl tracking-[0.28em] text-atelier-cream">
-                PRASRI RUGS
-              </span>
-              <div className="text-[9px] tracking-[0.4em] text-atelier-taupe uppercase mt-1">
-                BHADOHI · INDIA
+          <div className="lg:col-span-6 space-y-5">
+            <Link to="/" className="inline-flex items-center gap-4 sm:gap-5 group">
+              {/* Gold Heritage Medallion Seal */}
+              <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden ring-1 ring-[#C59E50]/50 shadow-2xl shadow-black/80 flex-shrink-0 bg-[#F4EFEA] transition-all duration-700 ease-out group-hover:scale-105 group-hover:ring-[#C59E50]">
+                <img
+                  src="/images/prasri-medallion.jpg"
+                  alt="Prasri Rugs Bhadohi Heritage Medallion Seal"
+                  className="w-full h-full object-cover scale-[1.08] transition-transform duration-700 ease-out group-hover:scale-112"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <span className="font-serif text-2xl sm:text-3xl tracking-[0.28em] text-atelier-cream block group-hover:text-white transition-colors">
+                  PRASRI RUGS
+                </span>
+                <div className="text-[9px] tracking-[0.4em] text-atelier-taupe uppercase">
+                  BHADOHI · INDIA
+                </div>
+                <div className="text-[10px] tracking-[0.22em] text-[#C59E50] uppercase font-medium pt-1 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#C59E50]/80 animate-pulse"></span>
+                  <span>Handcrafted Heritage Atelier</span>
+                </div>
               </div>
             </Link>
+
             <p className="text-sm text-atelier-parchment/70 max-w-md font-light leading-relaxed">
               Contemporary rugs rooted in Indian craftsmanship. Handcrafted slowly, with patience and restraint, in Bhadohi for considered architectural spaces worldwide.
             </p>
-            <div className="text-xs text-atelier-taupe pt-2 space-y-1">
+            <div className="text-xs text-atelier-taupe pt-1 space-y-1">
               <div>Prasri Rugs · G.T. Road, Gopiganj, Bhadohi, Uttar Pradesh 221303, India</div>
-              <div>Insured International Express Air Delivery</div>
+              <div>Insured International Express Air Delivery · Door-to-Door Tracking</div>
             </div>
           </div>
 

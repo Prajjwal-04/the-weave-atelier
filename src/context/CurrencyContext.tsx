@@ -36,7 +36,11 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const [currency, setCurrencyState] = useState<Currency>(() => {
     const saved = localStorage.getItem('twa_currency');
-    return (saved && DEFAULT_CURRENCY_RATES[saved as Currency]) ? (saved as Currency) : 'USD';
+    if (saved && saved !== 'USD' && DEFAULT_CURRENCY_RATES[saved as Currency]) {
+      return saved as Currency;
+    }
+    // Always default to INR
+    return 'INR';
   });
 
   const refreshRates = useCallback(async () => {
