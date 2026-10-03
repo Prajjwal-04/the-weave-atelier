@@ -34,6 +34,7 @@ export interface RazorpayBackendOrderResponse {
   order_id: string;
   amount: number;
   currency: string;
+  key_id?: string;
   error?: string;
 }
 
@@ -238,8 +239,10 @@ export const paymentService = {
           prefillData.vpa = params.upiVpa.trim();
         }
 
+        const activeKey = (backendOrder.key_id || keyId).trim();
+
         const options: any = {
-          key: keyId,
+          key: activeKey,
           amount: backendOrder.amount,
           currency: backendOrder.currency,
           name: 'Prasri Rugs',
