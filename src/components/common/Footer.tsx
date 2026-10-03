@@ -53,10 +53,6 @@ export const Footer: React.FC = () => {
                 <div className="text-[9px] tracking-[0.4em] text-atelier-taupe uppercase">
                   BHADOHI · INDIA
                 </div>
-                <div className="text-[10px] tracking-[0.22em] text-[#C59E50] uppercase font-medium pt-1 flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#C59E50]/80 animate-pulse"></span>
-                  <span>Handcrafted Heritage Atelier</span>
-                </div>
               </div>
             </Link>
 
