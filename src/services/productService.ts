@@ -87,10 +87,17 @@ export const sanitizeProductImage = (img: any): any => {
   };
 };
 
+import { parseRugDimensions } from '../utils/dimensionHelper';
+
 export const sanitizeProductVariant = (v: any, index: number, productSlug: string): ProductVariant => {
   const safeSlug = (productSlug || 'rug').replace(/[^a-z0-9]/gi, '').toUpperCase().slice(0, 4) || 'RUG';
-  const sizeStr = v?.size || v?.dimensionsFt || '8 x 10 ft (240 x 300 cm)';
-  const sizeDigits = sizeStr.replace(/[^0-9]/g, '').slice(0, 4) || '0810';
+
+  // Normalize and parse dimensions
+  // Prioritize v.size if it was edited by the user in admin, fallback to dimensionsFt
+  const rawSizeInput = v?.size || v?.dimensionsFt || v?.dimensions_ft || "8' × 10'";
+  const parsed = parseRugDimensions(rawSizeInput);
+
+  const sizeDigits = parsed.dimensionsFt.replace(/[^0-9]/g, '').slice(0, 4) || '0810';
 
   const rawPrice = v?.priceUSD ?? v?.price_usd ?? 1500;
   const numPrice = Number(rawPrice);
@@ -102,8 +109,8 @@ export const sanitizeProductVariant = (v: any, index: number, productSlug: strin
 
   return {
     id: v?.id || `var-${safeSlug.toLowerCase()}-${index + 1}`,
-    size: sizeStr,
-    dimensionsFt: v?.dimensionsFt || v?.dimensions_ft || '8 x 10 ft',
+    size: parsed.size,
+    dimensionsFt: parsed.dimensionsFt,
     sku: v?.sku
       ? v.sku.replace(/^TWA-/i, 'PR-')
       : `PR-${safeSlug}-${sizeDigits.padStart(4, '0')}`,

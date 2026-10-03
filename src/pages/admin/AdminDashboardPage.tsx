@@ -63,6 +63,7 @@ import { emailService, ATELIER_PRIMARY_EMAIL } from '../../services/emailService
 import { supabase, isSupabaseConfigured } from '../../services/supabase';
 import { isStoreOwnerEmail } from '../../context/AuthContext';
 import { storageService } from '../../services/storageService';
+import { parseRugDimensions } from '../../utils/dimensionHelper';
 
 // Helper to optimize and convert local file to high-res data URL
 const processLocalImageFile = (file: File): Promise<string> => {
@@ -244,8 +245,8 @@ export const AdminDashboardPage: React.FC = () => {
   const [variantsList, setVariantsList] = useState<ProductVariant[]>([
     {
       id: 'v-1',
-      size: "5' × 8'",
-      dimensionsFt: "5' × 8' (152 × 244 cm)",
+      size: "5' × 8' (152 × 244 cm)",
+      dimensionsFt: "5' × 8'",
       sku: 'PR-NEW-0508',
       priceUSD: 1650,
       inventory: 2,
@@ -255,8 +256,8 @@ export const AdminDashboardPage: React.FC = () => {
     },
     {
       id: 'v-2',
-      size: "8' × 10'",
-      dimensionsFt: "8' × 10' (244 × 305 cm)",
+      size: "8' × 10' (244 × 305 cm)",
+      dimensionsFt: "8' × 10'",
       sku: 'PR-NEW-0810',
       priceUSD: 3150,
       inventory: 1,
@@ -601,8 +602,8 @@ export const AdminDashboardPage: React.FC = () => {
     setVariantsList([
       {
         id: `var-${Date.now()}-1`,
-        size: "5' × 8'",
-        dimensionsFt: "5' × 8' (152 × 244 cm)",
+        size: "5' × 8' (152 × 244 cm)",
+        dimensionsFt: "5' × 8'",
         sku: 'PR-NEW-0508',
         priceUSD: 1850,
         inventory: 2,
@@ -612,8 +613,8 @@ export const AdminDashboardPage: React.FC = () => {
       },
       {
         id: `var-${Date.now()}-2`,
-        size: "8' × 10'",
-        dimensionsFt: "8' × 10' (244 × 305 cm)",
+        size: "8' × 10' (244 × 305 cm)",
+        dimensionsFt: "8' × 10'",
         sku: 'PR-NEW-0810',
         priceUSD: 3400,
         inventory: 1,
@@ -623,8 +624,8 @@ export const AdminDashboardPage: React.FC = () => {
       },
       {
         id: `var-${Date.now()}-3`,
-        size: "9' × 12'",
-        dimensionsFt: "9' × 12' (274 × 366 cm)",
+        size: "9' × 12' (274 × 366 cm)",
+        dimensionsFt: "9' × 12'",
         sku: 'PR-NEW-0912',
         priceUSD: 4600,
         inventory: 0,
@@ -738,7 +739,14 @@ export const AdminDashboardPage: React.FC = () => {
       isNew: prodIsNew,
       isReadyToShip: prodIsReadyToShip,
       images: sanitizedImages,
-      variants: variantsList,
+      variants: variantsList.map((v) => {
+        const parsed = parseRugDimensions(v.size || v.dimensionsFt);
+        return {
+          ...v,
+          dimensionsFt: parsed.dimensionsFt,
+          size: v.size && v.size.includes('(') ? v.size : parsed.size,
+        };
+      }),
     };
 
     try {
@@ -762,13 +770,14 @@ export const AdminDashboardPage: React.FC = () => {
   };
 
   // Add a size preset to variants list in the editor
-  const handleAddVariantPreset = (sizeLabel: string, dimensions: string, defaultPrice: number, defaultWeight: number) => {
+  const handleAddVariantPreset = (inputSize: string, defaultPrice: number, defaultWeight: number) => {
     const skuCode = prodSlug.replace(/[^a-z0-9]/g, '').substring(0, 4).toUpperCase() || 'RUG';
-    const sizeNumber = sizeLabel.replace(/[^0-9]/g, '');
+    const parsed = parseRugDimensions(inputSize);
+    const sizeNumber = parsed.dimensionsFt.replace(/[^0-9]/g, '').slice(0, 4) || '0000';
     const newVariant: ProductVariant = {
       id: `var-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-      size: sizeLabel,
-      dimensionsFt: dimensions,
+      size: parsed.size,
+      dimensionsFt: parsed.dimensionsFt,
       sku: `PR-${skuCode}-${sizeNumber.padStart(4, '0')}`,
       priceUSD: defaultPrice,
       inventory: 1,
@@ -783,7 +792,16 @@ export const AdminDashboardPage: React.FC = () => {
   const handleUpdateVariantField = (index: number, field: keyof ProductVariant, value: any) => {
     setVariantsList((prev) => {
       const updated = [...prev];
-      updated[index] = { ...updated[index], [field]: value };
+      if (field === 'size') {
+        const parsed = parseRugDimensions(value);
+        updated[index] = {
+          ...updated[index],
+          size: value,
+          dimensionsFt: parsed.dimensionsFt,
+        };
+      } else {
+        updated[index] = { ...updated[index], [field]: value };
+      }
       return updated;
     });
   };
@@ -3105,42 +3123,49 @@ VITE_RAZORPAY_KEY_ID=rzp_live_...`}
                     <span className="text-[10px] text-atelier-taupe uppercase self-center mr-1">Quick Add:</span>
                     <button
                       type="button"
-                      onClick={() => handleAddVariantPreset("5' × 8'", "5' × 8' (152 × 244 cm)", 1850, 18)}
+                      onClick={() => handleAddVariantPreset("4' × 6'", 1450, 14)}
+                      className="px-2 py-1 bg-atelier-ivory border border-atelier-parchment text-[10px] font-mono hover:border-black"
+                    >
+                      + 4×6
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleAddVariantPreset("5' × 8'", 1850, 18)}
                       className="px-2 py-1 bg-atelier-ivory border border-atelier-parchment text-[10px] font-mono hover:border-black"
                     >
                       + 5×8
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleAddVariantPreset("6' × 9'", "6' × 9' (183 × 274 cm)", 2450, 24)}
+                      onClick={() => handleAddVariantPreset("6' × 9'", 2450, 24)}
                       className="px-2 py-1 bg-atelier-ivory border border-atelier-parchment text-[10px] font-mono hover:border-black"
                     >
                       + 6×9
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleAddVariantPreset("8' × 10'", "8' × 10' (244 × 305 cm)", 3400, 32)}
+                      onClick={() => handleAddVariantPreset("8' × 10'", 3400, 32)}
                       className="px-2 py-1 bg-atelier-ivory border border-atelier-parchment text-[10px] font-mono hover:border-black"
                     >
                       + 8×10
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleAddVariantPreset("9' × 12'", "9' × 12' (274 × 366 cm)", 4600, 42)}
+                      onClick={() => handleAddVariantPreset("9' × 12'", 4600, 42)}
                       className="px-2 py-1 bg-atelier-ivory border border-atelier-parchment text-[10px] font-mono hover:border-black"
                     >
                       + 9×12
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleAddVariantPreset("10' × 14'", "10' × 14' (305 × 427 cm)", 5950, 52)}
+                      onClick={() => handleAddVariantPreset("10' × 14'", 5950, 52)}
                       className="px-2 py-1 bg-atelier-ivory border border-atelier-parchment text-[10px] font-mono hover:border-black"
                     >
                       + 10×14
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleAddVariantPreset("2.5' × 10' Runner", "2.5' × 10' (76 × 305 cm)", 1250, 12)}
+                      onClick={() => handleAddVariantPreset("2.5' × 10' Runner", 1250, 12)}
                       className="px-2 py-1 bg-atelier-ivory border border-atelier-parchment text-[10px] font-mono hover:border-black"
                     >
                       + Runner
@@ -3156,14 +3181,20 @@ VITE_RAZORPAY_KEY_ID=rzp_live_...`}
                     >
                       <div>
                         <label className="block text-[10px] text-atelier-taupe uppercase mb-0.5 font-medium">
-                          Size
+                          Size (e.g. 4x6, 8x10)
                         </label>
                         <input
                           type="text"
                           value={v.size}
+                          placeholder="e.g. 4x6 or 4' × 6'"
                           onChange={(e) => handleUpdateVariantField(idx, 'size', e.target.value)}
                           className="w-full px-2 py-1 bg-atelier-cream border border-atelier-parchment text-xs font-medium"
                         />
+                        {v.dimensionsFt && (
+                          <span className="text-[9px] text-atelier-taupe block mt-0.5 font-mono truncate">
+                            Preview: {v.dimensionsFt}
+                          </span>
+                        )}
                       </div>
 
                       <div>

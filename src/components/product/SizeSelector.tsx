@@ -1,6 +1,6 @@
-import React from 'react';
 import { ProductVariant } from '../../types';
 import { useCurrency } from '../../context/CurrencyContext';
+import { getVariantDisplayDimensions } from '../../utils/dimensionHelper';
 
 interface SizeSelectorProps {
   variants: ProductVariant[];
@@ -37,6 +37,7 @@ export const SizeSelector: React.FC<SizeSelectorProps> = ({
         {variants.map((variant) => {
           const isSelected = variant.id === selectedVariant.id;
           const isSoldOut = variant.inventory === 0 && !variant.productionTimeWeeks;
+          const { primary, secondary } = getVariantDisplayDimensions(variant);
 
           return (
             <button
@@ -51,11 +52,13 @@ export const SizeSelector: React.FC<SizeSelectorProps> = ({
               } ${isSoldOut ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
             >
               <div className="font-medium text-xs text-atelier-softblack">
-                {variant.dimensionsFt}
+                {primary}
               </div>
-              <div className="text-[10px] text-atelier-taupe truncate">
-                {variant.size.split('(')[1]?.replace(')', '') || ''}
-              </div>
+              {secondary ? (
+                <div className="text-[10px] text-atelier-taupe truncate">
+                  {secondary}
+                </div>
+              ) : null}
               <div className="mt-1.5 flex items-baseline justify-between">
                 <span className="font-sans text-xs sm:text-sm text-atelier-softblack font-medium">
                   {formatPrice(variant.priceUSD)}
