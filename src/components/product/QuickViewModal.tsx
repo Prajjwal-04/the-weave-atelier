@@ -8,6 +8,7 @@ import { useCurrency } from '../../context/CurrencyContext';
 import { useInventory } from '../../context/InventoryContext';
 import { SizeSelector } from './SizeSelector';
 import { StockBadge } from './StockBadge';
+import { getDetailImageUrl, getThumbnailUrl } from '../../utils/imageOptimizer';
 
 interface QuickViewModalProps {
   product: Product | null;
@@ -127,9 +128,10 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
           <div className="space-y-3">
             <div className="aspect-[4/5] bg-atelier-cream border border-atelier-parchment overflow-hidden">
               <img
-                src={safeImages[activeImageIndex]?.url || safeImages[0]?.url}
+                src={getDetailImageUrl(safeImages[activeImageIndex]?.url || safeImages[0]?.url)}
                 alt={product.name}
                 className="w-full h-full object-cover"
+                decoding="async"
               />
             </div>
             {/* Thumbs */}
@@ -143,7 +145,13 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
                     activeImageIndex === i ? 'border-atelier-softblack ring-1 ring-atelier-softblack' : 'border-atelier-parchment opacity-70'
                   }`}
                 >
-                  <img src={img.url} alt={img.alt || product.name} className="w-full h-full object-cover" />
+                  <img
+                    src={getThumbnailUrl(img.url)}
+                    alt={img.alt || product.name}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </button>
               ))}
             </div>

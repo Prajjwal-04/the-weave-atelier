@@ -12,6 +12,7 @@ export const HeroSection: React.FC = () => {
           alt="Contemporary architectural living room with Prasri Rugs handmade rug"
           className="w-full h-full object-cover object-center filter brightness-[0.93] contrast-[1.04]"
           loading="eager"
+          fetchPriority="high"
           decoding="async"
           style={{
             transform: 'translateZ(0)',

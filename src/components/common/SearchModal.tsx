@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Search, X, ArrowRight } from 'lucide-react';
 import { useCurrency } from '../../context/CurrencyContext';
 import { useInventory } from '../../context/InventoryContext';
+import { getThumbnailUrl } from '../../utils/imageOptimizer';
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -138,9 +139,11 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                       className="flex items-center space-x-4 p-2 hover:bg-atelier-cream/80 transition-colors group"
                     >
                       <img
-                        src={product.images[0]?.url}
+                        src={getThumbnailUrl(product.images[0]?.url)}
                         alt={product.name}
                         className="w-16 h-20 object-cover border border-atelier-parchment"
+                        loading="lazy"
+                        decoding="async"
                       />
                       <div className="flex-1 min-w-0">
                         <div className="text-xs text-atelier-taupe uppercase tracking-wider">

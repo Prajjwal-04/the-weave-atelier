@@ -54,6 +54,8 @@ export const getCleanPerspectiveLabel = (label?: string, viewType?: string): str
   return 'Perspective';
 };
 
+import { getThumbnailUrl, getDetailImageUrl, getFullscreenImageUrl } from '../../utils/imageOptimizer';
+
 export const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
@@ -73,9 +75,9 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName 
         ];
 
   const activeImage = safeImages[selectedIndex] || safeImages[0];
-  const activeImageUrl =
-    activeImage.url ||
-    'https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=1200&q=80';
+  const rawActiveUrl = activeImage.url || 'https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=1200&q=80';
+  const activeImageUrl = getDetailImageUrl(rawActiveUrl);
+  const zoomImageUrl = getFullscreenImageUrl(rawActiveUrl);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -90,7 +92,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName 
       <div className="flex lg:flex-col overflow-x-auto lg:overflow-y-auto space-x-3 lg:space-x-0 lg:space-y-3 flex-shrink-0 py-1 scrollbar-none">
         {safeImages.map((img, index) => {
           const badgeText = getCleanPerspectiveLabel(img.label, img.viewType);
-          const thumbUrl = img.url || activeImageUrl;
+          const thumbUrl = getThumbnailUrl(img.url || rawActiveUrl);
           return (
             <button
               key={img.id || index}
@@ -138,7 +140,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName 
             <div
               className="absolute inset-0 w-full h-full pointer-events-none"
               style={{
-                backgroundImage: `url(${activeImageUrl})`,
+                backgroundImage: `url(${zoomImageUrl})`,
                 backgroundPosition: `${mousePos.x}% ${mousePos.y}%`,
                 backgroundSize: '240%',
                 backgroundRepeat: 'no-repeat',

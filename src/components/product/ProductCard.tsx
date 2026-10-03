@@ -6,6 +6,7 @@ import { useCurrency } from '../../context/CurrencyContext';
 import { useWishlist } from '../../context/WishlistContext';
 import { StockBadge } from './StockBadge';
 import { useInventory } from '../../context/InventoryContext';
+import { getCardImageUrl } from '../../utils/imageOptimizer';
 
 interface ProductCardProps {
   product: Product;
@@ -19,14 +20,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   aspectRatio = 'portrait',
 }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [hasHoveredOnce, setHasHoveredOnce] = useState(false);
   const { formatPrice } = useCurrency();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { getInventory } = useInventory();
 
   const isFavorited = isInWishlist(product.id);
   const startingPrice = product.variants[0]?.priceUSD || 0;
-  const primaryImage = product.images[0]?.url || '';
-  const secondaryImage = product.images[1]?.url || product.images[0]?.url || '';
+  const primaryImage = getCardImageUrl(product.images[0]?.url || '');
+  const secondaryImage = getCardImageUrl(product.images[1]?.url || product.images[0]?.url || '');
 
   // Check live reactive inventory
   const hasLastOne = product.variants.some((v) => getInventory(v.sku) === 1);
@@ -36,7 +38,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   return (
     <div
       className="group relative flex flex-col"
-      onMouseEnter={() => setIsHovered(true)}
+      onMouseEnter={() => {
+        setIsHovered(true);
+        if (!hasHoveredOnce) setHasHoveredOnce(true);
+      }}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Image Container */}
@@ -54,17 +59,21 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               isHovered ? 'opacity-0 scale-105' : 'opacity-100 scale-100'
             }`}
             loading="lazy"
+            decoding="async"
           />
 
-          {/* Secondary Image on Hover */}
-          <img
-            src={secondaryImage}
-            alt={`${product.name} alternate view`}
-            className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-700 ease-out ${
-              isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
-            }`}
-            loading="lazy"
-          />
+          {/* Secondary Image on Hover - Loaded On Demand */}
+          {hasHoveredOnce && (
+            <img
+              src={secondaryImage}
+              alt={`${product.name} alternate view`}
+              className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-700 ease-out ${
+                isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
+              }`}
+              loading="lazy"
+              decoding="async"
+            />
+          )}
         </Link>
 
         {/* Top Badges */}

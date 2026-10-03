@@ -4,6 +4,7 @@ import { X, Plus, Minus, Trash2, ArrowRight, ShieldCheck, Truck } from 'lucide-r
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
 import { useCurrency } from '../../context/CurrencyContext';
+import { getThumbnailUrl } from '../../utils/imageOptimizer';
 
 const COUNTRIES = [
   'United States',
@@ -126,9 +127,11 @@ export const CartDrawer: React.FC = () => {
                     className="w-20 h-24 bg-atelier-cream flex-shrink-0 overflow-hidden border border-atelier-parchment"
                   >
                     <img
-                      src={item.productImage}
+                      src={getThumbnailUrl(item.productImage)}
                       alt={item.productName}
                       className="w-full h-full object-cover"
+                      loading="lazy"
+                      decoding="async"
                     />
                   </Link>
 
