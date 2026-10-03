@@ -50,12 +50,9 @@ export const paymentService = {
    */
   getRazorpayKeyId(): string {
     const envKey = (import.meta.env.VITE_RAZORPAY_KEY_ID || '').trim();
-    const storedKey = typeof window !== 'undefined' ? (localStorage.getItem('twa_razorpay_key_id') || '').trim() : '';
-    // If a live key is configured via admin settings / localStorage, prioritize it
-    if (storedKey.startsWith('rzp_live_')) return storedKey;
     if (envKey) return envKey;
-    if (storedKey) return storedKey;
-    return envKey;
+    const storedKey = typeof window !== 'undefined' ? (localStorage.getItem('twa_razorpay_key_id') || '').trim() : '';
+    return storedKey;
   },
 
   setRazorpayKeyId(key: string): void {
