@@ -41,6 +41,12 @@ import {
   Check,
   Upload,
   Image as ImageIcon,
+  MessageSquare,
+  Reply,
+  Phone,
+  MapPin,
+  User,
+  Calculator,
 } from 'lucide-react';
 import { useInventory } from '../../context/InventoryContext';
 import { useCurrency } from '../../context/CurrencyContext';
@@ -281,6 +287,21 @@ export const AdminDashboardPage: React.FC = () => {
   const [calcLength, setCalcLength] = useState<number>(10);
   const [calcTechnique, setCalcTechnique] = useState<string>('Hand-Knotted');
   const [calcLeadTime, setCalcLeadTime] = useState<'Usual 3–4 weeks' | '3 to 6 months'>('3 to 6 months');
+
+  // Bespoke Quotes Filter & Search State
+  const [quoteSearch, setQuoteSearch] = useState('');
+  const [quoteStatusFilter, setQuoteStatusFilter] = useState<string>('ALL');
+
+  // Bespoke Quote & Reply Modal State
+  const [selectedQuoteForReply, setSelectedQuoteForReply] = useState<CustomQuoteRequest | null>(null);
+  const [quoteReplyPrice, setQuoteReplyPrice] = useState<number>(0);
+  const [quoteReplyLeadTime, setQuoteReplyLeadTime] = useState<string>('Usual 3–4 weeks');
+  const [quoteReplyStatus, setQuoteReplyStatus] = useState<CustomQuoteRequest['status']>('Quotation Sent');
+  const [quoteReplyNotes, setQuoteReplyNotes] = useState<string>('');
+  const [quoteReplyDeposit, setQuoteReplyDeposit] = useState<number>(0);
+  const [isSendingQuoteEmail, setIsSendingQuoteEmail] = useState<boolean>(false);
+  const [deleteQuoteConfirmId, setDeleteQuoteConfirmId] = useState<string | null>(null);
+  const [copiedQuoteRef, setCopiedQuoteRef] = useState<string | null>(null);
 
   // Load orders and quotes
   const loadOrdersAndQuotes = async () => {
@@ -1218,6 +1239,144 @@ export const AdminDashboardPage: React.FC = () => {
       leadTime: calcLeadTime,
     };
   }, [calcWidth, calcLength, calcTechnique, calcLeadTime]);
+
+  // Filtered Bespoke Quotes
+  const filteredQuotes = useMemo(() => {
+    return quotes.filter((q) => {
+      if (quoteStatusFilter !== 'ALL' && q.status !== quoteStatusFilter) {
+        return false;
+      }
+      if (quoteSearch.trim()) {
+        const query = quoteSearch.toLowerCase().trim();
+        const matchesName = q.fullName?.toLowerCase().includes(query);
+        const matchesEmail = q.email?.toLowerCase().includes(query);
+        const matchesRef = q.referenceNumber?.toLowerCase().includes(query);
+        const matchesTech = q.technique?.toLowerCase().includes(query);
+        const matchesMat = q.material?.toLowerCase().includes(query);
+        const matchesCountry = q.country?.toLowerCase().includes(query);
+        const matchesRoom = q.roomType?.toLowerCase().includes(query);
+        return matchesName || matchesEmail || matchesRef || matchesTech || matchesMat || matchesCountry || matchesRoom;
+      }
+      return true;
+    });
+  }, [quotes, quoteStatusFilter, quoteSearch]);
+
+  // Handle Opening Quote / Reply Modal
+  const handleOpenQuoteModal = (q: CustomQuoteRequest) => {
+    setSelectedQuoteForReply(q);
+    const sqFt = q.unit === 'feet' ? q.width * q.length : Math.round((q.width * q.length) / 929.03);
+    const baseRate = q.technique === 'Hand-Knotted' ? 62 : q.technique === 'Flatweave' ? 28 : 38;
+    const defaultCalculatedPrice = Math.round(sqFt * baseRate);
+    const recommendedPrice = q.quotedPriceUSD != null ? q.quotedPriceUSD : (q.estimatedPriceUSD?.min || defaultCalculatedPrice);
+    const recommendedLeadTime = q.quotedLeadTime || (q.technique === 'Hand-Knotted' ? '3 to 6 months' : 'Usual 3–4 weeks');
+
+    setQuoteReplyPrice(recommendedPrice);
+    setQuoteReplyLeadTime(recommendedLeadTime);
+    setQuoteReplyDeposit(q.depositRequiredUSD != null ? q.depositRequiredUSD : Math.round(recommendedPrice * 0.5));
+    setQuoteReplyStatus(q.status === 'Received' ? 'Reviewing' : q.status);
+
+    const defaultMessage = q.adminReplyMessage || `Dear ${q.fullName},\n\nThank you for inviting Prasri Rugs into your space. Our master loom directors in Bhadohi have evaluated your bespoke commission for a ${q.shape} ${q.length}×${q.width} ${q.unit} ${q.technique} piece (${q.material}).\n\nWe are pleased to provide this official atelier valuation and reserve loom capacity. We will custom dye the premium wool yarns to your exact tonal palette. The estimated handcrafted timeline is ${recommendedLeadTime}, with production starting upon deposit confirmation.\n\nPlease review this proposal, and let us know if you would like physical yarn pompoms dispatched to your address for exact color confirmation.\n\nWarm regards,\nPrasri Rugs Atelier Directorship`;
+    setQuoteReplyNotes(defaultMessage);
+  };
+
+  // Handle Saving Quote Draft or Sending Email Quote
+  const handleSaveQuoteReply = async (sendEmailToClient: boolean) => {
+    if (!selectedQuoteForReply) return;
+
+    try {
+      if (sendEmailToClient) {
+        setIsSendingQuoteEmail(true);
+      }
+
+      const updatedStatus = sendEmailToClient ? 'Quotation Sent' : quoteReplyStatus;
+
+      await quoteService.updateQuote(selectedQuoteForReply.referenceNumber, {
+        status: updatedStatus,
+        quotedPriceUSD: Number(quoteReplyPrice),
+        quotedLeadTime: quoteReplyLeadTime,
+        depositRequiredUSD: Number(quoteReplyDeposit),
+        adminReplyMessage: quoteReplyNotes,
+        repliedAt: new Date().toISOString(),
+      });
+
+      if (sendEmailToClient) {
+        const result = await emailService.sendQuoteProposal(selectedQuoteForReply, {
+          quotedPriceUSD: Number(quoteReplyPrice),
+          quotedLeadTime: quoteReplyLeadTime,
+          depositUSD: Number(quoteReplyDeposit),
+          adminReplyMessage: quoteReplyNotes,
+        });
+
+        if (result.success) {
+          showToast(`Official quotation sent to ${selectedQuoteForReply.email} via ${result.deliveredVia || 'Gmail SMTP'}.`, 'success');
+        } else {
+          showToast(`Quotation saved in atelier records. Notice: ${result.message}`, 'info');
+        }
+      } else {
+        showToast(`Quote details saved for ${selectedQuoteForReply.referenceNumber}.`, 'success');
+      }
+
+      await loadOrdersAndQuotes();
+      setSelectedQuoteForReply(null);
+    } catch (err: any) {
+      console.error('Error saving quote reply:', err);
+      showToast(err?.message || 'Failed to save bespoke quote', 'error');
+    } finally {
+      setIsSendingQuoteEmail(false);
+    }
+  };
+
+  // Quick Status changer from table
+  const handleQuickQuoteStatusChange = async (refNumber: string, status: any) => {
+    try {
+      await quoteService.updateQuoteStatus(refNumber, status);
+      showToast(`Inquiry ${refNumber} status updated to ${status}`, 'success');
+      loadOrdersAndQuotes();
+    } catch (err) {
+      console.error('Status update failed:', err);
+      showToast('Failed to update quote status', 'error');
+    }
+  };
+
+  // Delete / Archive quote
+  const handleDeleteQuote = async (refNumber: string) => {
+    try {
+      await quoteService.deleteQuote(refNumber);
+      showToast(`Inquiry ${refNumber} removed from active database.`, 'info');
+      setDeleteQuoteConfirmId(null);
+      loadOrdersAndQuotes();
+    } catch (err) {
+      console.error('Delete failed:', err);
+      showToast('Failed to delete inquiry', 'error');
+    }
+  };
+
+  // Load inquiry specs into top Loom Engine
+  const handleTransferQuoteToCalculator = (q: CustomQuoteRequest) => {
+    setCalcWidth(q.width);
+    setCalcLength(q.length);
+    if (q.technique === 'Hand-Knotted' || q.technique === 'Hand-Tufted' || q.technique === 'Flatweave') {
+      setCalcTechnique(q.technique);
+    }
+    if (q.technique === 'Hand-Knotted') {
+      setCalcLeadTime('3 to 6 months');
+    } else {
+      setCalcLeadTime('Usual 3–4 weeks');
+    }
+    showToast(`Loaded ${q.width}×${q.length}ft (${q.technique}) into Atelier Loom Engine.`, 'info');
+  };
+
+  // Copy structured quote proposal to clipboard
+  const handleCopyQuoteSummary = (q: CustomQuoteRequest) => {
+    const sqFt = q.unit === 'feet' ? q.width * q.length : Math.round((q.width * q.length) / 929.03);
+    const price = q.quotedPriceUSD || (q.estimatedPriceUSD?.min ? q.estimatedPriceUSD.min : customEstimate.totalUSD);
+    const lead = q.quotedLeadTime || (q.technique === 'Hand-Knotted' ? '3 to 6 months' : 'Usual 3–4 weeks');
+    const summary = `PRASRI RUGS - BESPOKE COMMISSION QUOTATION\nReference: ${q.referenceNumber}\nClient: ${q.fullName} (${q.email}${q.phone ? ' · ' + q.phone : ''})\nDestination: ${q.country}\nSpecifications: ${q.shape} ${q.length}×${q.width} ${q.unit} (~${sqFt} sq. ft.)\nTechnique: ${q.technique} | Fiber: ${q.material}\nPalette: ${q.colorPreference || 'Atelier Standard'} | Setting: ${q.roomType || 'Living Area'}\nValuation: $${price.toLocaleString()} USD\nArtisanal Lead Time: ${lead}\nStatus: ${q.status}${q.adminReplyMessage ? '\n\nAtelier Note:\n' + q.adminReplyMessage : ''}`;
+    navigator.clipboard.writeText(summary);
+    setCopiedQuoteRef(q.referenceNumber);
+    showToast('Quote summary copied for WhatsApp / Email.', 'success');
+    setTimeout(() => setCopiedQuoteRef(null), 2500);
+  };
 
   // -------------------------------------------------------------
   // VALIDATING SESSION LOADER (Prevents UI flash or inspection race)
@@ -2572,92 +2731,313 @@ export const AdminDashboardPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Inquiries Table */}
-            <div className="bg-atelier-cream border border-atelier-parchment p-6 space-y-4">
-              <h3 className="font-serif text-lg text-atelier-softblack font-normal">
-                Incoming Bespoke Quotes & Inquiries ({quotes.length})
-              </h3>
+            {/* Inquiries Table Container */}
+            <div className="bg-atelier-cream border border-atelier-parchment p-6 space-y-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-atelier-parchment pb-4">
+                <div>
+                  <h3 className="font-serif text-lg text-atelier-softblack font-normal flex items-center space-x-2">
+                    <span>Incoming Bespoke Quotes & Inquiries</span>
+                    <span className="text-xs font-mono font-normal text-atelier-taupe bg-atelier-ivory px-2 py-0.5 border border-atelier-parchment rounded">
+                      {quotes.length} total
+                    </span>
+                  </h3>
+                  <p className="text-xs text-atelier-charcoal/70 font-light mt-0.5">
+                    Review bespoke dimensions, calculate loom rates, provide official quotations, and dispatch proposals directly to clients.
+                  </p>
+                </div>
 
-              {quotes.length === 0 ? (
-                <div className="p-8 text-center text-xs text-atelier-taupe">
-                  No bespoke inquiries submitted yet. When visitors submit the Custom Rug Studio form on /custom-rugs, their dimensions and requirements appear here.
+                {/* Search Bar */}
+                <div className="relative min-w-[280px]">
+                  <input
+                    type="text"
+                    value={quoteSearch}
+                    onChange={(e) => setQuoteSearch(e.target.value)}
+                    placeholder="Search by client, email, ref, technique..."
+                    className="w-full bg-atelier-ivory border border-atelier-parchment pl-8 pr-3 py-1.5 text-xs text-atelier-softblack focus:outline-none focus:border-black font-mono placeholder:font-sans placeholder:text-atelier-taupe/60"
+                  />
+                  <Search size={13} className="absolute left-2.5 top-2.5 text-atelier-taupe" />
+                  {quoteSearch && (
+                    <button
+                      onClick={() => setQuoteSearch('')}
+                      className="absolute right-2.5 top-2.5 text-atelier-taupe hover:text-black"
+                    >
+                      <X size={12} />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Status Filter Pills */}
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                <span className="text-[11px] uppercase tracking-wider text-atelier-taupe font-medium mr-1">
+                  Filter:
+                </span>
+                {(
+                  [
+                    { id: 'ALL', label: 'All Inquiries', count: quotes.length },
+                    { id: 'Received', label: 'New Received', count: quotes.filter((q) => q.status === 'Received').length },
+                    { id: 'Reviewing', label: 'In Review', count: quotes.filter((q) => q.status === 'Reviewing').length },
+                    { id: 'Quotation Sent', label: 'Quotation Sent', count: quotes.filter((q) => q.status === 'Quotation Sent').length },
+                    { id: 'Production Scheduled', label: 'In Production', count: quotes.filter((q) => q.status === 'Production Scheduled').length },
+                    { id: 'Archived', label: 'Archived', count: quotes.filter((q) => q.status === 'Archived').length },
+                  ] as const
+                ).map((tab) => {
+                  const isActive = quoteStatusFilter === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setQuoteStatusFilter(tab.id)}
+                      className={`px-3 py-1 text-xs border font-mono transition-colors flex items-center space-x-1.5 ${
+                        isActive
+                          ? 'bg-atelier-softblack text-atelier-parchment border-atelier-softblack'
+                          : 'bg-atelier-ivory text-atelier-charcoal border-atelier-parchment hover:border-black'
+                      }`}
+                    >
+                      <span>{tab.label}</span>
+                      <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${isActive ? 'bg-neutral-800 text-neutral-300' : 'bg-atelier-parchment/60 text-atelier-taupe'}`}>
+                        {tab.count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {filteredQuotes.length === 0 ? (
+                <div className="p-12 text-center bg-atelier-ivory border border-atelier-parchment/80 space-y-2">
+                  <div className="font-serif text-sm text-atelier-softblack">No matching bespoke inquiries</div>
+                  <p className="text-xs text-atelier-taupe font-light">
+                    {quoteSearch || quoteStatusFilter !== 'ALL'
+                      ? 'Try clearing the search query or status filter to see other commission requests.'
+                      : 'When visitors submit the Custom Rug Studio form on /custom-rugs, their dimensions, room photos, and requests will appear here.'}
+                  </p>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto border border-atelier-parchment bg-atelier-ivory">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-atelier-parchment/60 text-atelier-charcoal uppercase tracking-wider text-[10px] border-b border-atelier-parchment">
+                    <thead className="bg-atelier-parchment/70 text-atelier-charcoal uppercase tracking-wider text-[10px] border-b border-atelier-parchment">
                       <tr>
-                        <th className="py-3 px-4 font-medium">Client Name</th>
-                        <th className="py-3 px-4 font-medium">Dimensions</th>
-                        <th className="py-3 px-4 font-medium">Technique & Material</th>
-                        <th className="py-3 px-4 font-medium">Color Palette</th>
-                        <th className="py-3 px-4 font-medium">Budget USD</th>
-                        <th className="py-3 px-4 font-medium">Status</th>
-                        <th className="py-3 px-4 font-medium text-right">Actions</th>
+                        <th className="py-3 px-3.5 font-medium">Ref & Date</th>
+                        <th className="py-3 px-3.5 font-medium">Client Info</th>
+                        <th className="py-3 px-3.5 font-medium">Dimensions & Shape</th>
+                        <th className="py-3 px-3.5 font-medium">Technique & Fiber</th>
+                        <th className="py-3 px-3.5 font-medium">Palette & Setting</th>
+                        <th className="py-3 px-3.5 font-medium">Quote & Timeline</th>
+                        <th className="py-3 px-3.5 font-medium">Status</th>
+                        <th className="py-3 px-3.5 font-medium text-right">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-atelier-parchment/50">
-                      {quotes.map((q) => (
-                        <tr key={q.id} className="hover:bg-atelier-ivory/60 transition-colors">
-                          <td className="py-3 px-4">
-                            <div className="font-medium text-atelier-softblack">{q.fullName}</div>
-                            <div className="text-[11px] text-atelier-taupe font-mono">{q.email}</div>
-                          </td>
+                    <tbody className="divide-y divide-atelier-parchment/60">
+                      {filteredQuotes.map((q) => {
+                        const sqFt = q.unit === 'feet' ? q.width * q.length : Math.round((q.width * q.length) / 929.03);
+                        const isKnotted = q.technique === 'Hand-Knotted';
+                        const isQuoted = q.quotedPriceUSD != null;
+                        const leadTimeDisplay = q.quotedLeadTime || (isKnotted ? '3 to 6 months' : 'Usual 3–4 weeks');
 
-                          <td className="py-3 px-4 font-mono">
-                            {q.width}' × {q.length}'
-                            <div className="text-[10px] text-atelier-taupe">
-                              {q.width * q.length} sq. ft.
-                            </div>
-                          </td>
+                        return (
+                          <tr key={q.id || q.referenceNumber} className="hover:bg-atelier-cream/80 transition-colors">
+                            {/* 1. Reference & Date */}
+                            <td className="py-3.5 px-3.5 align-top">
+                              <div className="font-mono font-medium text-atelier-softblack text-[11px]">
+                                {q.referenceNumber}
+                              </div>
+                              <div className="text-[10px] text-atelier-taupe font-mono mt-0.5">
+                                {q.createdAt}
+                              </div>
+                              {q.repliedAt && (
+                                <span className="inline-block mt-1 text-[9px] font-mono text-emerald-800 bg-emerald-50 px-1 py-0.2 border border-emerald-200">
+                                  Replied
+                                </span>
+                              )}
+                            </td>
 
-                          <td className="py-3 px-4">
-                            <div>{q.technique}</div>
-                            <div className="text-[11px] text-atelier-taupe">{q.material}</div>
-                          </td>
+                            {/* 2. Client Info */}
+                            <td className="py-3.5 px-3.5 align-top">
+                              <div className="font-medium text-atelier-softblack">{q.fullName}</div>
+                              <div className="text-[11px] text-atelier-charcoal font-mono">
+                                <a href={`mailto:${q.email}`} className="hover:underline hover:text-black">
+                                  {q.email}
+                                </a>
+                              </div>
+                              {q.phone && (
+                                <div className="text-[10px] text-atelier-taupe font-mono mt-0.5 flex items-center space-x-1">
+                                  <Phone size={10} />
+                                  <span>{q.phone}</span>
+                                </div>
+                              )}
+                              <div className="text-[10px] text-atelier-taupe uppercase tracking-wider mt-0.5">
+                                {q.country}
+                              </div>
+                            </td>
 
-                          <td className="py-3 px-4 text-atelier-charcoal">
-                            {q.colorPreference || 'Atelier Standard'}
-                          </td>
+                            {/* 3. Dimensions & Shape */}
+                            <td className="py-3.5 px-3.5 align-top font-mono">
+                              <div className="font-medium text-atelier-softblack">
+                                {q.width}' × {q.length}' <span className="text-[10px] text-atelier-taupe font-normal font-sans">({q.shape})</span>
+                              </div>
+                              <div className="text-[10px] text-atelier-taupe">
+                                ~{sqFt} sq. ft.
+                              </div>
+                            </td>
 
-                          <td className="py-3 px-4 font-mono font-medium">
-                            {q.estimatedPriceUSD?.min ? formatPrice(q.estimatedPriceUSD.min) : 'Flexible'}
-                          </td>
+                            {/* 4. Technique & Fiber */}
+                            <td className="py-3.5 px-3.5 align-top">
+                              <div className="font-medium text-atelier-softblack">{q.technique}</div>
+                              <div className="text-[11px] text-atelier-taupe">{q.material}</div>
+                              {q.pileDepth && (
+                                <div className="text-[10px] text-atelier-taupe/80 font-mono">
+                                  Pile: {q.pileDepth}
+                                </div>
+                              )}
+                            </td>
 
-                          <td className="py-3 px-4">
-                            <span
-                              className={`px-2 py-0.5 text-[9px] font-mono uppercase border ${
-                                q.status === 'Production Scheduled'
-                                  ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                                  : q.status === 'Quotation Sent'
-                                  ? 'bg-sky-50 text-sky-800 border-sky-300'
-                                  : 'bg-amber-50 text-amber-900 border-amber-300'
-                              }`}
-                            >
-                              {q.status}
-                            </span>
-                          </td>
+                            {/* 5. Palette & Setting */}
+                            <td className="py-3.5 px-3.5 align-top">
+                              <div className="text-atelier-softblack font-medium">
+                                {q.colorPreference || 'Atelier Standard'}
+                              </div>
+                              <div className="text-[10px] text-atelier-taupe">
+                                {q.roomType || 'Living Area'}
+                              </div>
+                              {q.notes && (
+                                <div
+                                  className="text-[10px] text-atelier-charcoal/80 font-light italic truncate max-w-[160px] mt-1"
+                                  title={q.notes}
+                                >
+                                  "{q.notes}"
+                                </div>
+                              )}
+                            </td>
 
-                          <td className="py-3 px-4 text-right">
-                            <button
-                              onClick={() => {
-                                const newStatus: any =
-                                  q.status === 'Received'
-                                    ? 'Reviewing'
+                            {/* 6. Quote & Timeline */}
+                            <td className="py-3.5 px-3.5 align-top font-mono">
+                              {isQuoted ? (
+                                <div>
+                                  <div className="text-sm font-semibold text-atelier-darkbrown">
+                                    {formatPrice(q.quotedPriceUSD!)}
+                                  </div>
+                                  <div className="text-[10px] text-emerald-800 font-medium">
+                                    Official Quote
+                                  </div>
+                                </div>
+                              ) : (
+                                <div>
+                                  <div className="text-xs text-atelier-charcoal font-medium">
+                                    {q.estimatedPriceUSD?.min ? formatPrice(q.estimatedPriceUSD.min) : 'Flexible'}
+                                  </div>
+                                  <div className="text-[10px] text-atelier-taupe">
+                                    Client Budget
+                                  </div>
+                                </div>
+                              )}
+                              <span
+                                className={`inline-block mt-1 px-1.5 py-0.5 text-[9px] uppercase border ${
+                                  isKnotted
+                                    ? 'bg-amber-50 text-amber-900 border-amber-200'
+                                    : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                                }`}
+                              >
+                                {leadTimeDisplay}
+                              </span>
+                            </td>
+
+                            {/* 7. Status & Selector */}
+                            <td className="py-3.5 px-3.5 align-top">
+                              <select
+                                value={q.status}
+                                onChange={(e) => handleQuickQuoteStatusChange(q.referenceNumber, e.target.value)}
+                                className={`text-[10px] font-mono uppercase px-2 py-1 border bg-atelier-ivory focus:outline-none focus:border-black cursor-pointer ${
+                                  q.status === 'Production Scheduled'
+                                    ? 'text-emerald-800 border-emerald-300 font-semibold'
+                                    : q.status === 'Quotation Sent'
+                                    ? 'text-sky-800 border-sky-300 font-semibold'
                                     : q.status === 'Reviewing'
-                                    ? 'Quotation Sent'
-                                    : 'Production Scheduled';
-                                quoteService.updateQuoteStatus(q.referenceNumber, newStatus).then(() => {
-                                  loadOrdersAndQuotes();
-                                });
-                              }}
-                              className="px-2.5 py-1 text-[10px] bg-atelier-ivory border border-atelier-parchment hover:border-black uppercase font-mono"
-                            >
-                              Advance Stage
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
+                                    ? 'text-indigo-800 border-indigo-300'
+                                    : q.status === 'Archived'
+                                    ? 'text-neutral-500 border-neutral-300'
+                                    : 'text-amber-900 border-amber-300'
+                                }`}
+                              >
+                                <option value="Received">Received</option>
+                                <option value="Reviewing">Reviewing</option>
+                                <option value="Quotation Sent">Quotation Sent</option>
+                                <option value="Production Scheduled">Production Scheduled</option>
+                                <option value="Archived">Archived</option>
+                                <option value="Declined">Declined</option>
+                              </select>
+                            </td>
+
+                            {/* 8. Row Action Buttons */}
+                            <td className="py-3.5 px-3.5 align-top text-right">
+                              <div className="flex flex-col items-end space-y-1.5">
+                                {/* Primary Action: Quote / Reply Modal */}
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenQuoteModal(q)}
+                                  className="px-3 py-1 bg-atelier-softblack text-atelier-parchment hover:bg-atelier-darkbrown text-[10px] font-medium tracking-wider uppercase transition-colors flex items-center space-x-1 shadow-xs"
+                                >
+                                  <Reply size={11} />
+                                  <span>Quote / Reply</span>
+                                </button>
+
+                                <div className="flex items-center space-x-1">
+                                  {/* Transfer to Loom Calculator */}
+                                  <button
+                                    type="button"
+                                    onClick={() => handleTransferQuoteToCalculator(q)}
+                                    title="Load dimensions into Loom Calculator"
+                                    className="p-1 bg-atelier-ivory border border-atelier-parchment hover:border-black text-atelier-charcoal hover:text-black transition-colors"
+                                  >
+                                    <Calculator size={12} />
+                                  </button>
+
+                                  {/* Copy Proposal Summary */}
+                                  <button
+                                    type="button"
+                                    onClick={() => handleCopyQuoteSummary(q)}
+                                    title="Copy quote proposal summary"
+                                    className="p-1 bg-atelier-ivory border border-atelier-parchment hover:border-black text-atelier-charcoal hover:text-black transition-colors"
+                                  >
+                                    {copiedQuoteRef === q.referenceNumber ? (
+                                      <Check size={12} className="text-emerald-700" />
+                                    ) : (
+                                      <Copy size={12} />
+                                    )}
+                                  </button>
+
+                                  {/* Delete / Archive Inquiry */}
+                                  {deleteQuoteConfirmId === q.referenceNumber ? (
+                                    <div className="flex items-center space-x-1">
+                                      <button
+                                        type="button"
+                                        onClick={() => handleDeleteQuote(q.referenceNumber)}
+                                        className="px-1.5 py-0.5 bg-rose-700 text-white text-[9px] uppercase font-mono hover:bg-rose-800"
+                                      >
+                                        Confirm
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => setDeleteQuoteConfirmId(null)}
+                                        className="p-1 text-atelier-taupe hover:text-black"
+                                      >
+                                        <X size={11} />
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      onClick={() => setDeleteQuoteConfirmId(q.referenceNumber)}
+                                      title="Delete or archive inquiry"
+                                      className="p-1 text-atelier-taupe/70 hover:text-rose-700 transition-colors"
+                                    >
+                                      <Trash2 size={12} />
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -3678,6 +4058,416 @@ VITE_RAZORPAY_KEY_ID=rzp_live_...`}
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ------------------------------------------------------------- */}
+      {/* MODAL: BESPOKE COMMISSION QUOTING & CLIENT REPLY */}
+      {/* ------------------------------------------------------------- */}
+      {selectedQuoteForReply && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-atelier-softblack/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6">
+          <div className="bg-atelier-ivory border border-atelier-parchment max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in-50 zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="p-4 sm:p-5 bg-atelier-cream border-b border-atelier-parchment flex items-center justify-between">
+              <div className="space-y-0.5">
+                <div className="flex items-center space-x-2">
+                  <span className="text-[10px] tracking-widest uppercase font-mono text-atelier-taupe">
+                    Bespoke Commission Atelier
+                  </span>
+                  <span className="px-2 py-0.5 bg-atelier-ivory border border-atelier-sand font-mono text-xs text-atelier-darkbrown font-medium">
+                    {selectedQuoteForReply.referenceNumber}
+                  </span>
+                </div>
+                <h3 className="font-serif text-lg text-atelier-softblack font-normal">
+                  Quote & Client Correspondence
+                </h3>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <button
+                  type="button"
+                  onClick={() => handleCopyQuoteSummary(selectedQuoteForReply)}
+                  className="px-2.5 py-1 text-xs bg-atelier-ivory border border-atelier-parchment hover:border-black text-atelier-charcoal hover:text-black flex items-center space-x-1"
+                  title="Copy quote summary"
+                >
+                  {copiedQuoteRef === selectedQuoteForReply.referenceNumber ? (
+                    <Check size={12} className="text-emerald-700" />
+                  ) : (
+                    <Copy size={12} />
+                  )}
+                  <span>{copiedQuoteRef === selectedQuoteForReply.referenceNumber ? 'Copied' : 'Copy Summary'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedQuoteForReply(null)}
+                  className="p-1 text-atelier-taupe hover:text-black transition-colors"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Body */}
+            <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                {/* LEFT COLUMN: Client Submission & Loom Evaluator */}
+                <div className="lg:col-span-5 space-y-5">
+                  {/* Client Info Card */}
+                  <div className="bg-atelier-cream/80 border border-atelier-parchment p-4 space-y-3">
+                    <span className="text-[10px] uppercase font-mono tracking-wider text-atelier-taupe block">
+                      Client Contact & Destination
+                    </span>
+                    <div className="space-y-1.5 text-xs text-atelier-softblack">
+                      <div className="font-medium text-sm flex items-center space-x-1.5">
+                        <User size={13} className="text-atelier-taupe" />
+                        <span>{selectedQuoteForReply.fullName}</span>
+                      </div>
+                      <div className="flex items-center space-x-1.5 text-atelier-charcoal font-mono">
+                        <Mail size={12} className="text-atelier-taupe" />
+                        <a href={`mailto:${selectedQuoteForReply.email}`} className="hover:underline">
+                          {selectedQuoteForReply.email}
+                        </a>
+                      </div>
+                      {selectedQuoteForReply.phone && (
+                        <div className="flex items-center space-x-1.5 text-atelier-charcoal font-mono">
+                          <Phone size={12} className="text-atelier-taupe" />
+                          <span>{selectedQuoteForReply.phone}</span>
+                        </div>
+                      )}
+                      <div className="flex items-center space-x-1.5 text-atelier-taupe uppercase tracking-wider text-[11px]">
+                        <MapPin size={12} />
+                        <span>{selectedQuoteForReply.country} · Inquiry submitted {selectedQuoteForReply.createdAt}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Rug Specifications */}
+                  <div className="bg-atelier-cream/80 border border-atelier-parchment p-4 space-y-3">
+                    <span className="text-[10px] uppercase font-mono tracking-wider text-atelier-taupe block">
+                      Commission Specifications
+                    </span>
+                    {(() => {
+                      const sqFt =
+                        selectedQuoteForReply.unit === 'feet'
+                          ? selectedQuoteForReply.width * selectedQuoteForReply.length
+                          : Math.round((selectedQuoteForReply.width * selectedQuoteForReply.length) / 929.03);
+                      return (
+                        <div className="space-y-2 text-xs">
+                          <div className="grid grid-cols-2 gap-2 text-atelier-charcoal">
+                            <div>
+                              <span className="text-[10px] text-atelier-taupe uppercase block">Dimensions</span>
+                              <strong className="font-mono text-atelier-softblack">
+                                {selectedQuoteForReply.width}' × {selectedQuoteForReply.length}' {selectedQuoteForReply.unit}
+                              </strong>
+                              <div className="text-[10px] text-atelier-taupe">~{sqFt} sq. ft. ({selectedQuoteForReply.shape})</div>
+                            </div>
+                            <div>
+                              <span className="text-[10px] text-atelier-taupe uppercase block">Technique</span>
+                              <strong className="text-atelier-softblack">{selectedQuoteForReply.technique}</strong>
+                            </div>
+                            <div>
+                              <span className="text-[10px] text-atelier-taupe uppercase block">Material</span>
+                              <span>{selectedQuoteForReply.material}</span>
+                            </div>
+                            <div>
+                              <span className="text-[10px] text-atelier-taupe uppercase block">Target Room</span>
+                              <span>{selectedQuoteForReply.roomType || 'Living Room'}</span>
+                            </div>
+                            <div className="col-span-2">
+                              <span className="text-[10px] text-atelier-taupe uppercase block">Palette / Tonal Notes</span>
+                              <span className="text-atelier-softblack font-medium">
+                                {selectedQuoteForReply.colorPreference || 'Atelier Standard'}
+                              </span>
+                            </div>
+                          </div>
+
+                          {selectedQuoteForReply.notes && (
+                            <div className="pt-2 border-t border-atelier-parchment/60">
+                              <span className="text-[10px] text-atelier-taupe uppercase block mb-0.5">Client Design Notes:</span>
+                              <div className="text-[11px] text-atelier-charcoal/90 italic bg-atelier-ivory p-2 border border-atelier-parchment/70">
+                                "{selectedQuoteForReply.notes}"
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
+                  </div>
+
+                  {/* Atelier Loom Estimation Sync Card */}
+                  {(() => {
+                    const sqFt =
+                      selectedQuoteForReply.unit === 'feet'
+                        ? selectedQuoteForReply.width * selectedQuoteForReply.length
+                        : Math.round((selectedQuoteForReply.width * selectedQuoteForReply.length) / 929.03);
+                    const rate =
+                      selectedQuoteForReply.technique === 'Hand-Knotted'
+                        ? 62
+                        : selectedQuoteForReply.technique === 'Flatweave'
+                        ? 28
+                        : 38;
+                    const calculatedTotal = Math.round(sqFt * rate);
+                    const calculatedLead =
+                      selectedQuoteForReply.technique === 'Hand-Knotted' ? '3 to 6 months' : 'Usual 3–4 weeks';
+
+                    return (
+                      <div className="bg-atelier-ivory border border-atelier-darkbrown/30 p-4 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-mono uppercase tracking-wider text-atelier-taupe">
+                            Loom Engine Benchmark
+                          </span>
+                          <span className="text-[10px] font-mono text-atelier-darkbrown font-medium">
+                            ${rate}/sq ft
+                          </span>
+                        </div>
+                        <div className="flex items-baseline justify-between">
+                          <div className="font-serif text-2xl text-atelier-softblack font-medium">
+                            ${calculatedTotal.toLocaleString()} <span className="text-xs font-sans text-atelier-taupe font-light">USD</span>
+                          </div>
+                          <span className="text-[10px] font-mono px-1.5 py-0.5 bg-atelier-cream border border-atelier-parchment">
+                            Lead: {calculatedLead}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setQuoteReplyPrice(calculatedTotal);
+                            setQuoteReplyLeadTime(calculatedLead);
+                            setQuoteReplyDeposit(Math.round(calculatedTotal * 0.5));
+                            showToast(`Applied Loom Engine rate: $${calculatedTotal} USD (${calculatedLead})`, 'info');
+                          }}
+                          className="w-full py-1.5 bg-atelier-cream border border-atelier-parchment hover:border-black text-[11px] text-atelier-softblack uppercase font-mono tracking-wider transition-colors flex items-center justify-center space-x-1 mt-1"
+                        >
+                          <Calculator size={11} />
+                          <span>Apply Loom Price to Quote</span>
+                        </button>
+                      </div>
+                    );
+                  })()}
+                </div>
+
+                {/* RIGHT COLUMN: Official Atelier Quotation & Direct Reply Form */}
+                <div className="lg:col-span-7 space-y-4">
+                  <div className="bg-atelier-cream/40 border border-atelier-parchment p-5 space-y-4">
+                    <span className="text-[10px] uppercase font-mono tracking-wider text-atelier-taupe block font-medium">
+                      Official Atelier Valuation & Terms
+                    </span>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      {/* Quoted Price */}
+                      <div>
+                        <label className="block text-[11px] text-atelier-taupe uppercase tracking-wider mb-1 font-medium">
+                          Quoted Price ($ USD)
+                        </label>
+                        <div className="relative">
+                          <span className="absolute left-2.5 top-2 text-xs text-atelier-taupe font-mono">$</span>
+                          <input
+                            type="number"
+                            min={100}
+                            value={quoteReplyPrice}
+                            onChange={(e) => {
+                              const val = Number(e.target.value);
+                              setQuoteReplyPrice(val);
+                              setQuoteReplyDeposit(Math.round(val * 0.5));
+                            }}
+                            className="w-full pl-6 pr-2 py-1.5 bg-atelier-ivory border border-atelier-parchment text-xs font-mono font-medium text-atelier-softblack focus:outline-none focus:border-black"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Lead Time */}
+                      <div>
+                        <label className="block text-[11px] text-atelier-taupe uppercase tracking-wider mb-1 font-medium">
+                          Artisanal Lead Time
+                        </label>
+                        <select
+                          value={quoteReplyLeadTime}
+                          onChange={(e) => setQuoteReplyLeadTime(e.target.value)}
+                          className="w-full px-2 py-1.5 bg-atelier-ivory border border-atelier-parchment text-xs text-atelier-softblack focus:outline-none focus:border-black"
+                        >
+                          <option value="Usual 3–4 weeks">1. Usual 3–4 weeks</option>
+                          <option value="3 to 6 months">2. 3 to 6 months</option>
+                          <option value="4 to 6 weeks">4 to 6 weeks</option>
+                          <option value="6 to 8 weeks">6 to 8 weeks</option>
+                          <option value="6 to 9 months">6 to 9 months</option>
+                        </select>
+                      </div>
+
+                      {/* Deposit (50%) */}
+                      <div>
+                        <label className="block text-[11px] text-atelier-taupe uppercase tracking-wider mb-1 font-medium">
+                          Loom Deposit (50%)
+                        </label>
+                        <div className="relative">
+                          <span className="absolute left-2.5 top-2 text-xs text-atelier-taupe font-mono">$</span>
+                          <input
+                            type="number"
+                            min={0}
+                            value={quoteReplyDeposit}
+                            onChange={(e) => setQuoteReplyDeposit(Number(e.target.value))}
+                            className="w-full pl-6 pr-2 py-1.5 bg-atelier-ivory border border-atelier-parchment text-xs font-mono text-atelier-softblack focus:outline-none focus:border-black"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Status Selector */}
+                    <div>
+                      <label className="block text-[11px] text-atelier-taupe uppercase tracking-wider mb-1 font-medium">
+                        Commission Status
+                      </label>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        {[
+                          { id: 'Reviewing', label: 'Reviewing', color: 'border-indigo-300 text-indigo-900' },
+                          { id: 'Quotation Sent', label: 'Quotation Sent', color: 'border-sky-300 text-sky-900' },
+                          { id: 'Production Scheduled', label: 'In Production', color: 'border-emerald-300 text-emerald-900' },
+                          { id: 'Archived', label: 'Archived', color: 'border-neutral-300 text-neutral-700' },
+                        ].map((st) => (
+                          <button
+                            type="button"
+                            key={st.id}
+                            onClick={() => setQuoteReplyStatus(st.id as any)}
+                            className={`py-1.5 px-2 text-center text-xs font-mono uppercase border transition-colors ${
+                              quoteReplyStatus === st.id
+                                ? 'bg-atelier-softblack text-atelier-parchment border-black font-semibold'
+                                : 'bg-atelier-ivory hover:border-black text-atelier-charcoal'
+                            }`}
+                          >
+                            {st.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Quick Response Templates */}
+                    <div className="pt-2 border-t border-atelier-parchment/70">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-[10px] uppercase font-mono tracking-wider text-atelier-taupe">
+                          Quick Atelier Message Templates
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setQuoteReplyNotes(
+                              `Dear ${selectedQuoteForReply.fullName},\n\nThank you for inviting Prasri Rugs into your space. Our master loom directors in Bhadohi have evaluated your bespoke commission for a ${selectedQuoteForReply.shape} ${selectedQuoteForReply.length}×${selectedQuoteForReply.width} ${selectedQuoteForReply.unit} ${selectedQuoteForReply.technique} piece (${selectedQuoteForReply.material}).\n\nWe are pleased to provide this official atelier valuation of $${quoteReplyPrice} USD. The artisanal lead time is ${quoteReplyLeadTime}. A 50% deposit ($${quoteReplyDeposit} USD) initiates the yarn spinning and loom reservation.\n\nPlease reply to confirm if you would like to proceed.\n\nWarm regards,\nPrasri Rugs Atelier Directorship`
+                            );
+                          }}
+                          className="px-2 py-1 bg-atelier-ivory border border-atelier-parchment hover:border-black text-[10px] font-mono text-atelier-charcoal"
+                        >
+                          Valuation & Deposit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setQuoteReplyNotes(
+                              `Dear ${selectedQuoteForReply.fullName},\n\nRegarding your bespoke commission ${selectedQuoteForReply.referenceNumber} (${selectedQuoteForReply.width}'×${selectedQuoteForReply.length}' ${selectedQuoteForReply.technique}):\n\nOur dyers have prepared initial wool pom-pom samples matching your palette "${selectedQuoteForReply.colorPreference || 'Atelier Standard'}". We would be delighted to courier these physical yarn swatches directly to your address in ${selectedQuoteForReply.country} before setting up the loom.\n\nPlease reply with your preferred shipping address for the swatch dispatch.\n\nWarm regards,\nPrasri Rugs Atelier Directorship`
+                            );
+                          }}
+                          className="px-2 py-1 bg-atelier-ivory border border-atelier-parchment hover:border-black text-[10px] font-mono text-atelier-charcoal"
+                        >
+                          Wool Swatch Approval
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setQuoteReplyNotes(
+                              `Dear ${selectedQuoteForReply.fullName},\n\nWe are delighted to confirm that your bespoke piece (Ref: ${selectedQuoteForReply.referenceNumber}) has been formally scheduled onto the loom in Bhadohi, India.\n\nThe wool warp and weft have been warped onto the frame, and master weavers will handcraft your ${selectedQuoteForReply.length}'×${selectedQuoteForReply.width}' ${selectedQuoteForReply.technique} rug with precision over the next ${quoteReplyLeadTime}.\n\nYou can track live loom milestones anytime at: ${window.location.origin}/track-order?orderNumber=${selectedQuoteForReply.referenceNumber}\n\nWarm regards,\nPrasri Rugs Atelier Directorship`
+                            );
+                            setQuoteReplyStatus('Production Scheduled');
+                          }}
+                          className="px-2 py-1 bg-atelier-ivory border border-atelier-parchment hover:border-black text-[10px] font-mono text-atelier-charcoal"
+                        >
+                          Loom Initiated Notice
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Atelier Reply Message Textarea */}
+                    <div>
+                      <label className="block text-[11px] text-atelier-taupe uppercase tracking-wider mb-1 font-medium">
+                        Atelier Letter / Response to Client
+                      </label>
+                      <textarea
+                        rows={7}
+                        value={quoteReplyNotes}
+                        onChange={(e) => setQuoteReplyNotes(e.target.value)}
+                        placeholder="Type personal designer notes, wool batch details, lead time, or deposit instructions..."
+                        className="w-full p-3 bg-atelier-ivory border border-atelier-parchment text-xs text-atelier-softblack focus:outline-none focus:border-black font-sans leading-relaxed resize-y"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Actions Bar */}
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 pt-2">
+                    <div className="flex items-center space-x-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const html = emailService.generateQuoteProposalHtml(selectedQuoteForReply, {
+                            quotedPriceUSD: Number(quoteReplyPrice),
+                            quotedLeadTime: quoteReplyLeadTime,
+                            depositUSD: Number(quoteReplyDeposit),
+                            adminReplyMessage: quoteReplyNotes,
+                          });
+                          setEmailPreviewContent(html);
+                        }}
+                        className="px-3 py-2 bg-atelier-cream border border-atelier-parchment hover:border-black text-xs font-mono text-atelier-softblack flex items-center space-x-1.5 transition-colors"
+                      >
+                        <Eye size={13} />
+                        <span>Preview Email</span>
+                      </button>
+
+                      <a
+                        href={emailService.generateMailtoUrl(
+                          `[Prasri Rugs] Quotation for Commission ${selectedQuoteForReply.referenceNumber}`,
+                          quoteReplyNotes,
+                          selectedQuoteForReply.email
+                        )}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-2 bg-atelier-cream border border-atelier-parchment hover:border-black text-xs font-mono text-atelier-softblack flex items-center space-x-1.5 transition-colors"
+                      >
+                        <ExternalLink size={13} />
+                        <span>Open Mail App</span>
+                      </a>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <button
+                        type="button"
+                        onClick={() => handleSaveQuoteReply(false)}
+                        className="px-3 py-2 bg-atelier-ivory border border-atelier-parchment hover:border-black text-xs font-mono uppercase text-atelier-softblack transition-colors"
+                      >
+                        Save Draft
+                      </button>
+
+                      {/* Primary Dispatch Action */}
+                      <button
+                        type="button"
+                        onClick={() => handleSaveQuoteReply(true)}
+                        disabled={isSendingQuoteEmail}
+                        className="px-4 py-2 bg-atelier-softblack text-atelier-parchment hover:bg-atelier-darkbrown text-xs font-medium tracking-wider uppercase transition-colors flex items-center justify-center space-x-1.5 shadow-sm disabled:opacity-50"
+                      >
+                        {isSendingQuoteEmail ? (
+                          <>
+                            <RefreshCw size={13} className="animate-spin" />
+                            <span>Sending to Client...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Send size={13} />
+                            <span>Send Quote to Client</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}

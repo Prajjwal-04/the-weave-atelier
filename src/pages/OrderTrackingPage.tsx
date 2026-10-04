@@ -4,7 +4,8 @@ import { Search, CheckCircle2, Clock, Truck, ShieldCheck, MapPin, Package, Arrow
 import { useAuth } from '../context/AuthContext';
 import { useCurrency } from '../context/CurrencyContext';
 import { orderService } from '../services/orderService';
-import { Order } from '../types';
+import { quoteService } from '../services/quoteService';
+import { Order, CustomQuoteRequest } from '../types';
 
 export const OrderTrackingPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -15,6 +16,7 @@ export const OrderTrackingPage: React.FC = () => {
   const [activeOrderNumber, setActiveOrderNumber] = useState(initialOrderNumber);
   const [searched, setSearched] = useState(Boolean(initialOrderNumber));
   const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
+  const [currentQuote, setCurrentQuote] = useState<CustomQuoteRequest | null>(null);
   const [loadingOrder, setLoadingOrder] = useState(false);
 
   const { getOrder } = useAuth();
@@ -31,12 +33,14 @@ export const OrderTrackingPage: React.FC = () => {
   useEffect(() => {
     if (!activeOrderNumber.trim()) {
       setCurrentOrder(null);
+      setCurrentQuote(null);
       return;
     }
 
     const localOrder = getOrder(activeOrderNumber);
     if (localOrder) {
       setCurrentOrder(localOrder);
+      setCurrentQuote(null);
     } else {
       setLoadingOrder(true);
     }
@@ -44,9 +48,23 @@ export const OrderTrackingPage: React.FC = () => {
     let isMounted = true;
     orderService
       .getOrderByNumber(activeOrderNumber)
-      .then((found) => {
-        if (isMounted && found) {
+      .then(async (found) => {
+        if (!isMounted) return;
+        if (found) {
           setCurrentOrder(found);
+          setCurrentQuote(null);
+        } else {
+          // Check if this reference corresponds to a bespoke custom quote
+          const quote = await quoteService.getQuoteByReference(activeOrderNumber);
+          if (isMounted) {
+            if (quote) {
+              setCurrentQuote(quote);
+              setCurrentOrder(null);
+            } else {
+              setCurrentOrder(null);
+              setCurrentQuote(null);
+            }
+          }
         }
       })
       .catch((err) => {
@@ -258,6 +276,163 @@ export const OrderTrackingPage: React.FC = () => {
                 </span>
                 <div>100% Insured Air Freight</div>
                 <div>Conditioning verified in Bhadohi</div>
+              </div>
+            </div>
+          </div>
+        ) : currentQuote ? (
+          <div className="bg-atelier-cream/80 border border-atelier-parchment p-8 sm:p-10 space-y-8 shadow-subtle animate-in fade-in-50 duration-200">
+            {/* Header info */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-atelier-parchment pb-6 gap-4">
+              <div>
+                <span className="text-[10px] uppercase tracking-wider text-atelier-taupe font-mono">
+                  Bespoke Commission Reference
+                </span>
+                <h2 className="font-serif text-2xl sm:text-3xl text-atelier-softblack font-normal mt-1">
+                  {currentQuote.referenceNumber}
+                </h2>
+                <div className="text-xs text-atelier-charcoal font-light mt-1">
+                  Commission registered for <strong className="font-medium">{currentQuote.fullName}</strong> · {currentQuote.country}
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:items-end">
+                <span className="text-[10px] uppercase tracking-wider text-atelier-taupe font-mono">
+                  Commission Stage
+                </span>
+                <span
+                  className={`mt-1 px-3 py-1 text-xs font-mono uppercase tracking-wider border font-medium ${
+                    currentQuote.status === 'Production Scheduled'
+                      ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                      : currentQuote.status === 'Quotation Sent'
+                      ? 'bg-sky-50 text-sky-800 border-sky-300'
+                      : 'bg-amber-50 text-amber-900 border-amber-300'
+                  }`}
+                >
+                  {currentQuote.status}
+                </span>
+                <span className="text-[11px] text-atelier-taupe mt-1 font-mono">
+                  Submitted {currentQuote.createdAt}
+                </span>
+              </div>
+            </div>
+
+            {/* Bespoke Loom Milestones Pipeline */}
+            <div className="space-y-4">
+              <span className="text-[10px] uppercase tracking-widest text-atelier-taupe font-mono block">
+                Atelier Commission Progression
+              </span>
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                {[
+                  {
+                    stage: 'Inquiry Received',
+                    desc: 'Dimensions & room specs registered',
+                    done: true,
+                    current: currentQuote.status === 'Received',
+                  },
+                  {
+                    stage: 'Atelier Review',
+                    desc: 'Master weaver & loom assessment',
+                    done: currentQuote.status !== 'Received',
+                    current: currentQuote.status === 'Reviewing',
+                  },
+                  {
+                    stage: 'Quotation Dispatched',
+                    desc: 'Official valuation & timeline issued',
+                    done: currentQuote.status === 'Quotation Sent' || currentQuote.status === 'Production Scheduled',
+                    current: currentQuote.status === 'Quotation Sent',
+                  },
+                  {
+                    stage: 'Loom Active',
+                    desc: 'Yarn dyeing & weaving initiated',
+                    done: currentQuote.status === 'Production Scheduled',
+                    current: currentQuote.status === 'Production Scheduled',
+                  },
+                ].map((step, idx) => (
+                  <div
+                    key={idx}
+                    className={`p-3.5 border transition-all ${
+                      step.current
+                        ? 'bg-atelier-ivory border-atelier-darkbrown shadow-xs ring-1 ring-atelier-darkbrown/40'
+                        : step.done
+                        ? 'bg-atelier-cream/60 border-emerald-300 text-atelier-softblack'
+                        : 'bg-atelier-ivory/50 border-atelier-parchment/70 opacity-60'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-2 mb-1.5">
+                      {step.done ? (
+                        <CheckCircle2 size={14} className="text-emerald-700 flex-shrink-0" />
+                      ) : (
+                        <Clock size={14} className="text-atelier-taupe flex-shrink-0" />
+                      )}
+                      <span className="text-xs font-serif font-medium">{step.stage}</span>
+                    </div>
+                    <p className="text-[11px] text-atelier-charcoal/80 font-light leading-snug">{step.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Commission Valuation & Timeline Specs */}
+            <div className="bg-atelier-ivory border border-atelier-parchment p-6 space-y-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+                <div>
+                  <span className="text-[10px] text-atelier-taupe uppercase tracking-wider block">Dimensions</span>
+                  <div className="font-mono text-sm font-medium text-atelier-softblack">
+                    {currentQuote.width}' × {currentQuote.length}' {currentQuote.unit}
+                  </div>
+                  <div className="text-[11px] text-atelier-taupe">({currentQuote.shape})</div>
+                </div>
+
+                <div>
+                  <span className="text-[10px] text-atelier-taupe uppercase tracking-wider block">Weave & Material</span>
+                  <div className="text-sm font-medium text-atelier-softblack">{currentQuote.technique}</div>
+                  <div className="text-[11px] text-atelier-taupe">{currentQuote.material}</div>
+                </div>
+
+                <div>
+                  <span className="text-[10px] text-atelier-taupe uppercase tracking-wider block">Atelier Valuation</span>
+                  <div className="font-mono text-sm font-semibold text-atelier-darkbrown">
+                    {currentQuote.quotedPriceUSD ? formatPrice(currentQuote.quotedPriceUSD) : 'Under Evaluation'}
+                  </div>
+                  <div className="text-[10px] text-emerald-800">
+                    {currentQuote.quotedPriceUSD ? 'Official Atelier Quotation' : 'Estimate pending'}
+                  </div>
+                </div>
+
+                <div>
+                  <span className="text-[10px] text-atelier-taupe uppercase tracking-wider block">Handcrafted Timeline</span>
+                  <div className="text-xs font-medium text-atelier-softblack">
+                    {currentQuote.quotedLeadTime || (currentQuote.technique === 'Hand-Knotted' ? '3 to 6 months' : 'Usual 3–4 weeks')}
+                  </div>
+                  <div className="text-[10px] text-atelier-taupe">From deposit confirmation</div>
+                </div>
+              </div>
+
+              {/* Message from Atelier Director */}
+              {currentQuote.adminReplyMessage && (
+                <div className="bg-atelier-cream border-l-3 border-atelier-agedgold p-4 space-y-1.5 mt-2">
+                  <span className="text-[10px] uppercase tracking-wider text-atelier-darkbrown font-mono font-medium block">
+                    Message from the Bhadohi Loom Directorship:
+                  </span>
+                  <p className="text-xs text-atelier-softblack font-light leading-relaxed whitespace-pre-line">
+                    {currentQuote.adminReplyMessage}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Direct Studio Contact */}
+            <div className="border-t border-atelier-parchment pt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs text-atelier-taupe gap-4">
+              <div>
+                Questions about your bespoke quote or want to request physical yarn pompoms?
+              </div>
+              <div className="flex items-center space-x-3">
+                <a
+                  href={`mailto:prasrirugs@gmail.com?subject=Inquiry%20Bespoke%20Commission%20${encodeURIComponent(currentQuote.referenceNumber)}`}
+                  className="px-3 py-1.5 bg-atelier-softblack text-atelier-parchment hover:bg-atelier-darkbrown uppercase font-mono tracking-wider text-[11px] transition-colors"
+                >
+                  Email Studio
+                </a>
               </div>
             </div>
           </div>

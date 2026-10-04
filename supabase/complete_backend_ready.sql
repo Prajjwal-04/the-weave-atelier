@@ -153,6 +153,12 @@ CREATE TABLE IF NOT EXISTS public.custom_quotes (
     room_type VARCHAR(100),
     notes TEXT,
     status VARCHAR(50) DEFAULT 'Received',
+    quoted_price_usd NUMERIC(10, 2),
+    quoted_lead_time VARCHAR(100),
+    admin_reply_message TEXT,
+    replied_at TIMESTAMPTZ,
+    deposit_required_usd NUMERIC(10, 2),
+    designer_contact VARCHAR(150),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );

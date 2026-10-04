@@ -122,7 +122,13 @@ export interface CustomQuoteRequest {
   estimatedPriceUSD: { min: number; max: number };
   roomType: string;
   notes?: string;
-  status: 'Received' | 'Reviewing' | 'Quotation Sent' | 'Production Scheduled';
+  status: 'Received' | 'Reviewing' | 'Quotation Sent' | 'Production Scheduled' | 'Archived' | 'Declined';
+  quotedPriceUSD?: number;
+  quotedLeadTime?: string;
+  adminReplyMessage?: string;
+  repliedAt?: string;
+  depositRequiredUSD?: number;
+  designerContact?: string;
 }
 
 export type OrderStatus = 

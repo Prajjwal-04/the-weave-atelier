@@ -920,9 +920,24 @@ export const AccountPage: React.FC = () => {
                               </div>
                               <div className="text-xs text-atelier-taupe">{q.createdAt}</div>
                             </div>
-                            <span className="text-[10px] uppercase font-mono px-2 py-0.5 bg-atelier-ivory border border-atelier-sand text-atelier-darkbrown font-medium">
-                              {q.status}
-                            </span>
+                            <div className="flex items-center space-x-2">
+                              {q.quotedLeadTime && (
+                                <span className="text-[10px] uppercase font-mono px-2 py-0.5 bg-atelier-cream border border-atelier-parchment text-atelier-taupe">
+                                  Lead: {q.quotedLeadTime}
+                                </span>
+                              )}
+                              <span
+                                className={`text-[10px] uppercase font-mono px-2 py-0.5 border font-medium ${
+                                  q.status === 'Production Scheduled'
+                                    ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                                    : q.status === 'Quotation Sent'
+                                    ? 'bg-sky-50 text-sky-800 border-sky-300'
+                                    : 'bg-atelier-ivory border-atelier-sand text-atelier-darkbrown'
+                                }`}
+                              >
+                                {q.status}
+                              </span>
+                            </div>
                           </div>
 
                           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs text-atelier-charcoal">
@@ -939,18 +954,53 @@ export const AccountPage: React.FC = () => {
                               {q.material}
                             </div>
                             <div>
-                              <span className="text-[10px] text-atelier-taupe uppercase block">Estimated Range</span>
-                              <span className="font-mono font-medium">
-                                {formatPrice(q.estimatedPriceUSD.min)} – {formatPrice(q.estimatedPriceUSD.max)}
+                              <span className="text-[10px] text-atelier-taupe uppercase block">
+                                {q.quotedPriceUSD ? 'Official Quoted Valuation' : 'Estimated Range'}
+                              </span>
+                              <span className="font-mono font-medium text-atelier-darkbrown">
+                                {q.quotedPriceUSD ? (
+                                  <span className="text-sm font-semibold">{formatPrice(q.quotedPriceUSD)}</span>
+                                ) : (
+                                  `${formatPrice(q.estimatedPriceUSD.min)} – ${formatPrice(q.estimatedPriceUSD.max)}`
+                                )}
                               </span>
                             </div>
                           </div>
 
-                          {q.notes && (
-                            <div className="text-xs text-atelier-charcoal/80 font-light border-t border-atelier-parchment/60 pt-2">
-                              Note: {q.notes}
+                          {/* Atelier Designer Reply Message */}
+                          {q.adminReplyMessage && (
+                            <div className="bg-atelier-ivory border-l-2 border-atelier-agedgold p-3 space-y-1">
+                              <span className="text-[10px] uppercase tracking-wider text-atelier-darkbrown font-mono font-medium block">
+                                Message from the Atelier Loom Director:
+                              </span>
+                              <p className="text-xs text-atelier-softblack/90 font-light whitespace-pre-line leading-relaxed">
+                                {q.adminReplyMessage}
+                              </p>
                             </div>
                           )}
+
+                          {q.notes && (
+                            <div className="text-xs text-atelier-charcoal/80 font-light border-t border-atelier-parchment/60 pt-2">
+                              Your Original Request: {q.notes}
+                            </div>
+                          )}
+
+                          <div className="pt-2 border-t border-atelier-parchment/60 flex items-center justify-between">
+                            <Link
+                              to={`/track-order?orderNumber=${encodeURIComponent(q.referenceNumber)}`}
+                              className="text-xs text-atelier-darkbrown hover:text-black font-mono flex items-center space-x-1"
+                            >
+                              <span>Track Commission Progress</span>
+                              <span>&rarr;</span>
+                            </Link>
+
+                            <a
+                              href={`mailto:prasrirugs@gmail.com?subject=Regarding%20Bespoke%20Commission%20${encodeURIComponent(q.referenceNumber)}`}
+                              className="text-xs text-atelier-taupe hover:text-black underline"
+                            >
+                              Reply to Studio
+                            </a>
+                          </div>
                         </div>
                       ))}
                     </div>

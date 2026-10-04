@@ -545,4 +545,136 @@ Carrier Assigned: ${order.carrier}
       fromName: 'Prasri Rugs',
     });
   },
+
+  // 9. Generate Official Atelier Quote Proposal Email Template (Customer Facing)
+  generateQuoteProposalHtml(
+    quote: CustomQuoteRequest,
+    proposal: {
+      quotedPriceUSD: number;
+      quotedLeadTime: string;
+      adminReplyMessage?: string;
+      depositUSD?: number;
+    }
+  ): string {
+    const sqFt = quote.unit === 'feet' ? quote.length * quote.width : Math.round((quote.length * quote.width) / 929.03);
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://theweaveatelier.com';
+    const trackingUrl = `${origin}/track-order?orderNumber=${encodeURIComponent(quote.referenceNumber)}`;
+
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head><meta charset="utf-8"/></head>
+      <body style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #FAF8F5; margin: 0; padding: 40px 20px; color: #2D2B2A;">
+        <table align="center" width="620" style="background: #FFFFFF; border: 1px solid #EDE6DD; padding: 40px; margin: 0 auto; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+          <tr>
+            <td align="center" style="padding-bottom: 25px; border-bottom: 1px solid #EDE6DD;">
+              <h1 style="font-family: Georgia, serif; font-size: 24px; letter-spacing: 0.25em; color: #1A1918; margin: 0; text-transform: uppercase;">PRASRI RUGS</h1>
+              <div style="font-size: 9px; letter-spacing: 0.35em; color: #8A7B6E; margin-top: 4px;">ATELIER BESPOKE COMMISSIONS · BHADOHI, INDIA</div>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 30px 0;">
+              <div style="background: #F8F5F1; border: 1px solid #EDE6DD; padding: 12px 18px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #8A7B6E;">Bespoke Commission Reference:</span>
+                <strong style="font-family: monospace; font-size: 15px; color: #1A1918; margin-left: 10px;">${quote.referenceNumber}</strong>
+              </div>
+
+              <h2 style="font-family: Georgia, serif; font-size: 21px; color: #1A1918; margin: 0 0 15px 0;">Official Atelier Quotation & Proposal</h2>
+              <p style="font-size: 13px; line-height: 1.7; color: #5C4D43; margin: 0 0 20px 0;">
+                Dear ${quote.fullName},<br/><br/>
+                Thank you for inviting Prasri Rugs into your space. Our master rug artisans and loom directors in Bhadohi, India have reviewed your bespoke design inquiry and prepared your official quotation below.
+              </p>
+
+              <!-- Spec Table -->
+              <table width="100%" style="font-size: 13px; line-height: 1.8; border-collapse: collapse; margin-bottom: 25px; background: #FCFBF9; border: 1px solid #EDE6DD;">
+                <tr><td style="padding: 8px 16px; color: #8A7B6E; border-bottom: 1px solid #EDE6DD; width: 160px;">Dimensions:</td><td style="padding: 8px 16px; color: #1A1918; font-weight: 500; border-bottom: 1px solid #EDE6DD;">${quote.length} × ${quote.width} ${quote.unit} (~${sqFt} sq. ft.)</td></tr>
+                <tr><td style="padding: 8px 16px; color: #8A7B6E; border-bottom: 1px solid #EDE6DD;">Shape & Technique:</td><td style="padding: 8px 16px; color: #1A1918; border-bottom: 1px solid #EDE6DD;">${quote.shape} · ${quote.technique}</td></tr>
+                <tr><td style="padding: 8px 16px; color: #8A7B6E; border-bottom: 1px solid #EDE6DD;">Fiber / Material:</td><td style="padding: 8px 16px; color: #1A1918; border-bottom: 1px solid #EDE6DD;">${quote.material}</td></tr>
+                <tr><td style="padding: 8px 16px; color: #8A7B6E; border-bottom: 1px solid #EDE6DD;">Palette & Room:</td><td style="padding: 8px 16px; color: #1A1918; border-bottom: 1px solid #EDE6DD;">${quote.colorPreference || 'Atelier Standard'} (${quote.roomType || 'Living Area'})</td></tr>
+                <tr><td style="padding: 8px 16px; color: #8A7B6E;">Destination Country:</td><td style="padding: 8px 16px; color: #1A1918;">${quote.country}</td></tr>
+              </table>
+
+              <!-- Atelier Valuation Box -->
+              <div style="background: #1A1918; color: #FAF8F5; padding: 25px 20px; text-align: center; margin: 25px 0;">
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: #D4AF37; margin-bottom: 6px;">Total Commission Valuation</div>
+                <div style="font-family: Georgia, serif; font-size: 28px; font-weight: normal; letter-spacing: 0.05em; color: #FAF8F5;">$${proposal.quotedPriceUSD.toLocaleString()} USD</div>
+                <div style="font-size: 12px; color: #D5C7B8; margin-top: 10px; font-family: monospace;">
+                  Handcrafted Timeline: <strong>${proposal.quotedLeadTime}</strong>
+                </div>
+                ${proposal.depositUSD ? `<div style="font-size: 11px; color: #E0D3C1; margin-top: 6px;">Loom Initiation Deposit (50%): <strong>$${proposal.depositUSD.toLocaleString()} USD</strong></div>` : ''}
+              </div>
+
+              <!-- Designer Notes -->
+              ${proposal.adminReplyMessage ? `
+              <div style="background: #F8F5F1; border-left: 3px solid #D4AF37; padding: 18px; margin: 25px 0; font-size: 13px; line-height: 1.7; color: #2D2B2A;">
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #8A7B6E; margin-bottom: 6px;">Note from the Atelier Director:</div>
+                ${proposal.adminReplyMessage.replace(/\n/g, '<br/>')}
+              </div>
+              ` : ''}
+
+              <!-- Action Link -->
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="${trackingUrl}" style="display: inline-block; background-color: #8C6D4F; color: #FFFFFF; text-decoration: none; padding: 12px 28px; font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 500;">
+                  Track Commission Progress
+                </a>
+              </div>
+
+              <p style="font-size: 12px; line-height: 1.6; color: #73675E;">
+                To approve this proposal or request physical wool yarn color pompoms sent to your address, simply reply directly to this email or reach us on WhatsApp.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="border-top: 1px solid #EDE6DD; padding-top: 20px; font-size: 11px; color: #8A7B6E; line-height: 1.6;">
+              Prasri Rugs, G.T. Road, Gopiganj, Bhadohi, UP 221303, India<br/>
+              Inquiries: ${ATELIER_PRIMARY_EMAIL} · Concierge WhatsApp Available
+            </td>
+          </tr>
+        </table>
+      </body>
+      </html>
+    `;
+  },
+
+  // 10. Send Official Atelier Quote Proposal Email to Client
+  async sendQuoteProposal(
+    quote: CustomQuoteRequest,
+    proposal: {
+      quotedPriceUSD: number;
+      quotedLeadTime: string;
+      adminReplyMessage?: string;
+      depositUSD?: number;
+    }
+  ): Promise<EmailDispatchResult> {
+    const subject = `[Prasri Rugs Quote] Bespoke Commission ${quote.referenceNumber} - $${proposal.quotedPriceUSD} USD (${proposal.quotedLeadTime})`;
+    const html = this.generateQuoteProposalHtml(quote, proposal);
+    const sqFt = quote.unit === 'feet' ? quote.length * quote.width : Math.round((quote.length * quote.width) / 929.03);
+
+    const text = `
+Prasri Rugs - Bespoke Commission Quotation
+------------------------------------------------
+Reference Number: ${quote.referenceNumber}
+Client: ${quote.fullName}
+Dimensions: ${quote.length} x ${quote.width} ${quote.unit} (~${sqFt} sq. ft.)
+Technique: ${quote.technique} (${quote.material})
+
+Valuation: $${proposal.quotedPriceUSD} USD
+Artisanal Lead Time: ${proposal.quotedLeadTime}
+
+Atelier Note:
+${proposal.adminReplyMessage || 'Thank you for your custom rug commission request.'}
+
+To proceed with your commission, reply directly to this email.
+    `.trim();
+
+    return dispatchToInbox({
+      toEmail: quote.email,
+      replyTo: ATELIER_PRIMARY_EMAIL,
+      subject,
+      html,
+      text,
+      fromName: 'Prasri Rugs Atelier',
+    });
+  },
 };
+
