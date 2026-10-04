@@ -10,12 +10,18 @@ import { CustomRugsPreview } from '../components/home/CustomRugsPreview';
 import { EditorialJournalPreview } from '../components/home/EditorialJournalPreview';
 import { TrustBanner } from '../components/home/TrustBanner';
 import { useInventory } from '../context/InventoryContext';
+import { SEO } from '../components/common/SEO';
 
 export const HomePage: React.FC = () => {
   const { products } = useInventory();
 
   return (
     <div className="animate-fadeIn">
+      <SEO
+        title="PRASRI RUGS — Contemporary Handmade Rugs from Bhadohi, India"
+        description="Contemporary rugs, rooted in Indian craftsmanship. Handcrafted slowly in Bhadohi, India for discerning architectural spaces worldwide. Ready-to-ship collections and bespoke custom sizing."
+        canonicalPath="/"
+      />
       {/* 1. Hero Section */}
       <HeroSection />
 

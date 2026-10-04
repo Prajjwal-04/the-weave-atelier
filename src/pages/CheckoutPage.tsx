@@ -94,7 +94,7 @@ export const CheckoutPage: React.FC = () => {
   const [city, setCity] = useState(user?.savedAddress?.city || '');
   const [state, setState] = useState(user?.savedAddress?.state || '');
   const [postalCode, setPostalCode] = useState(user?.savedAddress?.postalCode || '');
-  const [country, setCountry] = useState(destinationCountry || 'United States');
+  const [country, setCountry] = useState(destinationCountry || 'India');
 
   // Payment Method Selection State
   const [paymentMethod, setPaymentMethod] = useState<'upi' | 'card' | 'netbanking' | 'international'>('upi');

@@ -1,10 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, MapPin, Heart, Sparkles, Feather } from 'lucide-react';
+import { SEO } from '../components/common/SEO';
 
 export const TheAtelierPage: React.FC = () => {
   return (
     <div className="pt-20 sm:pt-24 pb-24 bg-atelier-ivory min-h-screen">
+      <SEO
+        title="The Atelier — Origin & Philosophy"
+        description="Learn the history and ethos of Prasri Rugs in Bhadohi, India. Merging generational hand-knotting traditions with contemporary architectural restraint."
+        canonicalPath="/the-atelier"
+        image="/images/atelier/the-atelier-studio.jpg"
+      />
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-20">
         {/* Header */}
         <div className="space-y-4 max-w-3xl">

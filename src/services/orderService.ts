@@ -1,5 +1,5 @@
 import { supabase, isSupabaseConfigured } from './supabase';
-import { Order, OrderStatus, OrderTimelineEvent } from '../types';
+import { Order, OrderStatus, OrderTimelineEvent, MadeToOrderMilestone } from '../types';
 import { productService } from './productService';
 
 const ORDERS_STORAGE_KEY = 'twa_orders_db';
@@ -514,6 +514,149 @@ export const orderService = {
       saveLocalOrders(local);
     } catch (storageErr) {
       console.warn('Non-blocking local orders cache update warning:', storageErr);
+    }
+
+    return order;
+  },
+
+  // 4b. Advance Made-to-Order Loom Stage Milestones
+  async updateMadeToOrderMilestone(
+    orderNumber: string,
+    milestone: MadeToOrderMilestone
+  ): Promise<Order> {
+    const cleanNum = orderNumber.trim().toUpperCase();
+    let local = getLocalOrders();
+    let index = local.findIndex((o) => o.orderNumber.trim().toUpperCase() === cleanNum);
+
+    if (index === -1) {
+      const fetched = await this.getOrderByNumber(cleanNum);
+      if (fetched) {
+        local = [fetched, ...local];
+        index = 0;
+      } else {
+        throw new Error(`Order ${orderNumber} not found.`);
+      }
+    }
+
+    const order = { ...local[index] };
+    order.isMadeToOrder = true;
+    order.productionMilestone = milestone;
+
+    const milestonesList: {
+      name: MadeToOrderMilestone;
+      title: string;
+      desc: string;
+      status: OrderStatus;
+    }[] = [
+      {
+        name: 'Yarn Dyeing',
+        title: 'Yarn Dyeing & Skeining',
+        desc: 'Raw highland wool washed and vat-dyed with custom botanical pigments in Bhadohi.',
+        status: 'IN PRODUCTION',
+      },
+      {
+        name: 'On the Loom',
+        title: 'On the Loom Weaving',
+        desc: 'Master artisans actively handcrafting knots on traditional vertical loom.',
+        status: 'IN PRODUCTION',
+      },
+      {
+        name: 'Washing & Shearing',
+        title: 'Washing, Sun Curing & Shearing',
+        desc: 'Purified soft-water wash, open-air sun curing, and manual tactile pile shearing.',
+        status: 'IN PRODUCTION',
+      },
+      {
+        name: 'Final Inspection',
+        title: 'Final Quality & Binding Audit',
+        desc: 'Rigorous knot density audit, side binding, fringe trimming, and heirloom certificate issuance.',
+        status: 'QUALITY CHECK',
+      },
+      {
+        name: 'Dispatched',
+        title: 'Dispatched & Handed to Courier',
+        desc: 'Packed in protective moisture-barrier canvas and dispatched via express courier.',
+        status: 'DISPATCHED',
+      },
+    ];
+
+    const currentMilestoneIndex = milestonesList.findIndex((m) => m.name === milestone);
+    const targetStatus = currentMilestoneIndex >= 0 ? milestonesList[currentMilestoneIndex].status : order.status;
+    order.status = targetStatus;
+
+    const todayStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+    // Build or update the 5-step milestone timeline
+    order.timeline = milestonesList.map((m, idx) => {
+      const isPast = idx < currentMilestoneIndex;
+      const isCurrent = idx === currentMilestoneIndex;
+      let dateLabel = 'Scheduled';
+      if (isPast) {
+        dateLabel = 'Completed';
+      } else if (isCurrent) {
+        dateLabel = `Active Stage · ${todayStr}`;
+      }
+
+      return {
+        title: `${idx + 1}. ${m.title}`,
+        date: dateLabel,
+        description: m.desc,
+        completed: isPast || (isCurrent && m.name === 'Dispatched'),
+        current: isCurrent && m.name !== 'Dispatched',
+      };
+    });
+
+    // 1. Primary Cloud Authority: Update Supabase
+    if (isSupabaseConfigured() && supabase) {
+      try {
+        const updatePayload: any = {
+          status: targetStatus,
+          is_made_to_order: true,
+          production_milestone: milestone,
+        };
+
+        const { data: updatedDbOrder } = await supabase
+          .from('orders')
+          .update(updatePayload)
+          .eq('order_number', cleanNum)
+          .select('id')
+          .maybeSingle();
+
+        let targetDbId = updatedDbOrder?.id;
+        if (!targetDbId) {
+          const { data: found } = await supabase
+            .from('orders')
+            .select('id')
+            .eq('order_number', cleanNum)
+            .maybeSingle();
+          targetDbId = found?.id;
+        }
+
+        if (targetDbId && order.timeline && order.timeline.length > 0) {
+          await supabase.from('order_timelines').delete().eq('order_id', targetDbId);
+          await supabase.from('order_timelines').insert(
+            order.timeline.map((event, idx) => ({
+              order_id: targetDbId,
+              title: event.title,
+              date_label: event.date,
+              description: event.description || '',
+              completed: Boolean(event.completed),
+              is_current: Boolean(event.current),
+              step_order: idx + 1,
+            }))
+          );
+        }
+      } catch (err) {
+        console.error('Error syncing milestone to Supabase:', err);
+      }
+    }
+
+    // 2. Update local storage
+    try {
+      local[index] = order;
+      saveLocalOrders(local);
+    } catch (storageErr) {
+      console.warn('Local storage save warning:', storageErr);
     }
 
     return order;

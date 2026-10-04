@@ -4,6 +4,7 @@ import { COLLECTIONS } from '../data/collections';
 import { ProductCard } from '../components/product/ProductCard';
 import { ArrowRight } from 'lucide-react';
 import { useInventory } from '../context/InventoryContext';
+import { SEO } from '../components/common/SEO';
 
 export const CollectionsPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -16,6 +17,12 @@ export const CollectionsPage: React.FC = () => {
 
     return (
       <div className="pt-20 sm:pt-24 pb-20 bg-atelier-ivory min-h-screen">
+        <SEO
+          title={`${currentCollection.name} Collection`}
+          description={currentCollection.description}
+          canonicalPath={`/collections/${currentCollection.slug}`}
+          image={currentCollection.heroImage}
+        />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Breadcrumbs */}
           <div className="text-[11px] text-atelier-taupe tracking-wider uppercase mb-8 flex items-center space-x-2">
@@ -76,6 +83,11 @@ export const CollectionsPage: React.FC = () => {
   // Otherwise, render full Collections Index
   return (
     <div className="pt-20 sm:pt-24 pb-20 bg-atelier-ivory min-h-screen">
+      <SEO
+        title="Curated Rug Collections"
+        description="Explore curated collections of contemporary handmade rugs: Modern Forms, Quiet Neutrals, Botanical Studies, Texture & Sculpture, Heritage Reimagined, and Hand-Knotted."
+        canonicalPath="/collections"
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="border-b border-atelier-parchment pb-8 mb-12">
           <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase font-medium mb-2 flex items-center space-x-2">

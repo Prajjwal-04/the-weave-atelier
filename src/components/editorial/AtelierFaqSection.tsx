@@ -27,7 +27,7 @@ const FAQ_DATA: FaqItem[] = [
   {
     id: 'care-1',
     category: 'care',
-    question: 'Is fiber shedding normal with pure Bikaner wool, and how should it be managed?',
+    question: 'Is fiber shedding normal with handcrafted virgin wool, and how should it be managed?',
     answer:
       'Yes. Genuine high-altitude wool contains short natural fleece fibers that gently loosen during the first 4 to 6 weeks of everyday use. This is a natural characteristic of virgin wool and is not a defect. Vacuum gently with a suction-only setting (avoid abrasive rotating beater bars) once or twice weekly, and shedding will taper off naturally.',
   },

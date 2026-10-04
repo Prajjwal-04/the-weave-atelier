@@ -117,7 +117,7 @@ export const sanitizeProductVariant = (v: any, index: number, productSlug: strin
     priceUSD,
     inventory,
     isReadyToShip: v?.isReadyToShip ?? v?.is_ready_to_ship ?? true,
-    productionTimeWeeks: v?.productionTimeWeeks || v?.production_time_weeks || '4–6 weeks',
+    productionTimeWeeks: v?.productionTimeWeeks || v?.production_time_weeks || '3–4 weeks',
     weightKg: Number(v?.weightKg || v?.weight_kg || 15) || 15,
   };
 };

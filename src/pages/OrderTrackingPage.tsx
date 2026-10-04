@@ -151,8 +151,15 @@ export const OrderTrackingPage: React.FC = () => {
               </div>
 
               <div className="text-left sm:text-right space-y-1">
-                <div className="inline-block px-3 py-1 bg-atelier-parchment border border-atelier-sand text-atelier-darkbrown text-xs font-mono font-medium">
-                  Status: {currentOrder.status}
+                <div className="flex flex-wrap items-center gap-2 justify-start sm:justify-end">
+                  <div className="inline-block px-3 py-1 bg-atelier-parchment border border-atelier-sand text-atelier-darkbrown text-xs font-mono font-medium">
+                    Status: {currentOrder.status}
+                  </div>
+                  {currentOrder.isMadeToOrder && (
+                    <div className="inline-block px-3 py-1 bg-purple-50 border border-purple-200 text-purple-900 text-xs font-mono font-medium">
+                      Loom Stage: {currentOrder.productionMilestone || 'In Production'}
+                    </div>
+                  )}
                 </div>
                 <div className="text-xs text-atelier-charcoal font-light">
                   Carrier: <span className="font-medium">{currentOrder.carrier}</span> · Tracking:{' '}

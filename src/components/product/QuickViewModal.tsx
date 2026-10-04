@@ -52,7 +52,7 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
         priceUSD: 1850,
         inventory: 1,
         isReadyToShip: true,
-        productionTimeWeeks: '4–6 weeks',
+        productionTimeWeeks: '3–4 weeks',
         weightKg: 15,
       };
     }
@@ -86,7 +86,7 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
         isReadyToShip: Boolean(activeVariant.isReadyToShip),
         estimatedDispatch: activeVariant.isReadyToShip
           ? 'Dispatches in 2–4 business days'
-          : `Made to Order (${activeVariant.productionTimeWeeks || '4–6 weeks'})`,
+          : `Made to Order (${activeVariant.productionTimeWeeks || '3–4 weeks'})`,
       },
       1,
       true

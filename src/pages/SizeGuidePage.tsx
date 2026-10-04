@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Sofa, Bed, Utensils, DoorOpen, ArrowRight, Check } from 'lucide-react';
+import { SEO } from '../components/common/SEO';
 
 export const SizeGuidePage: React.FC = () => {
   const [activeRoom, setActiveRoom] = useState<'living' | 'dining' | 'bedroom' | 'hallway'>('living');
@@ -66,6 +67,11 @@ export const SizeGuidePage: React.FC = () => {
 
   return (
     <div className="pt-20 sm:pt-24 pb-24 bg-atelier-ivory min-h-screen">
+      <SEO
+        title="Interactive Rug Size & Placement Guide"
+        description="Master interior rug placement proportions for living rooms, bedrooms, and dining spaces. Compare 5x8, 6x9, 8x10, 9x12 and custom sizing."
+        canonicalPath="/size-guide"
+      />
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto space-y-3">

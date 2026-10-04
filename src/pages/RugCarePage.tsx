@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Wind, Droplets, RotateCw, Sun, Sparkles, Archive, Scissors, AlertCircle } from 'lucide-react';
+import { SEO } from '../components/common/SEO';
 
 export const RugCarePage: React.FC = () => {
   const careSections = [
@@ -48,6 +49,11 @@ export const RugCarePage: React.FC = () => {
 
   return (
     <div className="pt-20 sm:pt-24 pb-24 bg-atelier-ivory min-h-screen">
+      <SEO
+        title="Rug Care & Wool Maintenance Guide"
+        description="Essential maintenance guidelines for handcrafted wool rugs: vacuuming, stain removal, fiber shedding, rotation, and longevity preservation."
+        canonicalPath="/rug-care"
+      />
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         {/* Header */}
         <div className="border-b border-atelier-parchment pb-8 max-w-3xl">

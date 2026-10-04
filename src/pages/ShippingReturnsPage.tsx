@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Truck, ShieldCheck, Clock, Globe, RotateCcw, Package, AlertCircle } from 'lucide-react';
+import { SEO } from '../components/common/SEO';
 
 export const ShippingReturnsPage: React.FC = () => {
   const destinations = [
@@ -44,9 +45,14 @@ export const ShippingReturnsPage: React.FC = () => {
 
   return (
     <div className="pt-20 sm:pt-24 pb-24 bg-atelier-ivory min-h-screen">
+      <SEO
+        title="Shipping & Returns Policy"
+        description="Worldwide express insured air shipping directly from our Bhadohi atelier to 50+ countries. 14-day return policy and doorstep delivery tracking."
+        canonicalPath="/shipping-returns"
+      />
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         {/* Header */}
-        <div className="border-b border-atelier-parchment pb-8 max-w-3xl">
+        <div id="shipping" className="border-b border-atelier-parchment pb-8 max-w-3xl">
           <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase font-medium mb-2 flex items-center space-x-2">
             <span className="text-atelier-agedgold">GLOBAL TRANSIT</span>
             <span className="text-atelier-taupe/40">·</span>

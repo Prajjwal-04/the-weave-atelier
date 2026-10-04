@@ -3,6 +3,7 @@ import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { JOURNAL_ARTICLES } from '../data/journal';
 import { Clock, ArrowRight, ArrowLeft, BookOpen, HelpCircle } from 'lucide-react';
 import { AtelierFaqSection } from '../components/editorial/AtelierFaqSection';
+import { SEO } from '../components/common/SEO';
 
 export const JournalPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -16,6 +17,13 @@ export const JournalPage: React.FC = () => {
 
     return (
       <div className="pt-20 sm:pt-24 pb-24 bg-atelier-ivory min-h-screen">
+        <SEO
+          title={article.title}
+          description={article.excerpt}
+          canonicalPath={`/journal/${article.slug}`}
+          image={article.heroImage}
+          type="article"
+        />
         <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           {/* Back link & Category */}
           <div className="flex items-center justify-between text-xs text-atelier-taupe border-b border-atelier-parchment pb-4">
@@ -123,6 +131,11 @@ export const JournalPage: React.FC = () => {
   // Journal Index
   return (
     <div className="pt-20 sm:pt-24 pb-24 bg-atelier-ivory min-h-screen">
+      <SEO
+        title="The Journal & Inquiries"
+        description="Essays on Indian carpet heritage, natural living fibers, sizing principles, and answers to common atelier questions."
+        canonicalPath="/journal"
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         <div className="border-b border-atelier-parchment pb-8 max-w-3xl">
           <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase font-medium mb-2 flex items-center space-x-2">

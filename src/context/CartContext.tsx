@@ -46,7 +46,15 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [isOpen, setIsOpen] = useState(false);
   const [destinationCountry, setDestinationCountry] = useState<string>(() => {
-    return localStorage.getItem('twa_shipping_country') || 'United States';
+    const saved = localStorage.getItem('twa_shipping_country');
+    if (saved) return saved;
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+      if (!tz.includes('Calcutta') && !tz.includes('Kolkata') && localStorage.getItem('twa_currency') === 'USD') {
+        return 'United States';
+      }
+    } catch (e) {}
+    return 'India';
   });
 
   useEffect(() => {

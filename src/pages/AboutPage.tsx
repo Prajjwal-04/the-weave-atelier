@@ -1,10 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles, MapPin, Feather, Heart } from 'lucide-react';
+import { SEO } from '../components/common/SEO';
 
 export const AboutPage: React.FC = () => {
   return (
     <div className="pt-20 sm:pt-24 pb-24 bg-atelier-ivory min-h-screen">
+      <SEO
+        title="About Us — Heritage & Artisans of Bhadohi"
+        description="Discover the story behind Prasri Rugs. An independent artisan atelier dedicated to crafting contemporary handmade wool rugs in Bhadohi, India."
+        canonicalPath="/about"
+        image="/images/narrative/stage-03-loom-at-work.jpg"
+      />
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         {/* Header */}
         <div className="space-y-4 max-w-3xl">
@@ -24,9 +31,9 @@ export const AboutPage: React.FC = () => {
         {/* Editorial Photo */}
         <div className="aspect-[16/9] overflow-hidden bg-atelier-parchment border border-atelier-parchment shadow-subtle">
           <img
-            src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1800&q=85"
-            alt="Prasri Rugs contemporary rug in architectural interior"
-            className="w-full h-full object-cover filter brightness-[0.92]"
+            src="/images/narrative/stage-03-loom-at-work.jpg"
+            alt="Master artisans weaving contemporary wool rug on upright timber loom at Prasri Rugs studio in Bhadohi"
+            className="w-full h-full object-cover filter brightness-[0.95]"
           />
         </div>
 

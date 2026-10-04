@@ -95,37 +95,37 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
       name: 'Modern Forms',
       path: '/collections/modern-forms',
       tagline: 'Architectural geometries & organic contours',
-      image: 'https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=400&q=80',
+      image: '/images/collections/modern-forms.jpg',
     },
     {
       name: 'Quiet Neutrals',
       path: '/collections/quiet-neutrals',
       tagline: 'Soft, restrained earth tones for serene spaces',
-      image: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=400&q=80',
+      image: '/images/collections/quiet-neutrals.jpg',
     },
     {
       name: 'Botanical Studies',
       path: '/collections/botanical-studies',
       tagline: 'Abstracted flora & nature-dyed pigments',
-      image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=400&q=80',
+      image: '/images/collections/botanical-studies.jpg',
     },
     {
       name: 'Texture & Sculpture',
       path: '/collections/texture-sculpture',
       tagline: 'High-low carved pile and variable reliefs',
-      image: 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=400&q=80',
+      image: '/images/collections/texture-sculpture.jpg',
     },
     {
       name: 'Heritage Reimagined',
       path: '/collections/heritage-reimagined',
       tagline: 'Centuries of Indian weaving reimagined',
-      image: 'https://images.unsplash.com/photo-1579656381226-5fc0f0100c3b?auto=format&fit=crop&w=400&q=80',
+      image: '/images/collections/heritage-reimagined.jpg',
     },
     {
       name: 'Hand-Knotted Archive',
       path: '/collections/hand-knotted-collection',
       tagline: 'Generational heirloom master craft',
-      image: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=400&q=80',
+      image: '/images/collections/hand-knotted-collection.jpg',
     },
   ];
 
@@ -448,7 +448,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
 
               {/* Wishlist - Active & visible on mobile and tablets in place of currency converter */}
               <Link
-                to="/account?tab=wishlist"
+                to="/wishlist"
                 className={`relative p-1.5 sm:p-2 rounded-full transition-all duration-300 inline-flex flex-shrink-0 ${
                   isTransparent
                     ? 'text-white hover:text-white hover:bg-white/15'
@@ -646,7 +646,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
               {/* Mobile Quick Account Links */}
               <div className="pt-4 border-t border-atelier-parchment space-y-2.5">
                 <Link
-                  to="/account?tab=wishlist"
+                  to="/wishlist"
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center justify-between text-xs text-atelier-charcoal hover:text-atelier-softblack py-1"
                 >

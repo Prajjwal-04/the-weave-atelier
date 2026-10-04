@@ -31,8 +31,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   const secondaryImage = getCardImageUrl(product.images[1]?.url || product.images[0]?.url || '');
 
   // Check live reactive inventory
-  const hasLastOne = product.variants.some((v) => getInventory(v.sku) === 1);
-  const hasAnyInStock = product.variants.some((v) => getInventory(v.sku) > 0);
+  const totalStock = product.variants.reduce((sum, v) => sum + (getInventory(v.sku) || 0), 0);
+  const hasLastOne = totalStock === 1;
+  const hasAnyInStock = totalStock > 0;
   const isReady = product.isReadyToShip && hasAnyInStock;
 
   return (
@@ -154,7 +155,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             </span>
           </div>
           <span className="text-[11px] font-sans text-atelier-taupe font-normal">
-            {product.variants[0]?.dimensionsFt || product.variants[0]?.size || "8' × 10'"}
+            {product.variants[0]?.size || product.variants[0]?.dimensionsFt?.split('(')[0]?.trim() || "5' × 8'"}
           </span>
         </div>
 

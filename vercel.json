@@ -1,4 +1,16 @@
 {
+  "redirects": [
+    {
+      "source": "/atelier",
+      "destination": "/the-atelier",
+      "permanent": true
+    },
+    {
+      "source": "/the-atelier/",
+      "destination": "/the-atelier",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/(.*)",

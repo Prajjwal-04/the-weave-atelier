@@ -142,6 +142,13 @@ export interface OrderTimelineEvent {
   current?: boolean;
 }
 
+export type MadeToOrderMilestone =
+  | 'Yarn Dyeing'
+  | 'On the Loom'
+  | 'Washing & Shearing'
+  | 'Final Inspection'
+  | 'Dispatched';
+
 export interface Order {
   id: string;
   orderNumber: string; // e.g. "PR-2026-8491"
@@ -176,6 +183,7 @@ export interface Order {
   trackingNumber: string;
   estimatedDeliveryDate: string;
   isMadeToOrder: boolean;
+  productionMilestone?: MadeToOrderMilestone;
   timeline: OrderTimelineEvent[];
   paymentProvider?: string;
   paymentId?: string;

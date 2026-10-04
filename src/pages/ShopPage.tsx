@@ -8,6 +8,7 @@ import { QuickViewModal } from '../components/product/QuickViewModal';
 import { CustomSizeModal } from '../components/product/CustomSizeModal';
 import { useCurrency } from '../context/CurrencyContext';
 import { useInventory } from '../context/InventoryContext';
+import { SEO } from '../components/common/SEO';
 
 export const ShopPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -19,8 +20,8 @@ export const ShopPage: React.FC = () => {
   const initialAvailability = searchParams.get('availability') || 'all';
   const searchQuery = searchParams.get('search') || '';
 
-  // Pagination Configuration (12 rugs per page)
-  const ITEMS_PER_PAGE = 12;
+  // Pagination Configuration (24 rugs per page so all designs display)
+  const ITEMS_PER_PAGE = 24;
   const [currentPage, setCurrentPage] = useState(1);
   const catalogTopRef = useRef<HTMLDivElement>(null);
 
@@ -170,6 +171,11 @@ export const ShopPage: React.FC = () => {
 
   return (
     <div className="pt-20 sm:pt-24 pb-20 bg-atelier-ivory min-h-screen">
+      <SEO
+        title="Shop All Works — 17 Contemporary Rugs"
+        description="Discover all contemporary hand-tufted, hand-knotted, and flatweave wool rugs handcrafted in Bhadohi, India. Ready to ship and bespoke custom sizing."
+        canonicalPath="/shop"
+      />
       <div ref={catalogTopRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Page Header */}
         <div className="border-b border-atelier-parchment pb-8 mb-8">

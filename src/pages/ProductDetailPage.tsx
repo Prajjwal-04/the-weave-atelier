@@ -24,6 +24,7 @@ import { StockBadge } from '../components/product/StockBadge';
 import { CustomSizeModal } from '../components/product/CustomSizeModal';
 import { ProductCard } from '../components/product/ProductCard';
 import { RoomScaleVisualizer } from '../components/product/RoomScaleVisualizer';
+import { SEO } from '../components/common/SEO';
 
 export const ProductDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -101,7 +102,7 @@ export const ProductDetailPage: React.FC = () => {
         priceUSD: 1850,
         inventory: 1,
         isReadyToShip: true,
-        productionTimeWeeks: '4–6 weeks',
+        productionTimeWeeks: '3–4 weeks',
         weightKg: 15,
       };
     }
@@ -212,7 +213,7 @@ export const ProductDetailPage: React.FC = () => {
         isReadyToShip: Boolean(activeVariant.isReadyToShip),
         estimatedDispatch: activeVariant.isReadyToShip
           ? 'Dispatches in 2–4 business days from Bhadohi'
-          : `Made to Order (${activeVariant.productionTimeWeeks || '4–6 weeks'})`,
+          : `Made to Order (${activeVariant.productionTimeWeeks || '3–4 weeks'})`,
       },
       quantity,
       openDrawer
@@ -245,6 +246,33 @@ export const ProductDetailPage: React.FC = () => {
 
   return (
     <div className="pt-20 sm:pt-24 pb-20 bg-atelier-ivory min-h-screen">
+      <SEO
+        title={`${product.name} — Handcrafted ${product.technique} Wool Rug`}
+        description={product.description || product.subtitle || `Handcrafted ${product.technique} rug from Bhadohi, India.`}
+        canonicalPath={`/product/${product.slug}`}
+        image={product.images?.[0]?.url}
+        type="product"
+        jsonLd={{
+          '@context': 'https://schema.org/',
+          '@type': 'Product',
+          name: product.name,
+          image: (product.images || []).map((img) => img.url),
+          description: product.description,
+          sku: activeVariant.sku,
+          brand: {
+            '@type': 'Brand',
+            name: 'Prasri Rugs',
+          },
+          offers: {
+            '@type': 'Offer',
+            url: `https://www.prasrirugs.com/product/${product.slug}`,
+            priceCurrency: 'USD',
+            price: activeVariant.priceUSD,
+            availability: isAvailable ? 'https://schema.org/InStock' : 'https://schema.org/PreOrder',
+            itemCondition: 'https://schema.org/NewCondition',
+          },
+        }}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <div className="text-[11px] text-atelier-taupe tracking-wider uppercase mb-8 flex items-center space-x-2">
@@ -340,7 +368,7 @@ export const ProductDetailPage: React.FC = () => {
                     <span className="font-medium">Made to Order: </span>
                     <span className="text-atelier-charcoal">
                       Woven specifically for your order. Estimated handcrafted completion in{' '}
-                      {activeVariant.productionTimeWeeks || '4–6 weeks'}.
+                      {activeVariant.productionTimeWeeks || '3–4 weeks'}.
                     </span>
                   </div>
                 </div>

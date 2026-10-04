@@ -1,4 +1,4 @@
-# robots.txt for PRASRI RUGS (https://prasrirugs.com)
+# robots.txt for PRASRI RUGS (https://www.prasrirugs.com)
 User-agent: *
 Allow: /
 Disallow: /admin
@@ -27,4 +27,4 @@ Allow: /
 User-agent: Bingbot
 Allow: /
 
-Sitemap: https://prasrirugs.com/sitemap.xml
+Sitemap: https://www.prasrirugs.com/sitemap.xml

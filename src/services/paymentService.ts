@@ -34,7 +34,6 @@ export interface RazorpayBackendOrderResponse {
   order_id: string;
   amount: number;
   currency: string;
-  key_id?: string;
   error?: string;
 }
 
@@ -51,9 +50,12 @@ export const paymentService = {
    */
   getRazorpayKeyId(): string {
     const envKey = (import.meta.env.VITE_RAZORPAY_KEY_ID || '').trim();
-    if (envKey) return envKey;
     const storedKey = typeof window !== 'undefined' ? (localStorage.getItem('twa_razorpay_key_id') || '').trim() : '';
-    return storedKey;
+    // If a live key is configured via admin settings / localStorage, prioritize it
+    if (storedKey.startsWith('rzp_live_')) return storedKey;
+    if (envKey) return envKey;
+    if (storedKey) return storedKey;
+    return envKey;
   },
 
   setRazorpayKeyId(key: string): void {
@@ -239,10 +241,8 @@ export const paymentService = {
           prefillData.vpa = params.upiVpa.trim();
         }
 
-        const activeKey = (backendOrder.key_id || keyId).trim();
-
         const options: any = {
-          key: activeKey,
+          key: keyId,
           amount: backendOrder.amount,
           currency: backendOrder.currency,
           name: 'Prasri Rugs',

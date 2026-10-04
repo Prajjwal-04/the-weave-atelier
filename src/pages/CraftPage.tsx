@@ -1,10 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, CheckCircle2, Shield, Sparkles } from 'lucide-react';
+import { SEO } from '../components/common/SEO';
 
 export const CraftPage: React.FC = () => {
   return (
     <div className="pt-20 sm:pt-24 pb-24 bg-atelier-ivory min-h-screen">
+      <SEO
+        title="The Craft of the Loom — Hand-Knotted & Hand-Tufted Techniques"
+        description="Explore the handmade carpet making process in Bhadohi, India: hand-knotting, hand-tufting, flatweave construction, hand-shearing, and river washing."
+        canonicalPath="/craft"
+        image="/images/craft/hand-knotting.jpg"
+      />
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-20">
         {/* Header */}
         <div className="space-y-4 max-w-3xl">

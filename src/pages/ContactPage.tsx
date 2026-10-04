@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Mail, MessageCircle, MapPin, Instagram, Check, ArrowRight, Clock, Loader2, ExternalLink, AlertCircle } from 'lucide-react';
 import { emailService, ATELIER_PRIMARY_EMAIL } from '../services/emailService';
+import { SEO } from '../components/common/SEO';
 
 export const ContactPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -43,6 +44,11 @@ export const ContactPage: React.FC = () => {
 
   return (
     <div className="pt-20 sm:pt-24 pb-24 bg-atelier-ivory min-h-screen">
+      <SEO
+        title="Contact & Bhadohi Studio Concierge"
+        description="Direct correspondence with Prasri Rugs in Bhadohi, India. Inquire about custom sizing, order dispatches, trade accounts, or WhatsApp concierge."
+        canonicalPath="/contact"
+      />
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         {/* Header */}
         <div className="border-b border-atelier-parchment pb-8 max-w-3xl">

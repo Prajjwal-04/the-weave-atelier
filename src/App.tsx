@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 
 // Providers
 import { CurrencyProvider } from './context/CurrencyContext';
@@ -28,6 +28,9 @@ import { JournalPage } from './pages/JournalPage';
 import { SizeGuidePage } from './pages/SizeGuidePage';
 import { RugCarePage } from './pages/RugCarePage';
 import { ShippingReturnsPage } from './pages/ShippingReturnsPage';
+import { TermsPage } from './pages/TermsPage';
+import { PrivacyPage } from './pages/PrivacyPage';
+import { WishlistPage } from './pages/WishlistPage';
 import { ContactPage } from './pages/ContactPage';
 import { CartPage } from './pages/CartPage';
 import { CheckoutPage } from './pages/CheckoutPage';
@@ -75,6 +78,10 @@ const AppContent: React.FC = () => {
           <Route path="/size-guide" element={<SizeGuidePage />} />
           <Route path="/rug-care" element={<RugCarePage />} />
           <Route path="/shipping-returns" element={<ShippingReturnsPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/wishlist" element={<WishlistPage />} />
+          <Route path="/atelier" element={<Navigate to="/the-atelier" replace />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />

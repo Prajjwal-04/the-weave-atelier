@@ -99,7 +99,7 @@ export const PRODUCTS: Product[] = [
         priceUSD: 1820,
         inventory: 0, // SOLD OUT -> Made to order
         isReadyToShip: false,
-        productionTimeWeeks: '4–5 weeks',
+        productionTimeWeeks: '3–4 weeks',
         weightKg: 42
       },
       {
@@ -110,7 +110,7 @@ export const PRODUCTS: Product[] = [
         priceUSD: 2380,
         inventory: 0,
         isReadyToShip: false,
-        productionTimeWeeks: '5–6 weeks',
+        productionTimeWeeks: '3–4 weeks',
         weightKg: 54
       }
     ]
@@ -186,7 +186,7 @@ export const PRODUCTS: Product[] = [
         priceUSD: 940,
         inventory: 0,
         isReadyToShip: false,
-        productionTimeWeeks: '4–5 weeks',
+        productionTimeWeeks: '3–4 weeks',
         weightKg: 24
       },
       {
@@ -217,7 +217,7 @@ export const PRODUCTS: Product[] = [
         priceUSD: 2490,
         inventory: 0,
         isReadyToShip: false,
-        productionTimeWeeks: '5–6 weeks',
+        productionTimeWeeks: '3–4 weeks',
         weightKg: 58
       }
     ]
@@ -314,7 +314,7 @@ export const PRODUCTS: Product[] = [
         priceUSD: 3080,
         inventory: 0,
         isReadyToShip: false,
-        productionTimeWeeks: '7–8 weeks',
+        productionTimeWeeks: '3–6 months',
         weightKg: 38
       }
     ]
@@ -394,7 +394,7 @@ export const PRODUCTS: Product[] = [
         priceUSD: 4890,
         inventory: 0,
         isReadyToShip: false,
-        productionTimeWeeks: '9–10 weeks',
+        productionTimeWeeks: '3–6 months',
         weightKg: 40
       }
     ]
@@ -473,7 +473,7 @@ export const PRODUCTS: Product[] = [
         priceUSD: 1480,
         inventory: 0,
         isReadyToShip: false,
-        productionTimeWeeks: '4–5 weeks',
+        productionTimeWeeks: '3–4 weeks',
         weightKg: 33
       },
       {
@@ -484,7 +484,7 @@ export const PRODUCTS: Product[] = [
         priceUSD: 1980,
         inventory: 0,
         isReadyToShip: false,
-        productionTimeWeeks: '5–6 weeks',
+        productionTimeWeeks: '3–4 weeks',
         weightKg: 44
       }
     ]

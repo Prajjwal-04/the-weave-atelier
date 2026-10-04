@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import {
   User,
   Package,
@@ -24,9 +24,11 @@ import { useCurrency } from '../context/CurrencyContext';
 import { useCart } from '../context/CartContext';
 import { useInventory } from '../context/InventoryContext';
 import { isSupabaseConfigured } from '../services/supabase';
+import { SEO } from '../components/common/SEO';
 
 export const AccountPage: React.FC = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const initialTab = searchParams.get('tab') || 'orders';
 
   const [activeTab, setActiveTab] = useState<'orders' | 'quotes' | 'addresses' | 'wishlist'>(
@@ -86,6 +88,13 @@ export const AccountPage: React.FC = () => {
       setAuthSuccess('Recovery session active. Enter your new password below.');
     }
   }, [searchParams]);
+
+  // If guest requests wishlist tab, redirect to dedicated /wishlist page
+  useEffect(() => {
+    if (!isLoggedIn && searchParams.get('tab') === 'wishlist') {
+      navigate('/wishlist', { replace: true });
+    }
+  }, [isLoggedIn, searchParams, navigate]);
 
   // Resend code countdown
   useEffect(() => {
@@ -315,7 +324,11 @@ export const AccountPage: React.FC = () => {
             </button>
           ) : (
             <span className="text-xs text-atelier-taupe font-light">
-              Guest access supported. Log in to review orders and saved custom sizes.
+              Guest access supported. View your{' '}
+              <Link to="/wishlist" className="underline text-atelier-softblack hover:text-atelier-gold font-normal">
+                Saved Wishlist
+              </Link>
+              , or sign in below.
             </span>
           )}
         </div>

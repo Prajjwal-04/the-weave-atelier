@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useCurrency } from '../context/CurrencyContext';
 import { emailService, ATELIER_PRIMARY_EMAIL } from '../services/emailService';
 import { quoteService } from '../services/quoteService';
+import { SEO } from '../components/common/SEO';
 
 export const CustomRugsPage: React.FC = () => {
   const { addCustomQuote } = useAuth();
@@ -23,7 +24,7 @@ export const CustomRugsPage: React.FC = () => {
   const [fullName, setFullName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [phone, setPhone] = useState<string>('');
-  const [country, setCountry] = useState<string>('United States');
+  const [country, setCountry] = useState<string>('India');
   const [notes, setNotes] = useState<string>('');
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -96,6 +97,11 @@ export const CustomRugsPage: React.FC = () => {
 
   return (
     <div className="pt-20 sm:pt-24 pb-24 bg-atelier-ivory min-h-screen">
+      <SEO
+        title="Custom Sizing & Bespoke Rug Studio"
+        description="Commission a bespoke handmade rug tailored to your architectural dimensions. Custom size calculator, yarn swatches, and direct loom weaving in Bhadohi."
+        canonicalPath="/custom-rugs"
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Hero Banner */}
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">

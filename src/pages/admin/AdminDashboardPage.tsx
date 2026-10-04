@@ -51,6 +51,7 @@ import {
   ImageViewType,
   Order,
   OrderStatus,
+  MadeToOrderMilestone,
   CustomQuoteRequest,
   Technique,
   Material,
@@ -227,6 +228,7 @@ export const AdminDashboardPage: React.FC = () => {
   const [prodBestSeller, setProdBestSeller] = useState(false);
   const [prodIsNew, setProdIsNew] = useState(true);
   const [prodIsReadyToShip, setProdIsReadyToShip] = useState(true);
+  const [prodDefaultLeadTime, setProdDefaultLeadTime] = useState<'3–4 weeks' | '3–6 months'>('3–4 weeks');
 
   // Image management in form
   const [imagesList, setImagesList] = useState<ProductImage[]>([
@@ -252,7 +254,7 @@ export const AdminDashboardPage: React.FC = () => {
       inventory: 2,
       isReadyToShip: true,
       weightKg: 16,
-      productionTimeWeeks: '4–6 weeks',
+      productionTimeWeeks: '3–4 weeks',
     },
     {
       id: 'v-2',
@@ -263,12 +265,13 @@ export const AdminDashboardPage: React.FC = () => {
       inventory: 1,
       isReadyToShip: true,
       weightKg: 28,
-      productionTimeWeeks: '4–6 weeks',
+      productionTimeWeeks: '3–4 weeks',
     },
   ]);
 
   // Filters & Search
   const [productSearch, setProductSearch] = useState('');
+  const [productAvailabilityFilter, setProductAvailabilityFilter] = useState<'ALL' | 'READY' | 'MADE_ALL' | 'MADE_3_4_WEEKS' | 'MADE_3_6_MONTHS'>('ALL');
   const [orderSearch, setOrderSearch] = useState('');
   const [orderStatusFilter, setOrderStatusFilter] = useState<string>('ALL');
   const [inventoryFilter, setInventoryFilter] = useState<'ALL' | 'LOW' | 'OUT'>('ALL');
@@ -277,6 +280,7 @@ export const AdminDashboardPage: React.FC = () => {
   const [calcWidth, setCalcWidth] = useState<number>(8);
   const [calcLength, setCalcLength] = useState<number>(10);
   const [calcTechnique, setCalcTechnique] = useState<string>('Hand-Knotted');
+  const [calcLeadTime, setCalcLeadTime] = useState<'Usual 3–4 weeks' | '3 to 6 months'>('3 to 6 months');
 
   // Load orders and quotes
   const loadOrdersAndQuotes = async () => {
@@ -597,6 +601,8 @@ export const AdminDashboardPage: React.FC = () => {
     setProdFeatured(true);
     setProdBestSeller(false);
     setProdIsNew(true);
+    setProdIsReadyToShip(true);
+    setProdDefaultLeadTime('3–4 weeks');
     setImagesList([]);
 
     setVariantsList([
@@ -609,7 +615,7 @@ export const AdminDashboardPage: React.FC = () => {
         inventory: 2,
         isReadyToShip: true,
         weightKg: 18,
-        productionTimeWeeks: '4–6 weeks',
+        productionTimeWeeks: '3–4 weeks',
       },
       {
         id: `var-${Date.now()}-2`,
@@ -620,7 +626,7 @@ export const AdminDashboardPage: React.FC = () => {
         inventory: 1,
         isReadyToShip: true,
         weightKg: 30,
-        productionTimeWeeks: '4–6 weeks',
+        productionTimeWeeks: '3–4 weeks',
       },
       {
         id: `var-${Date.now()}-3`,
@@ -631,7 +637,7 @@ export const AdminDashboardPage: React.FC = () => {
         inventory: 0,
         isReadyToShip: false,
         weightKg: 40,
-        productionTimeWeeks: '5–7 weeks',
+        productionTimeWeeks: '3–6 months',
       },
     ]);
 
@@ -661,6 +667,9 @@ export const AdminDashboardPage: React.FC = () => {
     setProdFeatured(product.featured || false);
     setProdBestSeller(product.bestSeller || false);
     setProdIsNew(product.isNew || false);
+    setProdIsReadyToShip(product.isReadyToShip ?? true);
+    const hasLongLead = product.variants?.some((v) => v.productionTimeWeeks?.includes('month'));
+    setProdDefaultLeadTime(hasLongLead ? '3–6 months' : '3–4 weeks');
     setImagesList(
       (product.images || []).map((img) => {
         const isBadLabel =
@@ -781,9 +790,9 @@ export const AdminDashboardPage: React.FC = () => {
       sku: `PR-${skuCode}-${sizeNumber.padStart(4, '0')}`,
       priceUSD: defaultPrice,
       inventory: 1,
-      isReadyToShip: true,
+      isReadyToShip: prodIsReadyToShip,
       weightKg: defaultWeight,
-      productionTimeWeeks: '4–6 weeks',
+      productionTimeWeeks: prodDefaultLeadTime || '3–4 weeks',
     };
     setVariantsList((prev) => [...prev, newVariant]);
   };
@@ -915,6 +924,27 @@ export const AdminDashboardPage: React.FC = () => {
     } catch (err: any) {
       console.error('Failed to update order status:', err);
       showToast(`Failed to update order stage: ${err.message}`, 'error');
+    } finally {
+      setOrderStageUpdating(null);
+    }
+  };
+
+  // Advance Made-to-Order Loom Stage Milestones (Yarn Dyeing -> On the Loom -> Washing & Shearing -> Final Inspection -> Dispatched)
+  const handleUpdateMadeToOrderMilestone = async (
+    orderNumber: string,
+    milestone: MadeToOrderMilestone
+  ) => {
+    setOrderStageUpdating(orderNumber);
+    try {
+      const updated = await orderService.updateMadeToOrderMilestone(orderNumber, milestone);
+      setOrders((prev) => prev.map((o) => (o.orderNumber === orderNumber ? updated : o)));
+      if (selectedOrder && selectedOrder.orderNumber === orderNumber) {
+        setSelectedOrder(updated);
+      }
+      showToast(`Advanced ${orderNumber} to "${milestone}". Client tracking synchronized!`, 'success');
+    } catch (err: any) {
+      console.error('Failed to update milestone:', err);
+      showToast(`Failed to update milestone: ${err.message}`, 'error');
     } finally {
       setOrderStageUpdating(null);
     }
@@ -1089,6 +1119,21 @@ export const AdminDashboardPage: React.FC = () => {
   // Filtered Products
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
+      // Availability filter
+      if (productAvailabilityFilter === 'READY') {
+        if (!p.isReadyToShip) return false;
+      } else if (productAvailabilityFilter === 'MADE_ALL') {
+        const isMade = !p.isReadyToShip || p.variants?.some((v) => !v.isReadyToShip);
+        if (!isMade) return false;
+      } else if (productAvailabilityFilter === 'MADE_3_4_WEEKS') {
+        const has34 = p.variants?.some((v) => !v.isReadyToShip && !v.productionTimeWeeks?.includes('month')) ||
+          (!p.isReadyToShip && !p.variants?.some((v) => v.productionTimeWeeks?.includes('month')));
+        if (!has34) return false;
+      } else if (productAvailabilityFilter === 'MADE_3_6_MONTHS') {
+        const has36 = p.variants?.some((v) => v.productionTimeWeeks?.includes('month'));
+        if (!has36) return false;
+      }
+
       if (!productSearch) return true;
       const q = productSearch.toLowerCase();
       return (
@@ -1098,7 +1143,7 @@ export const AdminDashboardPage: React.FC = () => {
         p.material.toLowerCase().includes(q)
       );
     });
-  }, [products, productSearch]);
+  }, [products, productSearch, productAvailabilityFilter]);
 
   // Design-Card Grouped Live Stock Matrix
   const designStockList = useMemo(() => {
@@ -1170,9 +1215,9 @@ export const AdminDashboardPage: React.FC = () => {
       rate,
       totalUSD,
       weightKg,
-      leadTime: calcTechnique === 'Hand-Knotted' ? '6–8 weeks' : '4–6 weeks',
+      leadTime: calcLeadTime,
     };
-  }, [calcWidth, calcLength, calcTechnique]);
+  }, [calcWidth, calcLength, calcTechnique, calcLeadTime]);
 
   // -------------------------------------------------------------
   // VALIDATING SESSION LOADER (Prevents UI flash or inspection race)
@@ -1519,18 +1564,34 @@ export const AdminDashboardPage: React.FC = () => {
             </div>
 
             {/* Filter Bar */}
-            <div className="flex items-center justify-between gap-4">
-              <div className="relative flex-1 max-w-md">
-                <input
-                  type="text"
-                  value={productSearch}
-                  onChange={(e) => setProductSearch(e.target.value)}
-                  placeholder="Search by rug name, collection, technique..."
-                  className="w-full pl-9 pr-4 py-2.5 bg-atelier-cream border border-atelier-parchment text-xs text-atelier-softblack focus:outline-none focus:border-atelier-softblack"
-                />
-                <Search size={14} className="absolute left-3 top-3 text-atelier-taupe" />
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+              <div className="flex flex-1 flex-col sm:flex-row items-stretch sm:items-center gap-2.5 max-w-2xl">
+                <div className="relative flex-1">
+                  <input
+                    type="text"
+                    value={productSearch}
+                    onChange={(e) => setProductSearch(e.target.value)}
+                    placeholder="Search by rug name, collection, technique..."
+                    className="w-full pl-9 pr-4 py-2 bg-atelier-cream border border-atelier-parchment text-xs text-atelier-softblack focus:outline-none focus:border-atelier-softblack"
+                  />
+                  <Search size={14} className="absolute left-3 top-2.5 text-atelier-taupe" />
+                </div>
+                <div className="flex items-center space-x-1.5 flex-shrink-0">
+                  <label className="text-[10px] uppercase font-mono text-atelier-taupe whitespace-nowrap">Filter:</label>
+                  <select
+                    value={productAvailabilityFilter}
+                    onChange={(e: any) => setProductAvailabilityFilter(e.target.value)}
+                    className="px-2.5 py-2 bg-atelier-cream border border-atelier-parchment text-xs text-atelier-softblack focus:outline-none focus:border-atelier-softblack cursor-pointer font-sans"
+                  >
+                    <option value="ALL">All Availability</option>
+                    <option value="READY">Ready to Ship (In Stock)</option>
+                    <option value="MADE_ALL">Made to Order (All)</option>
+                    <option value="MADE_3_4_WEEKS">Made to Order · Usual 3–4 weeks</option>
+                    <option value="MADE_3_6_MONTHS">Made to Order · 3 to 6 months</option>
+                  </select>
+                </div>
               </div>
-              <div className="text-xs text-atelier-taupe">
+              <div className="text-xs text-atelier-taupe flex-shrink-0">
                 Showing {filteredProducts.length} of {products.length} rugs
               </div>
             </div>
@@ -1605,15 +1666,27 @@ export const AdminDashboardPage: React.FC = () => {
                           </td>
 
                           <td className="py-3 px-4">
-                            <div className="flex flex-col gap-1">
+                            <div className="flex flex-col gap-1 items-start">
                               {p.isReadyToShip ? (
                                 <span className="inline-block px-1.5 py-0.5 text-[9px] bg-emerald-50 text-emerald-800 border border-emerald-200 tracking-wider uppercase font-mono">
                                   Ready to Ship
                                 </span>
                               ) : (
-                                <span className="inline-block px-1.5 py-0.5 text-[9px] bg-amber-50 text-amber-800 border border-amber-200 tracking-wider uppercase font-mono">
-                                  Made to Order
-                                </span>
+                                (() => {
+                                  const isLongLead = p.variants?.some((v) => v.productionTimeWeeks?.includes('month'));
+                                  return (
+                                    <span
+                                      className={`inline-block px-1.5 py-0.5 text-[9px] border tracking-wider uppercase font-mono ${
+                                        isLongLead
+                                          ? 'bg-purple-50 text-purple-900 border-purple-200'
+                                          : 'bg-amber-50 text-amber-800 border border-amber-200'
+                                      }`}
+                                      title={isLongLead ? '3 to 6 months lead time' : 'Usual 3–4 weeks lead time'}
+                                    >
+                                      {isLongLead ? 'Made to Order · 3–6 mos' : 'Made to Order · Usual 3–4 wks'}
+                                    </span>
+                                  );
+                                })()
                               )}
                               {p.featured && (
                                 <span className="inline-block px-1.5 py-0.5 text-[9px] bg-neutral-100 text-neutral-800 border border-neutral-300 tracking-wider uppercase font-mono">
@@ -1892,8 +1965,14 @@ export const AdminDashboardPage: React.FC = () => {
                                       <div className="font-mono text-xs font-semibold text-atelier-softblack">
                                         {formatPrice(v.priceUSD)}
                                       </div>
-                                      <div className="text-[10px] text-atelier-taupe uppercase">
-                                        {v.isReadyToShip ? 'Ready to Ship' : 'Made to Order'}
+                                      <div className="text-[10px] uppercase font-mono tracking-tight">
+                                        {v.isReadyToShip ? (
+                                          <span className="text-emerald-800">Ready to Ship</span>
+                                        ) : v.productionTimeWeeks?.includes('month') ? (
+                                          <span className="text-purple-800 font-medium">Made to Order · 3 to 6 mos</span>
+                                        ) : (
+                                          <span className="text-amber-800 font-medium">Made to Order · Usual 3–4 wks</span>
+                                        )}
                                       </div>
                                     </div>
                                   </div>
@@ -2103,8 +2182,9 @@ export const AdminDashboardPage: React.FC = () => {
                             </span>
 
                             {order.isMadeToOrder && (
-                              <span className="px-2 py-0.5 text-[9px] bg-purple-50 text-purple-800 border border-purple-200 font-mono uppercase">
-                                Loom Bespoke
+                              <span className="px-2 py-0.5 text-[9px] bg-purple-50 text-purple-900 border border-purple-300 font-mono uppercase font-semibold flex items-center space-x-1">
+                                <Sparkles size={10} className="text-purple-700" />
+                                <span>Made to Order{order.productionMilestone ? `: ${order.productionMilestone}` : ''}</span>
                               </span>
                             )}
 
@@ -2225,11 +2305,12 @@ export const AdminDashboardPage: React.FC = () => {
 
                         {/* Col 3: Interactive Fulfillment Controls */}
                         <div className="space-y-4 bg-atelier-cream p-4 border border-atelier-parchment">
-                          {/* 1. Stage Stepper */}
-                          <div className="space-y-1.5">
+                          {/* 1. Made-to-Order Loom Stage Milestones */}
+                          <div className="space-y-2">
                             <div className="flex items-center justify-between">
-                              <span className="text-[10px] text-atelier-taupe uppercase tracking-widest font-medium">
-                                Advance Order Stage
+                              <span className="text-[10px] text-atelier-taupe uppercase tracking-widest font-semibold flex items-center space-x-1.5">
+                                <Sparkles size={11} className="text-atelier-agedgold" />
+                                <span>Loom Stage Milestones</span>
                               </span>
                               {isUpdatingStage && (
                                 <span className="text-[10px] font-mono text-atelier-darkbrown flex items-center space-x-1 animate-pulse">
@@ -2239,27 +2320,86 @@ export const AdminDashboardPage: React.FC = () => {
                               )}
                             </div>
 
+                            {/* Stepper with the 5 exact milestones */}
+                            <div className="space-y-2 bg-atelier-ivory p-3 border border-atelier-parchment">
+                              <div className="text-[10px] font-mono text-atelier-taupe flex items-center justify-between border-b border-atelier-parchment/60 pb-1.5">
+                                <span>Active Milestone:</span>
+                                <strong className="text-atelier-softblack uppercase font-semibold">
+                                  {order.productionMilestone || (order.status === 'DISPATCHED' ? 'Dispatched' : order.status === 'QUALITY CHECK' ? 'Final Inspection' : 'Yarn Dyeing')}
+                                </strong>
+                              </div>
+
+                              <div className="grid grid-cols-1 sm:grid-cols-5 gap-1.5">
+                                {([
+                                  { key: 'Yarn Dyeing', step: '1', short: 'Yarn Dyeing', full: 'Yarn Dyeing & Skeining' },
+                                  { key: 'On the Loom', step: '2', short: 'On the Loom', full: 'Loom Knotting / Weaving' },
+                                  { key: 'Washing & Shearing', step: '3', short: 'Wash & Shear', full: 'Washing & Hand-Shearing' },
+                                  { key: 'Final Inspection', step: '4', short: 'Inspection', full: 'Final Quality Audit' },
+                                  { key: 'Dispatched', step: '5', short: 'Dispatched', full: 'Handed to Courier' },
+                                ] as const).map((m, mIdx) => {
+                                  const milestoneOrder = ['Yarn Dyeing', 'On the Loom', 'Washing & Shearing', 'Final Inspection', 'Dispatched'];
+                                  const activeIndex = order.productionMilestone
+                                    ? milestoneOrder.indexOf(order.productionMilestone)
+                                    : order.status === 'DISPATCHED' ? 4 : order.status === 'QUALITY CHECK' ? 3 : 0;
+                                  const isCurrent = order.productionMilestone === m.key || (mIdx === activeIndex);
+                                  const isPast = mIdx < activeIndex;
+
+                                  return (
+                                    <button
+                                      key={m.key}
+                                      type="button"
+                                      onClick={() => handleUpdateMadeToOrderMilestone(order.orderNumber, m.key as MadeToOrderMilestone)}
+                                      disabled={isUpdatingStage}
+                                      className={`p-2 text-left border transition-all relative ${
+                                        isCurrent
+                                          ? 'bg-atelier-softblack text-atelier-parchment border-atelier-softblack font-semibold shadow-xs'
+                                          : isPast
+                                          ? 'bg-emerald-50 text-emerald-950 border-emerald-300 hover:bg-emerald-100 font-medium'
+                                          : 'bg-atelier-cream border-atelier-parchment text-atelier-charcoal hover:border-black'
+                                      }`}
+                                      title={`Set milestone: ${m.full}`}
+                                    >
+                                      <div className="flex items-center space-x-1.5">
+                                        <span className={`w-4 h-4 rounded-full text-[9px] flex items-center justify-center font-mono flex-shrink-0 ${
+                                          isCurrent
+                                            ? 'bg-atelier-gold text-atelier-softblack font-bold'
+                                            : isPast
+                                            ? 'bg-emerald-600 text-white font-bold'
+                                            : 'bg-atelier-parchment text-atelier-taupe'
+                                        }`}>
+                                          {isPast ? '✓' : m.step}
+                                        </span>
+                                        <div className="min-w-0">
+                                          <span className="text-[10px] leading-tight block truncate">
+                                            {m.short}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* 2. General Status Override */}
+                          <div className="space-y-1.5 pt-1">
+                            <span className="text-[10px] text-atelier-taupe uppercase tracking-widest font-medium">
+                              General Status Override
+                            </span>
                             <div className="flex flex-wrap gap-1">
                               {(['PROCESSING', 'IN PRODUCTION', 'QUALITY CHECK', 'DISPATCHED', 'DELIVERED'] as const).map((st) => (
                                 <button
                                   key={st}
                                   onClick={() => handleUpdateOrderStatus(order.orderNumber, st)}
                                   disabled={isUpdatingStage}
-                                  className={`px-2 py-1 text-[10px] border font-mono transition-colors disabled:opacity-50 ${
+                                  className={`px-2 py-0.5 text-[9px] border font-mono transition-colors disabled:opacity-50 ${
                                     order.status === st
                                       ? 'bg-atelier-softblack text-atelier-parchment border-atelier-softblack font-semibold'
                                       : 'bg-atelier-ivory border-atelier-parchment text-atelier-charcoal hover:border-black'
                                   }`}
                                 >
-                                  {st === 'IN PRODUCTION'
-                                    ? 'On Loom'
-                                    : st === 'QUALITY CHECK'
-                                    ? 'Quality'
-                                    : st === 'PROCESSING'
-                                    ? 'Processing'
-                                    : st === 'DISPATCHED'
-                                    ? 'Dispatched'
-                                    : 'Delivered'}
+                                  {st.toLowerCase()}
                                 </button>
                               ))}
                             </div>
@@ -2354,7 +2494,7 @@ export const AdminDashboardPage: React.FC = () => {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                 <div>
                   <label className="block text-[11px] text-atelier-taupe uppercase tracking-wider mb-1 font-medium">
                     Width (ft)
@@ -2389,12 +2529,31 @@ export const AdminDashboardPage: React.FC = () => {
                   </label>
                   <select
                     value={calcTechnique}
-                    onChange={(e) => setCalcTechnique(e.target.value)}
+                    onChange={(e) => {
+                      const t = e.target.value;
+                      setCalcTechnique(t);
+                      if (t === 'Hand-Knotted') setCalcLeadTime('3 to 6 months');
+                      else setCalcLeadTime('Usual 3–4 weeks');
+                    }}
                     className="w-full px-3 py-2 bg-atelier-ivory border border-atelier-parchment text-xs text-atelier-softblack focus:outline-none focus:border-black"
                   >
                     <option value="Hand-Tufted">Hand-Tufted ($38/sq ft)</option>
                     <option value="Hand-Knotted">Hand-Knotted ($62/sq ft)</option>
                     <option value="Flatweave">Flatweave ($28/sq ft)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] text-atelier-taupe uppercase tracking-wider mb-1 font-medium">
+                    Made to Order Lead Time
+                  </label>
+                  <select
+                    value={calcLeadTime}
+                    onChange={(e: any) => setCalcLeadTime(e.target.value)}
+                    className="w-full px-3 py-2 bg-atelier-ivory border border-atelier-parchment text-xs text-atelier-softblack focus:outline-none focus:border-black"
+                  >
+                    <option value="Usual 3–4 weeks">1. Usual 3–4 weeks</option>
+                    <option value="3 to 6 months">2. 3 to 6 months</option>
                   </select>
                 </div>
 
@@ -2831,12 +2990,20 @@ VITE_RAZORPAY_KEY_ID=rzp_live_...`}
                     </label>
                     <select
                       value={prodTechnique}
-                      onChange={(e) => setProdTechnique(e.target.value as Technique)}
+                      onChange={(e) => {
+                        const newTech = e.target.value as Technique;
+                        setProdTechnique(newTech);
+                        const autoLead = newTech === 'Hand-Knotted' ? '3–6 months' : '3–4 weeks';
+                        setProdDefaultLeadTime(autoLead);
+                        setVariantsList((prev) =>
+                          prev.map((v) => ({ ...v, productionTimeWeeks: autoLead }))
+                        );
+                      }}
                       className="w-full px-3 py-2 bg-atelier-ivory border border-atelier-parchment text-xs text-atelier-softblack focus:outline-none focus:border-black"
                     >
-                      <option value="Hand-Tufted">Hand-Tufted</option>
-                      <option value="Hand-Knotted">Hand-Knotted</option>
-                      <option value="Flatweave">Flatweave</option>
+                      <option value="Hand-Tufted">Hand-Tufted (Usual 3–4 weeks)</option>
+                      <option value="Hand-Knotted">Hand-Knotted (3 to 6 months)</option>
+                      <option value="Flatweave">Flatweave (Usual 3–4 weeks)</option>
                     </select>
                   </div>
 
@@ -3177,100 +3344,289 @@ VITE_RAZORPAY_KEY_ID=rzp_live_...`}
                   {variantsList.map((v, idx) => (
                     <div
                       key={v.id || idx}
-                      className="p-3 bg-atelier-ivory border border-atelier-parchment grid grid-cols-2 sm:grid-cols-6 gap-3 items-center"
+                      className="p-3.5 bg-atelier-ivory border border-atelier-parchment space-y-3"
                     >
-                      <div>
-                        <label className="block text-[10px] text-atelier-taupe uppercase mb-0.5 font-medium">
-                          Size (e.g. 4x6, 8x10)
-                        </label>
-                        <input
-                          type="text"
-                          value={v.size}
-                          placeholder="e.g. 4x6 or 4' × 6'"
-                          onChange={(e) => handleUpdateVariantField(idx, 'size', e.target.value)}
-                          className="w-full px-2 py-1 bg-atelier-cream border border-atelier-parchment text-xs font-medium"
-                        />
-                        {v.dimensionsFt && (
-                          <span className="text-[9px] text-atelier-taupe block mt-0.5 font-mono truncate">
-                            Preview: {v.dimensionsFt}
-                          </span>
-                        )}
-                      </div>
-
-                      <div>
-                        <label className="block text-[10px] text-atelier-taupe uppercase mb-0.5 font-medium">
-                          SKU
-                        </label>
-                        <input
-                          type="text"
-                          value={v.sku}
-                          onChange={(e) => handleUpdateVariantField(idx, 'sku', e.target.value)}
-                          className="w-full px-2 py-1 bg-atelier-cream border border-atelier-parchment text-[11px] font-mono"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-[10px] text-atelier-taupe uppercase mb-0.5 font-medium">
-                          Price (USD $)
-                        </label>
-                        <input
-                          type="number"
-                          value={v.priceUSD}
-                          onChange={(e) => handleUpdateVariantField(idx, 'priceUSD', Number(e.target.value))}
-                          className="w-full px-2 py-1 bg-atelier-cream border border-atelier-parchment text-xs font-mono font-medium"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-[10px] text-atelier-taupe uppercase mb-0.5 font-medium">
-                          Stock (Units)
-                        </label>
-                        <input
-                          type="number"
-                          min={0}
-                          value={v.inventory}
-                          onChange={(e) => handleUpdateVariantField(idx, 'inventory', Number(e.target.value))}
-                          className="w-full px-2 py-1 bg-atelier-cream border border-atelier-parchment text-xs font-mono"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-[10px] text-atelier-taupe uppercase mb-0.5 font-medium">
-                          Weight (kg)
-                        </label>
-                        <input
-                          type="number"
-                          value={v.weightKg || 20}
-                          onChange={(e) => handleUpdateVariantField(idx, 'weightKg', Number(e.target.value))}
-                          className="w-full px-2 py-1 bg-atelier-cream border border-atelier-parchment text-xs font-mono"
-                        />
-                      </div>
-
-                      <div className="flex items-center justify-end space-x-2 pt-3 sm:pt-0">
-                        <label className="flex items-center space-x-1 text-[10px] text-atelier-charcoal cursor-pointer">
+                      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 items-center">
+                        <div>
+                          <label className="block text-[10px] text-atelier-taupe uppercase mb-0.5 font-medium">
+                            Size (e.g. 4x6, 8x10)
+                          </label>
                           <input
-                            type="checkbox"
-                            checked={v.isReadyToShip}
-                            onChange={(e) => handleUpdateVariantField(idx, 'isReadyToShip', e.target.checked)}
-                            className="rounded border-atelier-parchment"
+                            type="text"
+                            value={v.size}
+                            placeholder="e.g. 4x6 or 4' × 6'"
+                            onChange={(e) => handleUpdateVariantField(idx, 'size', e.target.value)}
+                            className="w-full px-2 py-1 bg-atelier-cream border border-atelier-parchment text-xs font-medium"
                           />
-                          <span>Ready</span>
-                        </label>
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveVariant(idx)}
-                          className="text-rose-500 hover:text-rose-700 p-1"
-                          title="Remove size"
-                        >
-                          <Trash2 size={14} />
-                        </button>
+                          {v.dimensionsFt && (
+                            <span className="text-[9px] text-atelier-taupe block mt-0.5 font-mono truncate">
+                              Preview: {v.dimensionsFt}
+                            </span>
+                          )}
+                        </div>
+
+                        <div>
+                          <label className="block text-[10px] text-atelier-taupe uppercase mb-0.5 font-medium">
+                            SKU
+                          </label>
+                          <input
+                            type="text"
+                            value={v.sku}
+                            onChange={(e) => handleUpdateVariantField(idx, 'sku', e.target.value)}
+                            className="w-full px-2 py-1 bg-atelier-cream border border-atelier-parchment text-[11px] font-mono"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[10px] text-atelier-taupe uppercase mb-0.5 font-medium">
+                            Price (USD $)
+                          </label>
+                          <input
+                            type="number"
+                            value={v.priceUSD}
+                            onChange={(e) => handleUpdateVariantField(idx, 'priceUSD', Number(e.target.value))}
+                            className="w-full px-2 py-1 bg-atelier-cream border border-atelier-parchment text-xs font-mono font-medium"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[10px] text-atelier-taupe uppercase mb-0.5 font-medium">
+                            Stock (Units)
+                          </label>
+                          <input
+                            type="number"
+                            min={0}
+                            value={v.inventory}
+                            onChange={(e) => handleUpdateVariantField(idx, 'inventory', Number(e.target.value))}
+                            className="w-full px-2 py-1 bg-atelier-cream border border-atelier-parchment text-xs font-mono"
+                          />
+                        </div>
+
+                        <div className="flex items-center space-x-2">
+                          <div className="flex-1">
+                            <label className="block text-[10px] text-atelier-taupe uppercase mb-0.5 font-medium">
+                              Weight (kg)
+                            </label>
+                            <input
+                              type="number"
+                              value={v.weightKg || 20}
+                              onChange={(e) => handleUpdateVariantField(idx, 'weightKg', Number(e.target.value))}
+                              className="w-full px-2 py-1 bg-atelier-cream border border-atelier-parchment text-xs font-mono"
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveVariant(idx)}
+                            className="text-rose-500 hover:text-rose-700 p-1.5 self-end mb-1 border border-transparent hover:border-rose-200 hover:bg-rose-50 rounded"
+                            title="Remove size variant"
+                          >
+                            <Trash2 size={15} />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Variant Fulfillment & Made-to-Order Lead Time */}
+                      <div className="pt-2.5 border-t border-atelier-parchment/60 flex flex-wrap items-center justify-between gap-3 text-xs bg-atelier-cream/50 -mx-3.5 -mb-3.5 p-2.5 px-3.5">
+                        <div className="flex items-center space-x-3">
+                          <span className="text-[10px] text-atelier-taupe uppercase font-semibold">
+                            Fulfillment:
+                          </span>
+                          <label className="inline-flex items-center space-x-1.5 cursor-pointer">
+                            <input
+                              type="radio"
+                              name={`fulfillment-${v.id || idx}`}
+                              checked={v.isReadyToShip}
+                              onChange={() => handleUpdateVariantField(idx, 'isReadyToShip', true)}
+                              className="text-emerald-700 focus:ring-0"
+                            />
+                            <span className="text-[11px] text-emerald-900 font-medium">Ready to Ship</span>
+                          </label>
+                          <label className="inline-flex items-center space-x-1.5 cursor-pointer">
+                            <input
+                              type="radio"
+                              name={`fulfillment-${v.id || idx}`}
+                              checked={!v.isReadyToShip}
+                              onChange={() => handleUpdateVariantField(idx, 'isReadyToShip', false)}
+                              className="text-amber-700 focus:ring-0"
+                            />
+                            <span className="text-[11px] text-amber-900 font-medium">Made to Order</span>
+                          </label>
+                        </div>
+
+                        {/* Two-part Made to Order lead time selection */}
+                        <div className="flex items-center space-x-2">
+                          <span className="text-[10px] text-atelier-taupe uppercase font-semibold">
+                            Made to Order:
+                          </span>
+                          <div className="inline-flex rounded border border-atelier-parchment bg-atelier-ivory p-0.5">
+                            <button
+                              type="button"
+                              onClick={() => handleUpdateVariantField(idx, 'productionTimeWeeks', '3–4 weeks')}
+                              className={`px-2.5 py-1 text-[11px] font-medium transition-colors ${
+                                v.productionTimeWeeks !== '3–6 months'
+                                  ? 'bg-atelier-softblack text-atelier-parchment shadow-xs'
+                                  : 'text-atelier-charcoal hover:text-black'
+                              }`}
+                            >
+                              1. Usual 3–4 weeks
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleUpdateVariantField(idx, 'productionTimeWeeks', '3–6 months')}
+                              className={`px-2.5 py-1 text-[11px] font-medium transition-colors ${
+                                v.productionTimeWeeks === '3–6 months'
+                                  ? 'bg-atelier-softblack text-atelier-parchment shadow-xs'
+                                  : 'text-atelier-charcoal hover:text-black'
+                              }`}
+                            >
+                              2. 3 to 6 months
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* SECTION 6: Storefront Badges & Flags */}
+              {/* SECTION 6: Catalog Fulfillment & Made-to-Order Schedule */}
+              <div className="p-4 bg-atelier-cream border border-atelier-parchment space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-atelier-parchment pb-2">
+                  <div className="space-y-0.5">
+                    <span className="text-[11px] text-atelier-taupe uppercase tracking-wider font-semibold block">
+                      6. Catalog Fulfillment & Made-to-Order Mode
+                    </span>
+                    <p className="text-[11px] text-atelier-charcoal/70">
+                      Configure default production timelines and batch-apply lead times across all size variants.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setVariantsList((prev) =>
+                        prev.map((v) => ({
+                          ...v,
+                          isReadyToShip: prodIsReadyToShip,
+                          productionTimeWeeks: prodDefaultLeadTime,
+                        }))
+                      );
+                    }}
+                    className="text-[10px] uppercase font-mono tracking-wider text-atelier-darkbrown hover:text-black underline flex-shrink-0 self-start sm:self-auto"
+                  >
+                    Sync setting to all {variantsList.length} sizes
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                  {/* Ready to Ship option */}
+                  <label
+                    className={`p-3 border cursor-pointer transition-all flex items-start space-x-3 ${
+                      prodIsReadyToShip
+                        ? 'border-emerald-600 bg-emerald-50/60 ring-1 ring-emerald-600'
+                        : 'border-atelier-parchment bg-atelier-ivory hover:border-atelier-taupe'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="prodFulfillmentType"
+                      checked={prodIsReadyToShip}
+                      onChange={() => setProdIsReadyToShip(true)}
+                      className="mt-0.5 text-emerald-700 focus:ring-0"
+                    />
+                    <div>
+                      <div className="font-medium text-xs text-emerald-950 flex items-center space-x-2">
+                        <span>Ready to Ship Piece</span>
+                        <span className="px-1.5 py-0.5 text-[9px] bg-emerald-200 text-emerald-900 rounded font-mono uppercase">
+                          In Stock
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-emerald-900/80 mt-0.5 font-light">
+                        In stock at the Bhadohi atelier. Immediate dispatch in 2–4 business days via DHL Express.
+                      </p>
+                    </div>
+                  </label>
+
+                  {/* Made to Order option */}
+                  <label
+                    className={`p-3 border cursor-pointer transition-all flex items-start space-x-3 ${
+                      !prodIsReadyToShip
+                        ? 'border-amber-600 bg-amber-50/60 ring-1 ring-amber-600'
+                        : 'border-atelier-parchment bg-atelier-ivory hover:border-atelier-taupe'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="prodFulfillmentType"
+                      checked={!prodIsReadyToShip}
+                      onChange={() => setProdIsReadyToShip(false)}
+                      className="mt-0.5 text-amber-700 focus:ring-0"
+                    />
+                    <div className="flex-1">
+                      <div className="font-medium text-xs text-amber-950 flex items-center space-x-2">
+                        <span>Made to Order Masterpiece</span>
+                        <span className="px-1.5 py-0.5 text-[9px] bg-amber-200 text-amber-900 rounded font-mono uppercase">
+                          On Loom
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-amber-900/80 mt-0.5 font-light">
+                        Artisanal handcrafting upon placement. Select lead time below:
+                      </p>
+                    </div>
+                  </label>
+                </div>
+
+                {/* The Two Parts for Made to Order */}
+                <div className="pt-2 border-t border-atelier-parchment/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                    <span className="text-[10px] text-atelier-taupe uppercase font-semibold">
+                      Made to Order Part / Lead Time:
+                    </span>
+                    <div className="inline-flex rounded border border-atelier-parchment bg-atelier-ivory p-0.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setProdDefaultLeadTime('3–4 weeks');
+                          setVariantsList((prev) =>
+                            prev.map((v) => ({ ...v, productionTimeWeeks: '3–4 weeks' }))
+                          );
+                        }}
+                        className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+                          prodDefaultLeadTime === '3–4 weeks'
+                            ? 'bg-atelier-softblack text-atelier-parchment shadow-xs'
+                            : 'text-atelier-charcoal hover:text-black'
+                        }`}
+                      >
+                        1. Usual 3–4 weeks
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setProdDefaultLeadTime('3–6 months');
+                          setVariantsList((prev) =>
+                            prev.map((v) => ({ ...v, productionTimeWeeks: '3–6 months' }))
+                          );
+                        }}
+                        className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+                          prodDefaultLeadTime === '3–6 months'
+                            ? 'bg-atelier-softblack text-atelier-parchment shadow-xs'
+                            : 'text-atelier-charcoal hover:text-black'
+                        }`}
+                      >
+                        2. 3 to 6 months
+                      </button>
+                    </div>
+                  </div>
+
+                  <span className="text-[11px] text-atelier-taupe font-mono">
+                    Active lead tier:{' '}
+                    <strong className="text-atelier-softblack">
+                      {prodDefaultLeadTime === '3–4 weeks' ? 'Usual 3–4 weeks (Standard)' : '3 to 6 months (Hand-Knotted Heirloom)'}
+                    </strong>
+                  </span>
+                </div>
+              </div>
+
+              {/* SECTION 7: Storefront Badges & Flags */}
               <div className="p-4 bg-atelier-ivory border border-atelier-parchment flex flex-wrap gap-6 items-center">
                 <span className="text-[11px] text-atelier-taupe uppercase tracking-wider font-medium">
                   Storefront Badges:

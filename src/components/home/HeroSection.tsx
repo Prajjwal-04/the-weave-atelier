@@ -76,7 +76,7 @@ export const HeroSection: React.FC = () => {
       <div className="absolute bottom-6 left-6 sm:left-8 z-10 hidden lg:flex items-center space-x-2 text-[9px] tracking-[0.25em] uppercase text-atelier-parchment/60 font-mono select-none pointer-events-none">
         <span>01 / 06</span>
         <span>·</span>
-        <span>Pure Bikaner Wool & Raw Silk</span>
+        <span>New Zealand & Indian Highland Wool</span>
         <span>·</span>
         <span>Loom 14, Bhadohi</span>
       </div>

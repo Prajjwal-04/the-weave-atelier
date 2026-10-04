@@ -7,13 +7,13 @@ import { useCurrency } from '../../context/CurrencyContext';
 import { getThumbnailUrl } from '../../utils/imageOptimizer';
 
 const COUNTRIES = [
+  'India',
   'United States',
   'United Kingdom',
   'Germany',
   'France',
   'Canada',
   'Australia',
-  'India',
   'Italy',
   'Netherlands',
   'Switzerland',

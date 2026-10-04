@@ -292,10 +292,10 @@ export const Footer: React.FC = () => {
             © {new Date().getFullYear()} Prasri Rugs. All rights reserved. Handcrafted in Bhadohi, India.
           </div>
           <div className="flex flex-wrap items-center space-x-6">
-            <Link to="/shipping-returns#terms" className="hover:text-atelier-parchment transition-colors">
+            <Link to="/terms" className="hover:text-atelier-parchment transition-colors">
               Terms & Conditions
             </Link>
-            <Link to="/shipping-returns#privacy" className="hover:text-atelier-parchment transition-colors">
+            <Link to="/privacy" className="hover:text-atelier-parchment transition-colors">
               Privacy Policy
             </Link>
             <Link to="/shipping-returns#refund" className="hover:text-atelier-parchment transition-colors">

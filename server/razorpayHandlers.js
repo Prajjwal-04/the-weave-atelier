@@ -12,20 +12,8 @@ const __dirname = path.dirname(__filename);
 const ORDERS_FILE = path.join(__dirname, 'verified_orders.json');
 
 function getCredentials() {
-  try {
-    const envPath = path.join(process.cwd(), '.env');
-    if (fs.existsSync(envPath)) {
-      const parsedEnv = dotenv.parse(fs.readFileSync(envPath, 'utf8'));
-      if (parsedEnv.RAZORPAY_KEY_ID) process.env.RAZORPAY_KEY_ID = parsedEnv.RAZORPAY_KEY_ID;
-      if (parsedEnv.VITE_RAZORPAY_KEY_ID) process.env.VITE_RAZORPAY_KEY_ID = parsedEnv.VITE_RAZORPAY_KEY_ID;
-      if (parsedEnv.RAZORPAY_KEY_SECRET) process.env.RAZORPAY_KEY_SECRET = parsedEnv.RAZORPAY_KEY_SECRET;
-    }
-  } catch (e) {
-    // Ignore error in production serverless environment
-  }
-
-  const keyId = (process.env.RAZORPAY_KEY_ID || process.env.VITE_RAZORPAY_KEY_ID || '').trim();
-  const keySecret = (process.env.RAZORPAY_KEY_SECRET || '').trim();
+  const keyId = process.env.RAZORPAY_KEY_ID || process.env.VITE_RAZORPAY_KEY_ID;
+  const keySecret = process.env.RAZORPAY_KEY_SECRET;
 
   if (!keyId || !keySecret) {
     throw new Error('Razorpay credentials (RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET) are missing in environment.');
@@ -118,7 +106,6 @@ export async function handleCreateOrder(req, res) {
       order_id: order.id,
       amount: order.amount,
       currency: order.currency,
-      key_id: credentials.keyId,
     });
   } catch (err) {
     console.error('[Razorpay Order Creation Error]:', err);

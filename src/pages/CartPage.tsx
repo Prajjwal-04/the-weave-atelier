@@ -6,13 +6,13 @@ import { useWishlist } from '../context/WishlistContext';
 import { useCurrency } from '../context/CurrencyContext';
 
 const COUNTRIES = [
+  'India',
   'United States',
   'United Kingdom',
   'Germany',
   'France',
   'Canada',
   'Australia',
-  'India',
   'Italy',
   'Netherlands',
   'Switzerland',
