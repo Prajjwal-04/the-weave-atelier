@@ -251,7 +251,7 @@ export const paymentService = {
           currency: backendOrder.currency,
           name: 'Prasri Rugs',
           description: `Handcrafted Rug Order (${params.orderNumber})`,
-          image: '/favicon.svg',
+          image: '/images/prasri-medallion.jpg',
           order_id: backendOrder.order_id,
           prefill: prefillData,
           notes: {
