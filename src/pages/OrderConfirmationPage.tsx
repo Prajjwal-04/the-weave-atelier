@@ -63,12 +63,12 @@ export const OrderConfirmationPage: React.FC = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
         {/* Success Banner */}
         <div className="text-center space-y-4 py-8 border-b border-atelier-parchment">
-          <div className="w-16 h-16 mx-auto bg-emerald-100 text-emerald-800 rounded-full flex items-center justify-center">
-            <Check size={32} />
+          <div className="w-14 h-14 mx-auto bg-atelier-cream border border-atelier-parchment text-atelier-softblack rounded-full flex items-center justify-center shadow-subtle">
+            <Check size={22} strokeWidth={1.75} />
           </div>
 
-          <div className="text-[10px] tracking-widest uppercase text-atelier-taupe font-mono">
-            Transaction Authorized & Verified
+          <div className="text-[10px] tracking-[0.25em] uppercase text-atelier-taupe font-mono">
+            Order Confirmed · Studio Register
           </div>
 
           <h1 className="font-serif text-3xl sm:text-5xl text-atelier-softblack font-light tracking-tight">
@@ -79,8 +79,8 @@ export const OrderConfirmationPage: React.FC = () => {
             Your handmade rug order has been registered directly at our Bhadohi studio in Uttar Pradesh, India.
           </p>
 
-          <div className="inline-flex items-center space-x-2 bg-atelier-cream border border-atelier-parchment px-6 py-2.5 rounded text-xs font-mono text-atelier-softblack">
-            <span>Order Number:</span>
+          <div className="inline-flex items-center space-x-2 bg-atelier-cream border border-atelier-parchment px-5 py-2 rounded text-xs font-mono text-atelier-softblack">
+            <span className="text-atelier-taupe">Reference:</span>
             <span className="font-bold text-sm">{orderNumber}</span>
           </div>
         </div>
@@ -88,6 +88,12 @@ export const OrderConfirmationPage: React.FC = () => {
         {/* Order Details Card */}
         {order && (
           <div className="bg-atelier-cream border border-atelier-parchment p-8 sm:p-10 space-y-8 shadow-subtle">
+            {order.syncStatus === 'pending_reconciliation' && (
+              <div className="p-3.5 bg-atelier-ivory border border-atelier-parchment text-xs text-atelier-charcoal leading-relaxed">
+                <span className="font-medium text-atelier-softblack">Payment Authorized:</span> Your transaction was recorded with reference <span className="font-mono text-atelier-softblack">{order.paymentId}</span>. Studio dispatch and tracking will be updated automatically.
+              </div>
+            )}
+
             <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-atelier-parchment pb-6 gap-4">
               <div>
                 <div className="text-xs text-atelier-taupe">Date Placed</div>
@@ -111,13 +117,12 @@ export const OrderConfirmationPage: React.FC = () => {
               </div>
               <div>
                 <div className="text-xs text-atelier-taupe">Payment Status</div>
-                <div className="inline-flex items-center text-xs font-mono text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 mt-0.5">
-                  <Check size={12} className="mr-1 text-emerald-600" />
-                  <span>{order.paymentProvider || 'Razorpay Verified'}</span>
+                <div className="inline-flex items-center text-xs font-mono text-atelier-softblack bg-atelier-ivory px-2.5 py-1 border border-atelier-parchment mt-0.5">
+                  <span>Paid · {order.paymentProvider || 'Razorpay'}</span>
                 </div>
                 {order.paymentId && (
                   <div className="text-[10px] text-atelier-taupe font-mono mt-0.5 truncate max-w-[160px]">
-                    ID: {order.paymentId}
+                    Ref: {order.paymentId}
                   </div>
                 )}
               </div>

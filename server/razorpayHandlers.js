@@ -106,6 +106,7 @@ export async function handleCreateOrder(req, res) {
       order_id: order.id,
       amount: order.amount,
       currency: order.currency,
+      key_id: credentials.keyId,
     });
   } catch (err) {
     console.error('[Razorpay Order Creation Error]:', err);
@@ -175,6 +176,11 @@ export async function handleVerifyPayment(req, res) {
       order_number: body.order_number || body.notes?.order_number || 'N/A',
       customer: body.customer || {},
       amountUSD: body.amountUSD || null,
+      items: body.items || [],
+      shippingAddress: body.shippingAddress || null,
+      totalUSD: body.totalUSD || null,
+      currency: body.currency || 'USD',
+      status: 'PAID_VERIFIED',
     };
     saveVerifiedOrder(verifiedRecord);
 
@@ -183,6 +189,7 @@ export async function handleVerifyPayment(req, res) {
       message: 'Payment signature verified successfully.',
       order_id: razorpay_order_id,
       payment_id: razorpay_payment_id,
+      verifiedRecord,
     });
   } catch (err) {
     console.error('[Razorpay Payment Verification Error]:', err);
@@ -190,6 +197,102 @@ export async function handleVerifyPayment(req, res) {
       success: false,
       message: err.message || 'An error occurred during payment verification.',
     });
+  }
+}
+
+/**
+ * Check payment status directly with Razorpay API (prevents duplicate charges and unsafe dismissal)
+ * Endpoint: GET /api/check-payment?order_id=...
+ */
+export async function handleCheckPaymentStatus(req, res) {
+  try {
+    const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+    const orderId = url.searchParams.get('order_id') || req.query?.order_id;
+
+    if (!orderId) {
+      return sendJsonResponse(res, 400, {
+        error: 'Missing order_id query parameter.',
+      });
+    }
+
+    let credentials;
+    try {
+      credentials = getCredentials();
+    } catch (authErr) {
+      return sendJsonResponse(res, 500, {
+        error: 'Razorpay credentials not configured on server.',
+      });
+    }
+
+    const instance = new Razorpay({
+      key_id: credentials.keyId,
+      key_secret: credentials.keySecret,
+    });
+
+    const [order, payments] = await Promise.all([
+      instance.orders.fetch(orderId).catch(() => null),
+      instance.orders.fetchPayments(orderId).catch(() => ({ items: [], count: 0 })),
+    ]);
+
+    const paymentItems = payments?.items || [];
+    const capturedPayment = paymentItems.find((p) => p.status === 'captured');
+    const authorizedPayment = paymentItems.find((p) => p.status === 'authorized');
+    const pendingPayment = paymentItems.find((p) => p.status === 'created' || p.status === 'pending');
+
+    return sendJsonResponse(res, 200, {
+      success: true,
+      order_id: orderId,
+      order_status: order?.status || 'unknown',
+      amount_paid: order?.amount_paid || 0,
+      payment_count: paymentItems.length,
+      has_successful_payment: Boolean(capturedPayment || authorizedPayment),
+      successful_payment_id: (capturedPayment || authorizedPayment)?.id || null,
+      is_pending: Boolean(pendingPayment),
+      payments: paymentItems.map((p) => ({
+        id: p.id,
+        status: p.status,
+        method: p.method,
+        amount: p.amount,
+        created_at: p.created_at,
+        error_code: p.error_code,
+        error_description: p.error_description,
+      })),
+    });
+  } catch (err) {
+    console.error('[Check Payment Status Error]:', err);
+    return sendJsonResponse(res, 500, {
+      error: err.message || 'Failed to inspect payment status.',
+    });
+  }
+}
+
+/**
+ * Backup order saving endpoint in case of Supabase database connection issues
+ * Endpoint: POST /api/save-order-backup
+ */
+export async function handleSaveOrderBackup(req, res) {
+  try {
+    const body = await parseRequestBody(req);
+    if (!body || !body.orderNumber) {
+      return sendJsonResponse(res, 400, { error: 'Invalid order payload' });
+    }
+
+    const orderRecord = {
+      ...body,
+      backup_saved_at: new Date().toISOString(),
+      reconciliation_needed: true,
+    };
+
+    saveVerifiedOrder(orderRecord);
+
+    return sendJsonResponse(res, 200, {
+      success: true,
+      message: 'Order safely logged on server backup store.',
+      orderNumber: body.orderNumber,
+    });
+  } catch (err) {
+    console.error('[Save Order Backup Error]:', err);
+    return sendJsonResponse(res, 500, { error: err.message });
   }
 }
 

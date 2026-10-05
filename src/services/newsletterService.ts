@@ -43,14 +43,18 @@ export const newsletterService = {
 
         if (error) {
           // PostgreSQL code 23505 is unique violation
-          if (error.code === '23505' || error.message.includes('unique constraint') || error.message.includes('already exists')) {
+          if (error.code === '23505' || error.message?.includes('unique constraint') || error.message?.includes('already exists')) {
             return {
               success: true,
               alreadySubscribed: true,
               message: 'You are already subscribed to The Atelier Letter.',
             };
           }
-          console.warn('[Newsletter] Supabase insert warning:', error);
+          console.error('[Newsletter] Supabase insert error:', error);
+          return {
+            success: false,
+            message: 'Server was unable to register your subscription. Please try again.',
+          };
         } else {
           return {
             success: true,
@@ -58,7 +62,11 @@ export const newsletterService = {
           };
         }
       } catch (err) {
-        console.warn('[Newsletter] Network error saving subscriber:', err);
+        console.error('[Newsletter] Network error saving subscriber:', err);
+        return {
+          success: false,
+          message: 'Network error connecting to atelier server. Please check your connection and try again.',
+        };
       }
     }
 

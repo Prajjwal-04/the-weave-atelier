@@ -68,7 +68,7 @@ export const TermsPage: React.FC = () => {
             <p>
               • <strong>Ready-to-Ship Pieces:</strong> Prepared, conditioned, and dispatched via express air courier within 2 to 4 business days from Bhadohi.<br />
               • <strong>Made-to-Order Pieces:</strong> Require dedicated loom weaving and artisan washing (typically 4–6 weeks for tufted works and 7–10 weeks for intricate hand-knotted heirlooms).<br />
-              • <strong>International Duties:</strong> While orders destined for the United States under $800 USD qualify for duty-free entry under Section 321 de minimis, orders shipping to the UK, EU, Canada, and other jurisdictions may incur local import VAT, tariffs, or clearance charges assessed by destination customs authorities.
+              • <strong>International Duties:</strong> Orders shipped from our Bhadohi atelier to international destinations (including the United States, UK, European Union, Canada, and Australia) are dispatched on a Delivery at Place (DAP / DDU) basis. Import duties, VAT, or local customs clearance assessments are determined by destination border authorities and remain the responsibility of the recipient. Domestic deliveries within India incur no import duties.
             </p>
           </section>
 

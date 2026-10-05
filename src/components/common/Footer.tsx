@@ -9,6 +9,7 @@ export const Footer: React.FC = () => {
   const [subscribed, setSubscribed] = useState(false);
   const [subscribing, setSubscribing] = useState(false);
   const [subscribeMessage, setSubscribeMessage] = useState('');
+  const [subscribeError, setSubscribeError] = useState('');
   const { currency, setCurrency, rates } = useCurrency();
 
   const handleSubscribe = async (e: React.FormEvent) => {
@@ -16,15 +17,21 @@ export const Footer: React.FC = () => {
     if (!email.trim() || subscribing) return;
 
     setSubscribing(true);
+    setSubscribeError('');
     try {
       const result = await newsletterService.subscribe(email);
-      setSubscribeMessage(result.message);
-      setSubscribed(true);
-      setEmail('');
+      if (result.success) {
+        setSubscribeMessage(result.message);
+        setSubscribed(true);
+        setEmail('');
+      } else {
+        setSubscribeError(result.message || 'Could not subscribe. Please try again.');
+        setSubscribed(false);
+      }
     } catch (err) {
       console.error('Subscription error:', err);
-      setSubscribeMessage('Thank you for subscribing.');
-      setSubscribed(true);
+      setSubscribeError('Unable to connect to server. Please try again.');
+      setSubscribed(false);
     } finally {
       setSubscribing(false);
     }
@@ -105,6 +112,11 @@ export const Footer: React.FC = () => {
                   )}
                 </button>
               </form>
+            )}
+            {subscribeError && (
+              <p className="text-xs text-rose-300 font-light mt-1.5 flex items-center">
+                <span>{subscribeError}</span>
+              </p>
             )}
           </div>
         </div>

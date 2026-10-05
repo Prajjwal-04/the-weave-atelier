@@ -28,7 +28,7 @@ export const FAQS: FAQItem[] = [
   {
     category: 'International Shipping',
     question: 'How are customs and import duties handled?',
-    answer: 'Handmade wool carpets shipped from India enter most international destinations under established textile harmonized codes. For the United States, orders under $800 USD are duty-free under Section 321 de minimis. For the EU and UK, VAT/customs are calculated at local rates, which our checkout can estimate or coordinate with your delivery courier.'
+    answer: 'Handmade wool carpets shipped from our Bhadohi atelier enter international destinations under established textile harmonized tariff codes. Shipments are sent Delivery at Place (DAP / DDU). International import duties, tariffs, or local VAT (e.g. UK VAT or EU import duties) are determined by destination border authorities and payable by the recipient. Indian domestic orders include all applicable GST with zero import duties.'
   },
   {
     category: 'Care & Maintenance',

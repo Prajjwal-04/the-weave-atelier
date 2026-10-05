@@ -1,6 +1,7 @@
 import { supabase, isSupabaseConfigured } from './supabase';
 import { Order, OrderStatus, OrderTimelineEvent, MadeToOrderMilestone } from '../types';
 import { productService } from './productService';
+import { paymentService } from './paymentService';
 
 const ORDERS_STORAGE_KEY = 'twa_orders_db';
 const FALLBACK_ORDER_IMAGE = 'https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=600&q=80';
@@ -80,39 +81,53 @@ const saveLocalOrders = (orders: Order[]) => {
 export const orderService = {
   // 1. Create a new order
   async createOrder(order: Order): Promise<Order> {
+    const activeProvider = order.paymentProvider || (paymentService.isLive() ? 'Razorpay Live' : 'Razorpay Test');
+    let orderToSave: Order = {
+      ...order,
+      paymentProvider: activeProvider,
+      syncStatus: 'synced',
+    };
+
+    let serverSaved = false;
+    let serverError: string | null = null;
+
     // 1. Persist to Supabase if connected
     if (isSupabaseConfigured() && supabase) {
       try {
         const { data: dbOrder, error: orderErr } = await supabase
           .from('orders')
           .insert({
-            order_number: order.orderNumber,
-            customer_email: order.customer.email,
-            customer_first_name: order.customer.firstName,
-            customer_last_name: order.customer.lastName,
-            customer_phone: order.customer.phone,
-            shipping_address: order.shippingAddress,
-            shipping_method: order.shippingMethod,
-            currency: order.currency,
-            subtotal_usd: order.subtotalUSD,
-            shipping_usd: order.shippingUSD,
-            tax_usd: order.taxUSD,
-            total_usd: order.totalUSD,
-            status: order.status,
-            carrier: order.carrier,
-            tracking_number: order.trackingNumber,
-            estimated_delivery_date: order.estimatedDeliveryDate,
-            is_made_to_order: order.isMadeToOrder,
-            payment_provider: order.paymentProvider || 'Razorpay Live',
-            payment_id: order.paymentId || null,
+            order_number: orderToSave.orderNumber,
+            customer_email: orderToSave.customer.email,
+            customer_first_name: orderToSave.customer.firstName,
+            customer_last_name: orderToSave.customer.lastName,
+            customer_phone: orderToSave.customer.phone,
+            shipping_address: orderToSave.shippingAddress,
+            shipping_method: orderToSave.shippingMethod,
+            currency: orderToSave.currency,
+            subtotal_usd: orderToSave.subtotalUSD,
+            shipping_usd: orderToSave.shippingUSD,
+            tax_usd: orderToSave.taxUSD,
+            total_usd: orderToSave.totalUSD,
+            status: orderToSave.status,
+            carrier: orderToSave.carrier,
+            tracking_number: orderToSave.trackingNumber,
+            estimated_delivery_date: orderToSave.estimatedDeliveryDate,
+            is_made_to_order: orderToSave.isMadeToOrder,
+            payment_provider: activeProvider,
+            payment_id: orderToSave.paymentId || null,
           })
           .select()
           .single();
 
-        if (!orderErr && dbOrder) {
+        if (orderErr) {
+          throw orderErr;
+        }
+
+        if (dbOrder) {
           // Insert order items
-          await supabase.from('order_items').insert(
-            order.items.map((item) => ({
+          const { error: itemsErr } = await supabase.from('order_items').insert(
+            orderToSave.items.map((item) => ({
               order_id: dbOrder.id,
               product_name: item.productName,
               product_slug: item.productSlug,
@@ -126,10 +141,11 @@ export const orderService = {
               estimated_dispatch: item.estimatedDispatch,
             }))
           );
+          if (itemsErr) throw itemsErr;
 
           // Insert timeline events
-          await supabase.from('order_timelines').insert(
-            order.timeline.map((event, idx) => ({
+          const { error: timelineErr } = await supabase.from('order_timelines').insert(
+            orderToSave.timeline.map((event, idx) => ({
               order_id: dbOrder.id,
               title: event.title,
               date_label: event.date,
@@ -139,22 +155,56 @@ export const orderService = {
               step_order: idx + 1,
             }))
           );
+          if (timelineErr) throw timelineErr;
+
+          serverSaved = true;
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('Error inserting order into Supabase:', err);
+        serverError = err.message || 'Database insert failed';
       }
     }
 
-    // 3. Save to local storage (safe, non-blocking)
+    // 2. If Supabase insert failed or is unconfigured, try the server-side backup API
+    if (!serverSaved) {
+      try {
+        const backupRes = await fetch('/api/backup-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(orderToSave),
+        });
+        if (backupRes.ok) {
+          serverSaved = true;
+          orderToSave.syncStatus = 'synced';
+          console.log('[OrderService] Order safely stored via server backup store.');
+        } else {
+          orderToSave.syncStatus = 'pending_reconciliation';
+          orderToSave.syncError = serverError || 'Failed to save to server database';
+        }
+      } catch (backupErr: any) {
+        console.error('Failed to save to backup endpoint:', backupErr);
+        orderToSave.syncStatus = 'pending_reconciliation';
+        orderToSave.syncError = serverError || backupErr.message;
+      }
+    }
+
+    // 3. Save to local storage cache (with safe quota eviction)
     try {
       const local = getLocalOrders();
-      const updated = [order, ...local];
+      const updated = [orderToSave, ...local];
       saveLocalOrders(updated);
     } catch (cacheErr) {
       console.warn('Non-blocking local orders cache warning on createOrder:', cacheErr);
     }
 
-    return order;
+    // If both primary database AND backup API failed, fail visibly!
+    if (!serverSaved && isSupabaseConfigured()) {
+      const saveError = new Error(`Order database synchronization failed: ${serverError || 'Server unreachable'}`);
+      (saveError as any).order = orderToSave;
+      throw saveError;
+    }
+
+    return orderToSave;
   },
 
   // 2. Lookup order by order number

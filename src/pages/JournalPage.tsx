@@ -4,6 +4,7 @@ import { JOURNAL_ARTICLES } from '../data/journal';
 import { Clock, ArrowRight, ArrowLeft, BookOpen, HelpCircle } from 'lucide-react';
 import { AtelierFaqSection } from '../components/editorial/AtelierFaqSection';
 import { SEO } from '../components/common/SEO';
+import { NotFoundPage } from './NotFoundPage';
 
 export const JournalPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -12,7 +13,10 @@ export const JournalPage: React.FC = () => {
 
   // If viewing a single article
   if (slug) {
-    const article = JOURNAL_ARTICLES.find((a) => a.slug === slug) || JOURNAL_ARTICLES[0];
+    const article = JOURNAL_ARTICLES.find((a) => a.slug === slug);
+    if (!article) {
+      return <NotFoundPage />;
+    }
     const otherArticles = JOURNAL_ARTICLES.filter((a) => a.id !== article.id);
 
     return (

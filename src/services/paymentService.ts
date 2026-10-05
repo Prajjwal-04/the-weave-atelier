@@ -34,6 +34,7 @@ export interface RazorpayBackendOrderResponse {
   order_id: string;
   amount: number;
   currency: string;
+  key_id?: string;
   error?: string;
 }
 
@@ -55,7 +56,8 @@ export const paymentService = {
     if (storedKey.startsWith('rzp_live_')) return storedKey;
     if (envKey) return envKey;
     if (storedKey) return storedKey;
-    return envKey;
+    // Production default: Live Key for Prasri Rugs
+    return 'rzp_live_TjRIpG9wb88GLs';
   },
 
   setRazorpayKeyId(key: string): void {
@@ -241,8 +243,10 @@ export const paymentService = {
           prefillData.vpa = params.upiVpa.trim();
         }
 
+        const activeKey = (backendOrder.key_id || keyId).trim();
+
         const options: any = {
-          key: keyId,
+          key: activeKey,
           amount: backendOrder.amount,
           currency: backendOrder.currency,
           name: 'Prasri Rugs',
@@ -263,12 +267,41 @@ export const paymentService = {
           },
           modal: {
             confirm_close: true,
-            ondismiss: function () {
+            ondismiss: async function () {
+              // Proactively verify with backend if any payment succeeded or is pending
+              try {
+                const statusRes = await fetch(`/api/check-payment?order_id=${encodeURIComponent(backendOrder.order_id)}`);
+                if (statusRes.ok) {
+                  const statusData = await statusRes.json();
+                  if (statusData.has_successful_payment) {
+                    resolve({
+                      success: true,
+                      transactionId: statusData.successful_payment_id || '',
+                      orderId: backendOrder.order_id,
+                      provider: 'razorpay',
+                      message: `Payment authorized via your banking portal (Ref: ${statusData.successful_payment_id}).`,
+                    });
+                    return;
+                  }
+                  if (statusData.is_pending) {
+                    resolve({
+                      success: false,
+                      transactionId: '',
+                      provider: 'razorpay',
+                      message: 'Payment authorization is currently pending with your bank. If money was debited, please do not retry immediately; check your banking app or contact our atelier concierge.',
+                    });
+                    return;
+                  }
+                }
+              } catch (e) {
+                console.warn('Status verification on modal dismiss:', e);
+              }
+
               resolve({
                 success: false,
                 transactionId: '',
                 provider: 'razorpay',
-                message: 'Payment session was closed before completion. No funds were deducted.',
+                message: 'Payment window was closed before completion. If your bank debited any amount, it will be automatically refunded by your banking provider. Please contact our concierge before re-attempting if you are unsure.',
               });
             },
           },

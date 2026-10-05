@@ -9,6 +9,26 @@
       "source": "/the-atelier/",
       "destination": "/the-atelier",
       "permanent": true
+    },
+    {
+      "source": "/journal/choosing-the-right-rug-size",
+      "destination": "/journal/choosing-the-right-rug-size-architects-guide",
+      "permanent": true
+    },
+    {
+      "source": "/journal/bhadohi-weaving-heritage",
+      "destination": "/journal/the-story-of-bhadohi-carpet-making",
+      "permanent": true
+    },
+    {
+      "source": "/journal/living-with-natural-wool",
+      "destination": "/journal/hand-knotted-vs-hand-tufted-rugs",
+      "permanent": true
+    },
+    {
+      "source": "/journal/quiet-luxury-in-modern-interiors",
+      "destination": "/journal",
+      "permanent": true
     }
   ],
   "rewrites": [
@@ -17,7 +37,7 @@
       "destination": "/api/$1"
     },
     {
-      "source": "/(.*)",
+      "source": "/(shop|product/.*|collections|collections/.*|custom-rugs|the-atelier|about|craft|journal|journal/.*|size-guide|rug-care|shipping-returns|terms|privacy|wishlist|contact|cart|checkout|order-confirmation|order-tracking|track-order|account|admin|admin/.*)",
       "destination": "/index.html"
     }
   ]

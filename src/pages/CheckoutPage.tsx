@@ -103,6 +103,30 @@ export const CheckoutPage: React.FC = () => {
   const [upiError, setUpiError] = useState('');
   const [selectedBank, setSelectedBank] = useState('HDFC');
   const [errorMessage, setErrorMessage] = useState('');
+  const [checkoutOrderNumber] = useState(() => `PR-2026-${Math.floor(1000 + Math.random() * 9000)}`);
+
+  const calculateEstimatedDeliveryDate = (isMadeToOrder: boolean): string => {
+    const now = new Date();
+    if (isMadeToOrder) {
+      const start = new Date(now.getTime() + 35 * 24 * 60 * 60 * 1000);
+      const end = new Date(now.getTime() + 49 * 24 * 60 * 60 * 1000);
+      const startMonth = start.toLocaleDateString('en-US', { month: 'short' });
+      const endMonth = end.toLocaleDateString('en-US', { month: 'short' });
+      if (startMonth === endMonth) {
+        return `${startMonth} ${start.getDate()}–${end.getDate()}, ${end.getFullYear()}`;
+      }
+      return `${startMonth} ${start.getDate()} – ${endMonth} ${end.getDate()}, ${end.getFullYear()}`;
+    } else {
+      const start = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+      const end = new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000);
+      const startMonth = start.toLocaleDateString('en-US', { month: 'short' });
+      const endMonth = end.toLocaleDateString('en-US', { month: 'short' });
+      if (startMonth === endMonth) {
+        return `${startMonth} ${start.getDate()}–${end.getDate()}, ${end.getFullYear()}`;
+      }
+      return `${startMonth} ${start.getDate()} – ${endMonth} ${end.getDate()}, ${end.getFullYear()}`;
+    }
+  };
 
   const totalUSD = effectiveSubtotalUSD + shippingUSD;
   const inrRate = rates['INR']?.rate || 84.0;
@@ -147,8 +171,9 @@ export const CheckoutPage: React.FC = () => {
     setIsProcessing(true);
 
     try {
-      const orderNum = `PR-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+      const orderNum = checkoutOrderNumber;
       const hasMadeToOrder = effectiveItems.some((i) => !i.isReadyToShip);
+      const deliveryTimeline = calculateEstimatedDeliveryDate(hasMadeToOrder);
 
       // 1. Process payment via Razorpay All-In-One Checkout
       const paymentRes = await paymentService.processPayment({
@@ -214,15 +239,15 @@ export const CheckoutPage: React.FC = () => {
         status: hasMadeToOrder ? 'IN PRODUCTION' : 'PROCESSING',
         carrier: 'Insured Express Air',
         trackingNumber: '',
-        estimatedDeliveryDate: hasMadeToOrder ? 'Late October 2026' : 'September 22, 2026',
+        estimatedDeliveryDate: deliveryTimeline,
         isMadeToOrder: hasMadeToOrder,
-        paymentProvider: paymentRes.provider === 'razorpay' ? 'Razorpay Live' : 'Razorpay Sandbox',
+        paymentProvider: paymentService.isLive() ? 'Razorpay Live' : 'Razorpay Test',
         paymentId: paymentRes.transactionId,
         timeline: hasMadeToOrder
           ? [
               {
-                title: 'Order Placed & Payment Verified',
-                date: 'Today · Verified via Secure Gateway',
+                title: 'Order Placed & Payment Confirmed',
+                date: 'Today · Confirmed',
                 description: 'Order confirmed and registered at our Bhadohi studio.',
                 completed: true,
                 current: true,
@@ -261,7 +286,7 @@ export const CheckoutPage: React.FC = () => {
           : [
               {
                 title: 'Order Placed & Payment Confirmed',
-                date: 'Today · Verified via Gateway',
+                date: 'Today · Confirmed',
                 description: 'Order confirmed at our Bhadohi studio.',
                 completed: true,
                 current: true,
@@ -294,7 +319,32 @@ export const CheckoutPage: React.FC = () => {
       };
 
       // 2. Persist order to Supabase and Local Storage (also updates inventory in orderService)
-      await orderService.createOrder(newOrder);
+      let persistedOrder = newOrder;
+      let orderSyncDelay = false;
+      try {
+        persistedOrder = await orderService.createOrder(newOrder);
+      } catch (saveErr: any) {
+        console.error('Server order save delay:', saveErr);
+        orderSyncDelay = true;
+        persistedOrder = {
+          ...newOrder,
+          syncStatus: 'pending_reconciliation',
+          syncError: saveErr.message || 'Server save pending',
+        };
+
+        // Cache for reconciliation so it is not lost
+        try {
+          const unreconciled = JSON.parse(localStorage.getItem('twa_unreconciled_orders') || '[]');
+          unreconciled.push({
+            orderNumber: orderNum,
+            paymentId: paymentRes.transactionId,
+            error: saveErr.message,
+            customerEmail: email,
+            timestamp: new Date().toISOString(),
+          });
+          localStorage.setItem('twa_unreconciled_orders', JSON.stringify(unreconciled));
+        } catch (_) {}
+      }
 
       // 3. Decrement local InventoryContext state for live reactivity
       for (const item of effectiveItems) {
@@ -304,7 +354,7 @@ export const CheckoutPage: React.FC = () => {
       }
 
       // 4. Save to Auth context state & update saved address for future orders
-      addOrder(newOrder);
+      addOrder(persistedOrder);
       if (user) {
         await updateSavedAddress(
           {
@@ -326,11 +376,11 @@ export const CheckoutPage: React.FC = () => {
           emailService.sendTransactionalEmail({
             to: email,
             subject: `Order Confirmed: ${newOrder.orderNumber} · Prasri Rugs`,
-            html: emailService.generateOrderConfirmationHtml(newOrder),
+            html: emailService.generateOrderConfirmationHtml(persistedOrder),
             type: 'order_confirmation',
           }),
           // Direct notification to prasrirugs@gmail.com
-          emailService.sendOrderNotificationToAdmin(newOrder),
+          emailService.sendOrderNotificationToAdmin(persistedOrder),
         ]);
       } catch (mailErr) {
         console.warn('Email dispatch notice:', mailErr);
@@ -338,10 +388,10 @@ export const CheckoutPage: React.FC = () => {
 
       clearCart();
       setIsProcessing(false);
-      navigate(`/order-confirmation?orderNumber=${orderNum}`);
+      navigate(`/order-confirmation?orderNumber=${orderNum}${orderSyncDelay ? '&sync=pending' : ''}`);
     } catch (err: any) {
       console.error('Order creation error:', err);
-      setErrorMessage('An unexpected error occurred while placing your order. Please try again.');
+      setErrorMessage('An unexpected error occurred while placing your order. Please try again or contact concierge.');
       setIsProcessing(false);
     }
   };
@@ -361,8 +411,8 @@ export const CheckoutPage: React.FC = () => {
           </Link>
 
           <div className="flex items-center space-x-2 text-xs text-atelier-taupe">
-            <Lock size={14} className="text-emerald-700" />
-            <span className="hidden sm:inline">256-Bit SSL Encrypted Transaction</span>
+            <Lock size={13} className="text-atelier-charcoal/70" />
+            <span className="hidden sm:inline text-[10px] tracking-widest uppercase font-mono">Secure Checkout</span>
           </div>
         </div>
 
@@ -579,43 +629,41 @@ export const CheckoutPage: React.FC = () => {
                 </div>
               </form>
             ) : (
-              /* Payment Step - Authentic Production Multi-Channel Gateway */
+              /* Payment Step - Clean, Minimalist, Luxury Atelier Interface */
               <form onSubmit={handlePaymentSubmit} className="space-y-6">
-                <div className="flex items-center justify-between border-b border-atelier-parchment pb-4">
-                  <div>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-[10px] tracking-[0.2em] uppercase font-mono text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 flex items-center">
-                        <ShieldCheck size={11} className="mr-1 text-emerald-600" />
-                        Verified Payment Gateway
-                      </span>
-                      <span className="text-[10px] text-atelier-taupe font-mono">· 256-Bit TLS Secured</span>
+                <div className="flex items-start justify-between border-b border-atelier-parchment pb-4">
+                  <div className="space-y-1">
+                    <div className="text-[10px] tracking-[0.25em] uppercase font-mono text-atelier-taupe">
+                      Step 02 · Payment
                     </div>
-                    <h2 className="font-serif text-2xl sm:text-3xl text-atelier-softblack font-normal mt-1">
-                      Payment & Order Authorization
+                    <h2 className="font-serif text-2xl sm:text-3xl text-atelier-softblack font-light">
+                      Payment Method
                     </h2>
-                    <p className="text-xs text-atelier-charcoal font-light mt-0.5">
-                      Select your preferred payment method. Direct from our Bhadohi atelier with 100% insured transit.
+                    <p className="text-xs text-atelier-charcoal font-light leading-relaxed">
+                      Select your preferred settlement method. All orders are insured throughout express transit from our Bhadohi studio.
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={() => setStep('shipping')}
-                    className="text-xs text-atelier-taupe hover:text-black underline flex items-center"
+                    className="text-xs text-atelier-taupe hover:text-atelier-softblack transition-colors underline flex items-center pt-1"
                   >
                     <ArrowLeft size={12} className="mr-1" />
-                    <span>Edit Shipping</span>
+                    <span>Edit Details</span>
                   </button>
                 </div>
 
                 {/* Shipping Destination Recap */}
-                <div className="bg-atelier-ivory border border-atelier-parchment p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div className="bg-atelier-ivory/60 border border-atelier-parchment p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                   <div className="space-y-0.5">
-                    <div className="text-[10px] uppercase font-mono tracking-wider text-atelier-taupe">Shipping Destination</div>
+                    <div className="text-[10px] uppercase font-mono tracking-wider text-atelier-taupe">
+                      Delivery Address
+                    </div>
                     <div className="font-medium text-atelier-softblack">
                       {firstName} {lastName} · <span className="font-normal text-atelier-charcoal">{address}{apartment ? `, ${apartment}` : ''}, {city}, {state} {postalCode}, {country}</span>
                     </div>
-                    <div className="text-[11px] text-atelier-taupe">
-                      Courier: <span className="font-medium text-atelier-softblack">Atelier Insured Express Air</span> · Phone: {phone || 'Not specified'}
+                    <div className="text-[11px] text-atelier-taupe font-light">
+                      Carrier: Atelier Insured Express Air{phone ? ` · Contact: ${phone}` : ''}
                     </div>
                   </div>
                   <button
@@ -627,42 +675,36 @@ export const CheckoutPage: React.FC = () => {
                   </button>
                 </div>
 
-                {/* Payment Method Selector Tabs */}
+                {/* Payment Method Selector */}
                 <div className="space-y-3">
                   <label className="text-xs font-medium text-atelier-softblack uppercase tracking-wider block">
-                    Choose Payment Method
+                    Select Channel
                   </label>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {/* 1. UPI */}
                     <button
                       type="button"
                       onClick={() => { setPaymentMethod('upi'); setErrorMessage(''); }}
-                      className={`p-3.5 text-left border transition-all flex items-start space-x-3 relative ${
+                      className={`p-4 text-left border transition-all flex items-start space-x-3 ${
                         paymentMethod === 'upi'
-                          ? 'bg-atelier-ivory border-atelier-softblack shadow-sm ring-1 ring-atelier-softblack'
-                          : 'bg-atelier-cream border-atelier-parchment hover:border-atelier-taupe'
+                          ? 'bg-atelier-ivory border-atelier-softblack shadow-sm'
+                          : 'bg-white border-atelier-parchment hover:border-atelier-taupe'
                       }`}
                     >
                       <div className="mt-0.5">
                         <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                          paymentMethod === 'upi' ? 'border-atelier-softblack' : 'border-atelier-taupe'
+                          paymentMethod === 'upi' ? 'border-atelier-softblack' : 'border-atelier-parchment'
                         }`}>
                           {paymentMethod === 'upi' && <div className="w-2 h-2 rounded-full bg-atelier-softblack" />}
                         </div>
                       </div>
-                      <div className="flex-1 min-w-0 space-y-1">
-                        <div className="flex items-center justify-between">
-                          <span className="font-medium text-xs text-atelier-softblack flex items-center">
-                            <Zap size={14} className="mr-1.5 text-emerald-600 flex-shrink-0" />
-                            Instant UPI
-                          </span>
-                          <span className="text-[10px] font-mono uppercase bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded font-semibold">
-                            Recommended
-                          </span>
-                        </div>
+                      <div className="flex-1 min-w-0 space-y-0.5">
+                        <span className="font-medium text-xs text-atelier-softblack block">
+                          Instant UPI & QR
+                        </span>
                         <p className="text-[11px] text-atelier-taupe font-light">
-                          Google Pay, PhonePe, Paytm, BHIM, QR
+                          Google Pay, PhonePe, Paytm, or scan QR
                         </p>
                       </div>
                     </button>
@@ -671,31 +713,25 @@ export const CheckoutPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => { setPaymentMethod('card'); setErrorMessage(''); }}
-                      className={`p-3.5 text-left border transition-all flex items-start space-x-3 ${
+                      className={`p-4 text-left border transition-all flex items-start space-x-3 ${
                         paymentMethod === 'card'
-                          ? 'bg-atelier-ivory border-atelier-softblack shadow-sm ring-1 ring-atelier-softblack'
-                          : 'bg-atelier-cream border-atelier-parchment hover:border-atelier-taupe'
+                          ? 'bg-atelier-ivory border-atelier-softblack shadow-sm'
+                          : 'bg-white border-atelier-parchment hover:border-atelier-taupe'
                       }`}
                     >
                       <div className="mt-0.5">
                         <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                          paymentMethod === 'card' ? 'border-atelier-softblack' : 'border-atelier-taupe'
+                          paymentMethod === 'card' ? 'border-atelier-softblack' : 'border-atelier-parchment'
                         }`}>
                           {paymentMethod === 'card' && <div className="w-2 h-2 rounded-full bg-atelier-softblack" />}
                         </div>
                       </div>
-                      <div className="flex-1 min-w-0 space-y-1">
-                        <div className="flex items-center justify-between">
-                          <span className="font-medium text-xs text-atelier-softblack flex items-center">
-                            <CreditCard size={14} className="mr-1.5 text-atelier-agedgold flex-shrink-0" />
-                            Credit & Debit Cards
-                          </span>
-                          <span className="text-[10px] font-mono text-atelier-taupe">
-                            3D Secure
-                          </span>
-                        </div>
+                      <div className="flex-1 min-w-0 space-y-0.5">
+                        <span className="font-medium text-xs text-atelier-softblack block">
+                          Credit & Debit Cards
+                        </span>
                         <p className="text-[11px] text-atelier-taupe font-light">
-                          Visa, Mastercard, RuPay, Amex
+                          Visa, Mastercard, RuPay, American Express
                         </p>
                       </div>
                     </button>
@@ -704,31 +740,25 @@ export const CheckoutPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => { setPaymentMethod('netbanking'); setErrorMessage(''); }}
-                      className={`p-3.5 text-left border transition-all flex items-start space-x-3 ${
+                      className={`p-4 text-left border transition-all flex items-start space-x-3 ${
                         paymentMethod === 'netbanking'
-                          ? 'bg-atelier-ivory border-atelier-softblack shadow-sm ring-1 ring-atelier-softblack'
-                          : 'bg-atelier-cream border-atelier-parchment hover:border-atelier-taupe'
+                          ? 'bg-atelier-ivory border-atelier-softblack shadow-sm'
+                          : 'bg-white border-atelier-parchment hover:border-atelier-taupe'
                       }`}
                     >
                       <div className="mt-0.5">
                         <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                          paymentMethod === 'netbanking' ? 'border-atelier-softblack' : 'border-atelier-taupe'
+                          paymentMethod === 'netbanking' ? 'border-atelier-softblack' : 'border-atelier-parchment'
                         }`}>
                           {paymentMethod === 'netbanking' && <div className="w-2 h-2 rounded-full bg-atelier-softblack" />}
                         </div>
                       </div>
-                      <div className="flex-1 min-w-0 space-y-1">
-                        <div className="flex items-center justify-between">
-                          <span className="font-medium text-xs text-atelier-softblack flex items-center">
-                            <Building2 size={14} className="mr-1.5 text-blue-700 flex-shrink-0" />
-                            NetBanking
-                          </span>
-                          <span className="text-[10px] font-mono text-atelier-taupe">
-                            50+ Banks
-                          </span>
-                        </div>
+                      <div className="flex-1 min-w-0 space-y-0.5">
+                        <span className="font-medium text-xs text-atelier-softblack block">
+                          NetBanking
+                        </span>
                         <p className="text-[11px] text-atelier-taupe font-light">
-                          HDFC, ICICI, SBI, Axis, Kotak
+                          Direct transfer from 50+ scheduled banks
                         </p>
                       </div>
                     </button>
@@ -737,31 +767,25 @@ export const CheckoutPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => { setPaymentMethod('international'); setErrorMessage(''); }}
-                      className={`p-3.5 text-left border transition-all flex items-start space-x-3 ${
+                      className={`p-4 text-left border transition-all flex items-start space-x-3 ${
                         paymentMethod === 'international'
-                          ? 'bg-atelier-ivory border-atelier-softblack shadow-sm ring-1 ring-atelier-softblack'
-                          : 'bg-atelier-cream border-atelier-parchment hover:border-atelier-taupe'
+                          ? 'bg-atelier-ivory border-atelier-softblack shadow-sm'
+                          : 'bg-white border-atelier-parchment hover:border-atelier-taupe'
                       }`}
                     >
                       <div className="mt-0.5">
                         <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                          paymentMethod === 'international' ? 'border-atelier-softblack' : 'border-atelier-taupe'
+                          paymentMethod === 'international' ? 'border-atelier-softblack' : 'border-atelier-parchment'
                         }`}>
                           {paymentMethod === 'international' && <div className="w-2 h-2 rounded-full bg-atelier-softblack" />}
                         </div>
                       </div>
-                      <div className="flex-1 min-w-0 space-y-1">
-                        <div className="flex items-center justify-between">
-                          <span className="font-medium text-xs text-atelier-softblack flex items-center">
-                            <Globe size={14} className="mr-1.5 text-amber-700 flex-shrink-0" />
-                            Global & Wire
-                          </span>
-                          <span className="text-[10px] font-mono text-atelier-taupe">
-                            Export Invoice
-                          </span>
-                        </div>
+                      <div className="flex-1 min-w-0 space-y-0.5">
+                        <span className="font-medium text-xs text-atelier-softblack block">
+                          International & Wire
+                        </span>
                         <p className="text-[11px] text-atelier-taupe font-light">
-                          Multi-Currency International Cards
+                          Multi-currency cards & commercial export invoice
                         </p>
                       </div>
                     </button>
@@ -769,283 +793,198 @@ export const CheckoutPage: React.FC = () => {
                 </div>
 
                 {/* Method Specific Details Pane */}
-                <div className="bg-atelier-ivory border border-atelier-parchment p-5 sm:p-6 space-y-4">
-                  {/* UPI DETAILS */}
+                <div className="bg-atelier-ivory border border-atelier-parchment p-5 space-y-3.5 text-xs text-atelier-charcoal">
+                  {/* UPI Details */}
                   {paymentMethod === 'upi' && (
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between pb-3 border-b border-atelier-parchment">
-                        <div>
-                          <span className="text-xs font-semibold text-atelier-softblack flex items-center">
-                            <Zap size={15} className="mr-1.5 text-emerald-600" />
-                            Unified Payments Interface (UPI)
-                          </span>
-                          <p className="text-[11px] text-atelier-taupe font-light mt-0.5">
-                            Real-time zero-fee settlement via National Payments Corporation of India (NPCI)
-                          </p>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <span className="text-[10px] font-bold tracking-wider px-1.5 py-0.5 bg-white border border-atelier-parchment text-emerald-800">
-                            UPI
-                          </span>
-                          <span className="text-[10px] font-medium px-1.5 py-0.5 bg-white border border-atelier-parchment text-slate-700">
-                            GPay
-                          </span>
-                          <span className="text-[10px] font-medium px-1.5 py-0.5 bg-white border border-atelier-parchment text-purple-700">
-                            PhonePe
-                          </span>
-                          <span className="text-[10px] font-medium px-1.5 py-0.5 bg-white border border-atelier-parchment text-sky-700">
-                            Paytm
-                          </span>
-                        </div>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between border-b border-atelier-parchment pb-2.5">
+                        <span className="font-medium text-atelier-softblack">
+                          Instant UPI Settlement
+                        </span>
+                        <span className="text-[10px] text-atelier-taupe font-mono">
+                          Zero Surcharge
+                        </span>
                       </div>
 
-                      {/* Sub-modes for UPI */}
-                      <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="flex gap-2">
                         <button
                           type="button"
                           onClick={() => { setUpiMode('qr_app'); setUpiError(''); }}
-                          className={`p-3 border text-left flex items-center space-x-2 transition-colors ${
+                          className={`flex-1 py-2 px-3 border text-left text-xs transition-colors ${
                             upiMode === 'qr_app'
-                              ? 'bg-atelier-cream border-atelier-softblack font-medium'
-                              : 'bg-white border-atelier-parchment text-atelier-taupe hover:border-atelier-charcoal'
+                              ? 'bg-white border-atelier-softblack font-medium text-atelier-softblack'
+                              : 'bg-transparent border-atelier-parchment text-atelier-taupe hover:border-atelier-charcoal'
                           }`}
                         >
-                          <QrCode size={16} className={upiMode === 'qr_app' ? 'text-atelier-softblack' : 'text-atelier-taupe'} />
-                          <div>
-                            <div className="text-xs text-atelier-softblack">Scan QR / Any UPI App</div>
-                            <div className="text-[10px] text-atelier-taupe font-normal">GPay, PhonePe, Paytm QR</div>
-                          </div>
+                          Scan QR / One-Tap App
                         </button>
-
                         <button
                           type="button"
                           onClick={() => { setUpiMode('vpa'); setUpiError(''); }}
-                          className={`p-3 border text-left flex items-center space-x-2 transition-colors ${
+                          className={`flex-1 py-2 px-3 border text-left text-xs transition-colors ${
                             upiMode === 'vpa'
-                              ? 'bg-atelier-cream border-atelier-softblack font-medium'
-                              : 'bg-white border-atelier-parchment text-atelier-taupe hover:border-atelier-charcoal'
+                              ? 'bg-white border-atelier-softblack font-medium text-atelier-softblack'
+                              : 'bg-transparent border-atelier-parchment text-atelier-taupe hover:border-atelier-charcoal'
                           }`}
                         >
-                          <Smartphone size={16} className={upiMode === 'vpa' ? 'text-atelier-softblack' : 'text-atelier-taupe'} />
-                          <div>
-                            <div className="text-xs text-atelier-softblack">Enter UPI ID / VPA</div>
-                            <div className="text-[10px] text-atelier-taupe font-normal">Direct collect request</div>
-                          </div>
+                          Enter UPI ID
                         </button>
                       </div>
 
                       {upiMode === 'qr_app' ? (
-                        <div className="p-3.5 bg-emerald-50/70 border border-emerald-200 text-emerald-950 text-xs space-y-1.5">
-                          <div className="flex items-center font-medium">
-                            <CheckCircle2 size={14} className="mr-1.5 text-emerald-700" />
-                            Instant QR Code & App Redirection
-                          </div>
-                          <p className="text-[11px] text-emerald-900/80 font-light leading-relaxed">
-                            Clicking <strong>Authorize with UPI</strong> launches Razorpay's verified UPI window with a dynamic QR code you can scan with any phone, or direct one-tap links to open Google Pay, PhonePe, or Paytm on mobile.
-                          </p>
-                        </div>
+                        <p className="text-[11px] text-atelier-charcoal font-light leading-relaxed">
+                          Upon clicking <strong>Authorize Payment</strong>, an interactive QR code will appear for scanning with Google Pay, PhonePe, Paytm, or your banking app. If browsing on mobile, you will be redirected directly to your app.
+                        </p>
                       ) : (
-                        <div className="space-y-2.5 pt-1">
-                          <label className="text-[11px] font-medium text-atelier-softblack block">
-                            Your Virtual Payment Address (UPI ID)
+                        <div className="space-y-2 pt-1">
+                          <label className="text-[11px] text-atelier-taupe block">
+                            Virtual Payment Address (VPA)
                           </label>
-                          <div className="relative">
-                            <input
-                              type="text"
-                              value={upiVpa}
-                              onChange={(e) => {
-                                setUpiVpa(e.target.value);
-                                setUpiError('');
-                              }}
-                              placeholder="e.g. yourname@okhdfcbank or 9876543210@paytm"
-                              className={`w-full px-3.5 py-2.5 bg-white border text-xs font-mono text-atelier-softblack focus:outline-none ${
-                                upiError ? 'border-rose-400 focus:border-rose-600' : 'border-atelier-parchment focus:border-black'
-                              }`}
-                            />
-                          </div>
-
+                          <input
+                            type="text"
+                            value={upiVpa}
+                            onChange={(e) => {
+                              setUpiVpa(e.target.value);
+                              setUpiError('');
+                            }}
+                            placeholder="yourname@bank or mobile@paytm"
+                            className={`w-full px-3.5 py-2.5 bg-white border text-xs font-mono text-atelier-softblack focus:outline-none ${
+                              upiError ? 'border-rose-400' : 'border-atelier-parchment focus:border-atelier-softblack'
+                            }`}
+                          />
                           {upiError && (
-                            <div className="text-[11px] text-rose-700 flex items-center">
-                              <AlertCircle size={12} className="mr-1 flex-shrink-0" />
-                              <span>{upiError}</span>
+                            <div className="text-[11px] text-rose-700">
+                              {upiError}
                             </div>
                           )}
-
-                          {/* Quick Append Chips */}
-                          <div className="space-y-1">
-                            <span className="text-[10px] text-atelier-taupe font-mono uppercase">Quick Add Bank Handle:</span>
-                            <div className="flex flex-wrap gap-1.5">
-                              {COMMON_UPI_HANDLES.map((handle) => (
-                                <button
-                                  key={handle}
-                                  type="button"
-                                  onClick={() => handleApplyUpiHandle(handle)}
-                                  className="px-2 py-1 bg-white border border-atelier-parchment hover:border-atelier-softblack text-[11px] font-mono text-atelier-charcoal hover:text-black transition-colors"
-                                >
-                                  {handle}
-                                </button>
-                              ))}
-                            </div>
+                          <div className="flex flex-wrap gap-1.5 pt-1">
+                            {COMMON_UPI_HANDLES.map((handle) => (
+                              <button
+                                key={handle}
+                                type="button"
+                                onClick={() => handleApplyUpiHandle(handle)}
+                                className="px-2 py-0.5 bg-white border border-atelier-parchment hover:border-atelier-softblack text-[10px] font-mono text-atelier-charcoal transition-colors"
+                              >
+                                {handle}
+                              </button>
+                            ))}
                           </div>
-
-                          <p className="text-[11px] text-atelier-taupe font-light">
-                            A collect request will be sent to your UPI app. Simply open your app and enter your UPI PIN to approve.
-                          </p>
                         </div>
                       )}
                     </div>
                   )}
 
-                  {/* CARDS DETAILS */}
+                  {/* Card Details */}
                   {paymentMethod === 'card' && (
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between pb-3 border-b border-atelier-parchment">
-                        <div>
-                          <span className="text-xs font-semibold text-atelier-softblack flex items-center">
-                            <CreditCard size={15} className="mr-1.5 text-atelier-agedgold" />
-                            Credit & Debit Cards
-                          </span>
-                          <p className="text-[11px] text-atelier-taupe font-light mt-0.5">
-                            Bank-grade 256-bit encryption with dynamic OTP verification
-                          </p>
-                        </div>
-                        <div className="flex items-center space-x-1 text-[10px] font-mono">
-                          <span className="px-1.5 py-0.5 bg-blue-900 text-white rounded font-bold">VISA</span>
-                          <span className="px-1.5 py-0.5 bg-red-800 text-white rounded font-bold">MC</span>
-                          <span className="px-1.5 py-0.5 bg-emerald-800 text-white rounded font-bold">RUPAY</span>
-                          <span className="px-1.5 py-0.5 bg-sky-800 text-white rounded font-bold">AMEX</span>
-                        </div>
+                    <div className="space-y-2.5">
+                      <div className="flex items-center justify-between border-b border-atelier-parchment pb-2.5">
+                        <span className="font-medium text-atelier-softblack">
+                          Credit & Debit Cards
+                        </span>
+                        <span className="text-[10px] text-atelier-taupe font-mono">
+                          3D Secure Authorized
+                        </span>
                       </div>
-
-                      <div className="p-3.5 bg-atelier-cream border border-atelier-parchment text-xs space-y-1.5">
-                        <div className="flex items-center font-medium text-atelier-softblack">
-                          <ShieldCheck size={14} className="mr-1.5 text-emerald-700" />
-                          RBI 3D Secure 2.0 Dynamic OTP
-                        </div>
-                        <p className="text-[11px] text-atelier-charcoal font-light leading-relaxed">
-                          Your card details are securely authorized via Razorpay's PCI-DSS Level 1 compliant gateway. You will be redirected to your bank's secure page to complete authentication via OTP. No card data is stored on atelier servers.
-                        </p>
-                      </div>
+                      <p className="text-[11px] text-atelier-charcoal font-light leading-relaxed">
+                        Cards are processed through our compliant banking infrastructure with mandatory dynamic OTP verification. Card credentials are never stored on atelier servers.
+                      </p>
                     </div>
                   )}
 
-                  {/* NETBANKING DETAILS */}
+                  {/* NetBanking Details */}
                   {paymentMethod === 'netbanking' && (
                     <div className="space-y-3">
-                      <div className="flex items-center justify-between pb-3 border-b border-atelier-parchment">
-                        <div>
-                          <span className="text-xs font-semibold text-atelier-softblack flex items-center">
-                            <Building2 size={15} className="mr-1.5 text-blue-700" />
-                            Indian NetBanking
-                          </span>
-                          <p className="text-[11px] text-atelier-taupe font-light mt-0.5">
-                            Direct debit access across all major retail and commercial banks
-                          </p>
-                        </div>
-                        <span className="text-[10px] font-mono text-atelier-taupe">50+ Banks</span>
+                      <div className="flex items-center justify-between border-b border-atelier-parchment pb-2.5">
+                        <span className="font-medium text-atelier-softblack">
+                          Indian Scheduled Banks
+                        </span>
+                        <span className="text-[10px] text-atelier-taupe font-mono">
+                          50+ Banks Supported
+                        </span>
                       </div>
-
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
                         {POPULAR_BANKS.map((b) => (
                           <button
                             key={b.id}
                             type="button"
                             onClick={() => setSelectedBank(b.name)}
-                            className={`p-2.5 border text-left transition-colors flex items-center justify-between ${
+                            className={`p-2 border text-left transition-colors flex items-center justify-between ${
                               selectedBank === b.name
-                                ? 'bg-atelier-cream border-atelier-softblack font-medium text-atelier-softblack'
-                                : 'bg-white border-atelier-parchment text-atelier-charcoal hover:border-atelier-taupe'
+                                ? 'bg-white border-atelier-softblack font-medium text-atelier-softblack'
+                                : 'bg-transparent border-atelier-parchment text-atelier-charcoal hover:border-atelier-taupe'
                             }`}
                           >
                             <span>{b.name}</span>
-                            {selectedBank === b.name && <Check size={12} className="text-emerald-700" />}
+                            {selectedBank === b.name && <Check size={12} className="text-atelier-softblack" />}
                           </button>
                         ))}
                       </div>
-
                       <p className="text-[11px] text-atelier-taupe font-light">
-                        Selected: <strong className="text-atelier-softblack">{selectedBank}</strong>. Upon submission, you will be redirected to your bank's portal to authenticate and approve the payment.
+                        Selected: <span className="font-medium text-atelier-softblack">{selectedBank}</span>. You will be routed to your bank's secure authorization portal upon clicking proceed.
                       </p>
                     </div>
                   )}
 
-                  {/* INTERNATIONAL DETAILS */}
+                  {/* International Details */}
                   {paymentMethod === 'international' && (
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between pb-3 border-b border-atelier-parchment">
-                        <div>
-                          <span className="text-xs font-semibold text-atelier-softblack flex items-center">
-                            <Globe size={15} className="mr-1.5 text-amber-700" />
-                            International Patrons & Export Wire
-                          </span>
-                          <p className="text-[11px] text-atelier-taupe font-light mt-0.5">
-                            Seamless overseas card clearance in USD, EUR, GBP, CAD, or AUD
-                          </p>
-                        </div>
-                        <span className="text-[10px] font-mono text-atelier-taupe">Worldwide</span>
+                    <div className="space-y-2.5">
+                      <div className="flex items-center justify-between border-b border-atelier-parchment pb-2.5">
+                        <span className="font-medium text-atelier-softblack">
+                          International & Export Wire
+                        </span>
+                        <span className="text-[10px] text-atelier-taupe font-mono">
+                          Worldwide Export
+                        </span>
                       </div>
-
-                      <div className="p-3.5 bg-atelier-cream border border-atelier-parchment text-xs space-y-1.5">
-                        <div className="flex items-center font-medium text-atelier-softblack">
-                          <CheckCircle2 size={14} className="mr-1.5 text-emerald-700" />
-                          Official Commercial Export Invoice
-                        </div>
-                        <p className="text-[11px] text-atelier-charcoal font-light leading-relaxed">
-                          International payments include export packing declarations, Certificate of Origin from Bhadohi, and HS Code 5701/5702 custom clearance documentation.
-                        </p>
-                      </div>
+                      <p className="text-[11px] text-atelier-charcoal font-light leading-relaxed">
+                        International transactions are billed in USD or your local currency equivalent. All export orders include formal commercial invoices, customs documentation (HS Code 5701/5702), and transit insurance from our Bhadohi studio.
+                      </p>
                     </div>
                   )}
                 </div>
 
                 {/* Amount Authorization Summary */}
-                <div className="p-5 bg-atelier-ivory border border-atelier-parchment space-y-3 text-xs">
-                  <div className="flex justify-between items-center text-atelier-softblack font-medium">
+                <div className="p-5 bg-atelier-ivory border border-atelier-parchment space-y-2 text-xs">
+                  <div className="flex justify-between items-center text-atelier-softblack">
                     <div>
-                      <span className="text-[10px] uppercase font-mono tracking-wider text-atelier-taupe block">Amount to Authorize</span>
-                      <div className="font-serif text-2xl sm:text-3xl text-atelier-softblack font-normal mt-0.5">
+                      <span className="text-[10px] uppercase font-mono tracking-wider text-atelier-taupe block">
+                        Total Amount Due
+                      </span>
+                      <div className="font-serif text-2xl sm:text-3xl text-atelier-softblack font-light mt-0.5">
                         {formatPrice(totalUSD)}
                       </div>
                     </div>
                     {!isINR && (
                       <div className="text-right">
-                        <span className="text-[10px] uppercase font-mono tracking-wider text-atelier-taupe block">Indian Banking Equivalent</span>
-                        <div className="font-mono text-sm font-semibold text-emerald-900 bg-emerald-50 px-2.5 py-1 border border-emerald-200 inline-block mt-0.5">
+                        <span className="text-[10px] uppercase font-mono tracking-wider text-atelier-taupe block">
+                          Settlement Equivalent
+                        </span>
+                        <div className="font-mono text-sm font-medium text-atelier-softblack bg-white px-3 py-1 border border-atelier-parchment inline-block mt-0.5">
                           ₹{amountINR.toLocaleString('en-IN')} INR
                         </div>
                       </div>
                     )}
                   </div>
-
-                  {!isINR && (
-                    <div className="pt-2 border-t border-atelier-parchment/70 flex flex-col sm:flex-row sm:items-center justify-between text-[11px] text-atelier-taupe gap-1">
-                      <span>Conversion rate: 1 USD ≈ ₹{inrRate} INR</span>
-                      <span className="flex items-center text-emerald-800 font-medium">
-                        <Check size={12} className="mr-1 text-emerald-600" /> 0% Payment Surcharge
-                      </span>
-                    </div>
-                  )}
                 </div>
 
-                {/* Atelier Concierge Direct Support Strip */}
-                <div className="p-3 bg-atelier-ivory border border-dashed border-atelier-parchment flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] text-atelier-charcoal">
-                  <div className="flex items-center space-x-2">
-                    <HelpCircle size={14} className="text-atelier-gold flex-shrink-0" />
-                    <span>Need assistance with payment limits or corporate GST invoices?</span>
-                  </div>
+                {/* Atelier Concierge Inquiries */}
+                <div className="p-3.5 bg-atelier-ivory/50 border border-atelier-parchment flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] text-atelier-charcoal">
+                  <span className="text-atelier-taupe">
+                    Assistance with payment limits, corporate GST billing, or direct bank transfer:
+                  </span>
                   <a
                     href="https://wa.me/919839418038"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-emerald-800 hover:text-emerald-950 font-medium font-mono text-[11px] underline flex items-center self-start sm:self-auto"
+                    className="text-atelier-softblack hover:text-atelier-darkbrown font-medium underline flex items-center self-start sm:self-auto"
                   >
-                    WhatsApp Concierge (Live Chat)
+                    Atelier Concierge (+91 98394 18038)
                   </a>
                 </div>
 
                 {errorMessage && (
                   <div className="p-3.5 bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center space-x-2">
-                    <AlertCircle size={16} className="text-rose-600 flex-shrink-0" />
+                    <AlertCircle size={15} className="text-rose-600 flex-shrink-0" />
                     <span>{errorMessage}</span>
                   </div>
                 )}
@@ -1064,18 +1003,20 @@ export const CheckoutPage: React.FC = () => {
                   <button
                     type="submit"
                     disabled={isProcessing}
-                    className="px-8 py-4 bg-atelier-softblack text-atelier-parchment text-xs tracking-widest uppercase hover:bg-atelier-darkbrown transition-colors font-medium flex items-center disabled:opacity-50 group"
+                    className="px-8 py-4 bg-atelier-softblack text-atelier-parchment text-xs tracking-[0.2em] uppercase hover:bg-atelier-darkbrown transition-colors font-medium flex items-center disabled:opacity-50 group"
                   >
                     {isProcessing ? (
-                      <span className="animate-pulse">Authorizing Payment Session...</span>
+                      <span className="flex items-center space-x-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-atelier-parchment animate-ping mr-1" />
+                        <span>Initializing Payment...</span>
+                      </span>
                     ) : (
                       <>
-                        <ShieldCheck size={16} className="mr-2 text-atelier-gold" />
                         <span>
                           {paymentMethod === 'upi'
                             ? isINR
                               ? `Authorize with UPI · ${formatPrice(totalUSD)}`
-                              : `Authorize with UPI · ${formatPrice(totalUSD)} (₹${amountINR.toLocaleString('en-IN')})`
+                              : `Authorize with UPI · ₹${amountINR.toLocaleString('en-IN')}`
                             : paymentMethod === 'card'
                             ? `Authorize with Card · ${formatPrice(totalUSD)}`
                             : paymentMethod === 'netbanking'
@@ -1139,9 +1080,15 @@ export const CheckoutPage: React.FC = () => {
                   </span>
                 </div>
               )}
-              <div className="flex justify-between text-atelier-taupe text-[11px]">
-                <span>Customs / Duties (Bhadohi, India Export)</span>
-                <span>Included / Under De Minimis</span>
+              <div className="flex justify-between items-start text-atelier-taupe text-[11px] gap-2">
+                <span>{country === 'India' ? 'Customs & Taxes' : 'Import Duties & VAT'}</span>
+                <span className="text-right">
+                  {country === 'India'
+                    ? 'Domestic Delivery (No Customs · GST Included)'
+                    : country === 'United States'
+                    ? 'Assessed by US Customs upon arrival (DDU / DAP)'
+                    : 'Assessed by destination customs upon arrival (DDU / DAP)'}
+                </span>
               </div>
               <div className="flex justify-between items-baseline font-serif text-xl text-atelier-softblack font-medium border-t border-atelier-parchment pt-3">
                 <span>Total Due</span>
@@ -1160,10 +1107,10 @@ export const CheckoutPage: React.FC = () => {
             <div className="p-4 bg-atelier-ivory border border-atelier-parchment space-y-2 text-[11px] text-atelier-taupe font-light">
               <div className="flex items-center text-atelier-softblack font-medium">
                 <ShieldCheck size={14} className="mr-1.5 text-emerald-700" />
-                100% Insured Transit & Escrow Protection
+                100% Insured Transit & Atelier Authenticity Guarantee
               </div>
               <p>
-                Each rug is certified handmade at our Bhadohi atelier. Your payment is held with escrow protection until final hand-shearing inspection and international air dispatch.
+                Each rug is certified handmade at our Bhadohi atelier. All shipments are fully insured against loss or transit damage, with direct personal tracking from loom to doorstep.
               </p>
             </div>
           </div>

@@ -9,7 +9,7 @@ export const ShippingReturnsPage: React.FC = () => {
       region: 'United States & Canada',
       transit: '5 to 7 business days',
       carrier: 'Insured Express Air',
-      duties: 'Duty-free under $800 USD (USA Section 321 de minimis). Canada subject to GST/PST.',
+      duties: 'Assessed upon entry by US Customs or local border authority (DAP / DDU). Canada subject to GST/HST/PST.',
     },
     {
       region: 'United Kingdom',

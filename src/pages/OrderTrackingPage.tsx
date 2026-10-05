@@ -275,7 +275,7 @@ export const OrderTrackingPage: React.FC = () => {
                   Transit Protection
                 </span>
                 <div>100% Insured Air Freight</div>
-                <div>Conditioning verified in Bhadohi</div>
+                <div>Conditioning inspected in Bhadohi</div>
               </div>
             </div>
           </div>

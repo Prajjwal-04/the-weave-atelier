@@ -193,6 +193,8 @@ export interface Order {
   timeline: OrderTimelineEvent[];
   paymentProvider?: string;
   paymentId?: string;
+  syncStatus?: 'synced' | 'pending_reconciliation' | 'local_only';
+  syncError?: string;
 }
 
 export interface JournalArticle {
