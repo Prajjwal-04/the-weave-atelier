@@ -89,7 +89,7 @@ export const SizeGuidePage: React.FC = () => {
         </div>
 
         {/* Interactive Room Tabs */}
-        <div className="flex justify-center flex-wrap gap-3">
+        <div className="flex justify-center flex-wrap gap-2 sm:gap-3">
           {rooms.map((r) => {
             const Icon = r.icon;
             const isActive = activeRoom === r.id;
@@ -97,13 +97,13 @@ export const SizeGuidePage: React.FC = () => {
               <button
                 key={r.id}
                 onClick={() => setActiveRoom(r.id as any)}
-                className={`flex items-center space-x-2 px-5 py-3 border text-xs tracking-wider uppercase transition-all ${
+                className={`flex items-center space-x-1.5 sm:space-x-2 px-3 sm:px-5 py-2 sm:py-3 border text-[11px] sm:text-xs tracking-wider uppercase transition-all ${
                   isActive
                     ? 'bg-atelier-softblack text-atelier-parchment border-atelier-softblack shadow-sm'
                     : 'bg-atelier-cream border-atelier-parchment text-atelier-charcoal hover:border-atelier-taupe'
                 }`}
               >
-                <Icon size={16} strokeWidth={1.5} />
+                <Icon size={15} strokeWidth={1.5} className="shrink-0" />
                 <span>{r.name}</span>
               </button>
             );
@@ -116,7 +116,7 @@ export const SizeGuidePage: React.FC = () => {
             <button
               key={sz}
               onClick={() => setActiveSize(sz)}
-              className={`px-4 py-2 text-xs border rounded transition-colors ${
+              className={`px-3 sm:px-4 py-1.5 sm:py-2 text-[11px] sm:text-xs border rounded transition-colors ${
                 activeSize === sz
                   ? 'bg-atelier-parchment border-atelier-darkbrown text-atelier-darkbrown font-medium'
                   : 'bg-atelier-ivory border-atelier-parchment text-atelier-charcoal hover:border-atelier-taupe'
@@ -128,9 +128,9 @@ export const SizeGuidePage: React.FC = () => {
         </div>
 
         {/* Visual Architectural Diagram Canvas */}
-        <div className="bg-atelier-cream border border-atelier-parchment p-8 sm:p-12 shadow-luxury grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+        <div className="bg-atelier-cream border border-atelier-parchment p-4 sm:p-8 md:p-12 shadow-luxury grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
           {/* Visual Floorplan Representation */}
-          <div className="lg:col-span-7 bg-atelier-ivory border border-atelier-parchment/80 p-8 sm:p-10 relative aspect-[16/11] flex items-center justify-center overflow-hidden">
+          <div className="lg:col-span-7 bg-atelier-ivory border border-atelier-parchment/80 p-4 sm:p-8 md:p-10 relative aspect-[16/11] flex items-center justify-center overflow-hidden">
             {/* Room Boundary Walls */}
             <div className="absolute inset-4 border border-dashed border-atelier-sand/80 pointer-events-none" />
 

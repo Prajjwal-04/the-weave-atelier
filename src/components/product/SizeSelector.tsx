@@ -45,7 +45,7 @@ export const SizeSelector: React.FC<SizeSelectorProps> = ({
               type="button"
               disabled={isSoldOut}
               onClick={() => onSelectVariant(variant)}
-              className={`p-3 text-left border transition-all relative ${
+              className={`p-2.5 sm:p-3 text-left border transition-all relative ${
                 isSelected
                   ? 'border-atelier-softblack bg-atelier-cream/80 ring-1 ring-atelier-softblack'
                   : 'border-atelier-parchment hover:border-atelier-taupe bg-atelier-ivory'
@@ -59,12 +59,12 @@ export const SizeSelector: React.FC<SizeSelectorProps> = ({
                   {secondary}
                 </div>
               ) : null}
-              <div className="mt-1.5 flex items-baseline justify-between">
+              <div className="mt-1.5 flex flex-wrap items-baseline justify-between gap-1">
                 <span className="font-sans text-xs sm:text-sm text-atelier-softblack font-medium">
                   {formatPrice(variant.priceUSD)}
                 </span>
                 {variant.inventory === 1 && (
-                  <span className="text-[10px] text-amber-900 font-medium bg-amber-50 px-1.5 py-0.5 rounded-sm">1 left</span>
+                  <span className="text-[10px] text-amber-900 font-medium bg-amber-50 px-1 py-0.5 rounded-sm">1 left</span>
                 )}
                 {variant.inventory === 0 && (
                   <span className="text-[10px] text-atelier-taupe font-normal">Made to order</span>

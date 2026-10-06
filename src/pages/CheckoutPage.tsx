@@ -417,11 +417,11 @@ export const CheckoutPage: React.FC = () => {
         </div>
 
         {/* Progress Stepper */}
-        <div className="flex items-center justify-center space-x-4 text-xs font-mono">
+        <div className="flex items-center justify-center space-x-2 sm:space-x-4 text-[11px] sm:text-xs font-mono text-center">
           <span className={`font-medium ${step === 'shipping' ? 'text-atelier-softblack border-b border-atelier-softblack pb-0.5' : 'text-atelier-taupe'}`}>
             01 Shipping Information
           </span>
-          <ChevronRight size={14} className="text-atelier-taupe" />
+          <ChevronRight size={14} className="text-atelier-taupe shrink-0" />
           <span className={`font-medium ${step === 'payment' ? 'text-atelier-softblack border-b border-atelier-softblack pb-0.5' : 'text-atelier-taupe'}`}>
             02 Payment & Verification
           </span>
@@ -430,7 +430,7 @@ export const CheckoutPage: React.FC = () => {
         {/* Two Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
           {/* Left Form (7 cols) */}
-          <div className="lg:col-span-7 bg-atelier-cream border border-atelier-parchment p-8 sm:p-10 shadow-subtle">
+          <div className="lg:col-span-7 bg-atelier-cream border border-atelier-parchment p-5 sm:p-8 md:p-10 shadow-subtle">
             {step === 'shipping' ? (
               <form onSubmit={handleShippingSubmit} className="space-y-6">
                 <div>
@@ -610,10 +610,10 @@ export const CheckoutPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="pt-4 flex items-center justify-between">
+                <div className="pt-4 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3">
                   <Link
                     to="/cart"
-                    className="text-xs text-atelier-charcoal hover:text-black underline flex items-center"
+                    className="text-xs text-atelier-charcoal hover:text-black underline flex items-center justify-center sm:justify-start py-2 sm:py-0"
                   >
                     <ArrowLeft size={12} className="mr-1" />
                     <span>Return to Bag</span>
@@ -621,10 +621,10 @@ export const CheckoutPage: React.FC = () => {
 
                   <button
                     type="submit"
-                    className="px-8 py-3.5 bg-atelier-softblack text-atelier-parchment text-xs tracking-widest uppercase hover:bg-atelier-darkbrown transition-colors font-medium flex items-center"
+                    className="w-full sm:w-auto px-8 py-3.5 bg-atelier-softblack text-atelier-parchment text-xs tracking-widest uppercase hover:bg-atelier-darkbrown transition-colors font-medium flex items-center justify-center"
                   >
                     <span>Continue to Payment</span>
-                    <ArrowRight size={14} className="ml-2" />
+                    <ArrowRight size={14} className="ml-2 shrink-0" />
                   </button>
                 </div>
               </form>
@@ -990,11 +990,11 @@ export const CheckoutPage: React.FC = () => {
                 )}
 
                 {/* Process CTA Button */}
-                <div className="pt-2 flex items-center justify-between">
+                <div className="pt-2 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3">
                   <button
                     type="button"
                     onClick={() => setStep('shipping')}
-                    className="text-xs text-atelier-charcoal hover:text-black underline flex items-center"
+                    className="text-xs text-atelier-charcoal hover:text-black underline flex items-center justify-center sm:justify-start py-2 sm:py-0"
                   >
                     <ArrowLeft size={12} className="mr-1" />
                     <span>Back to Shipping</span>
@@ -1003,7 +1003,7 @@ export const CheckoutPage: React.FC = () => {
                   <button
                     type="submit"
                     disabled={isProcessing}
-                    className="px-8 py-4 bg-atelier-softblack text-atelier-parchment text-xs tracking-[0.2em] uppercase hover:bg-atelier-darkbrown transition-colors font-medium flex items-center disabled:opacity-50 group"
+                    className="w-full sm:w-auto px-6 sm:px-8 py-4 bg-atelier-softblack text-atelier-parchment text-xs tracking-[0.15em] sm:tracking-[0.2em] uppercase hover:bg-atelier-darkbrown transition-colors font-medium flex items-center justify-center text-center disabled:opacity-50 group"
                   >
                     {isProcessing ? (
                       <span className="flex items-center space-x-2">
@@ -1023,7 +1023,7 @@ export const CheckoutPage: React.FC = () => {
                             ? `Authorize NetBanking · ${formatPrice(totalUSD)}`
                             : `Authorize Payment · ${formatPrice(totalUSD)}`}
                         </span>
-                        <ArrowRight size={14} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                        <ArrowRight size={14} className="ml-2 group-hover:translate-x-1 transition-transform shrink-0" />
                       </>
                     )}
                   </button>

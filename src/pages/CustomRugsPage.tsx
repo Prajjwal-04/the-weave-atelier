@@ -119,7 +119,7 @@ export const CustomRugsPage: React.FC = () => {
         </div>
 
         {/* 7-Step Process Diagram */}
-        <div className="mb-20 bg-atelier-cream border border-atelier-parchment p-8 sm:p-12">
+        <div className="mb-20 bg-atelier-cream border border-atelier-parchment p-5 sm:p-8 md:p-12">
           <div className="text-center max-w-xl mx-auto mb-12 space-y-2">
             <div className="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase font-medium flex items-center justify-center space-x-2">
               <span className="text-atelier-agedgold">THE ATELIER PROTOCOL</span>
@@ -149,7 +149,7 @@ export const CustomRugsPage: React.FC = () => {
         </div>
 
         {/* Main Interactive Studio Calculator & Quote Form */}
-        <div id="custom-form" className="max-w-4xl mx-auto bg-atelier-cream/60 border border-atelier-parchment p-8 sm:p-12 shadow-luxury">
+        <div id="custom-form" className="max-w-4xl mx-auto bg-atelier-cream/60 border border-atelier-parchment p-5 sm:p-8 md:p-12 shadow-luxury">
           {submitted ? (
             <div className="text-center py-12 space-y-5">
               <div className="w-16 h-16 mx-auto bg-emerald-100 text-emerald-800 rounded-full flex items-center justify-center">
@@ -266,7 +266,7 @@ export const CustomRugsPage: React.FC = () => {
                 <span className="text-xs uppercase tracking-wider font-medium text-atelier-softblack block">
                   2. Shape & Spatial Application
                 </span>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                   <div>
                     <label className="text-xs text-atelier-taupe block mb-1">Shape</label>
                     <select
@@ -347,11 +347,11 @@ export const CustomRugsPage: React.FC = () => {
               </div>
 
               {/* Live Quotation Calculator Box */}
-              <div className="p-6 bg-atelier-ivory border border-atelier-parchment space-y-2">
-                <div className="flex items-center justify-between text-xs">
+              <div className="p-5 sm:p-6 bg-atelier-ivory border border-atelier-parchment space-y-2">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-1">
                   <span className="text-atelier-taupe flex items-center font-medium">
-                    <Calculator size={14} className="mr-1.5 text-atelier-agedgold" />
-                    Preliminary Atelier Estimate ({Math.round(sqFeet)} sq. ft.)
+                    <Calculator size={14} className="mr-1.5 text-atelier-agedgold shrink-0" />
+                    <span>Preliminary Atelier Estimate ({Math.round(sqFeet)} sq. ft.)</span>
                   </span>
                   <span className="font-mono text-[11px] text-atelier-taupe">
                     Timeline: {technique === 'Hand-Knotted' ? '7–10 weeks' : '4–6 weeks'}

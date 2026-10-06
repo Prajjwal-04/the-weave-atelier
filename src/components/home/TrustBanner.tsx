@@ -33,11 +33,14 @@ export const TrustBanner: React.FC = () => {
   return (
     <section className="py-16 bg-atelier-ivory border-b border-atelier-parchment/60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8">
           {pillars.map((p) => {
             const Icon = p.icon;
             return (
-              <div key={p.title} className="space-y-2 text-center sm:text-left">
+              <div
+                key={p.title}
+                className="space-y-2 text-center sm:text-left last:col-span-2 md:last:col-span-1 last:max-w-xs last:mx-auto md:last:max-w-none"
+              >
                 <Icon size={20} className="text-atelier-agedgold mx-auto sm:mx-0" strokeWidth={1.5} />
                 <h4 className="font-serif text-base text-atelier-softblack font-medium">
                   {p.title}

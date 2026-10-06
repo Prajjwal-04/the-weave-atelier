@@ -8,10 +8,178 @@ import { useInventory } from '../../context/InventoryContext';
 import { useCurrency } from '../../context/CurrencyContext';
 import { useWishlist } from '../../context/WishlistContext';
 import { StockBadge } from '../product/StockBadge';
+import { getCardImageUrl, getCardSrcSet } from '../../utils/imageOptimizer';
+import { ModernThrobber } from '../common/ModernThrobber';
 
 interface FeaturedCollectionProps {
   products: Product[];
 }
+
+interface FeaturedCardItemProps {
+  product: Product;
+  idx: number;
+  isFavorited: boolean;
+  toggleWishlist: (id: string) => void;
+  setQuickViewProduct: (product: Product) => void;
+  getInventory: (sku: string) => number;
+  formatPrice: (amount: number) => string;
+}
+
+const FeaturedCardItem: React.FC<FeaturedCardItemProps> = ({
+  product,
+  idx,
+  isFavorited,
+  toggleWishlist,
+  setQuickViewProduct,
+  getInventory,
+  formatPrice,
+}) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const [hasHoveredOnce, setHasHoveredOnce] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  const startingPrice = product.variants[0]?.priceUSD || 0;
+  const primaryImage = getCardImageUrl(product.images[0]?.url);
+  const primarySrcSet = getCardSrcSet(product.images[0]?.url);
+  const secondaryImage = getCardImageUrl(product.images[1]?.url || product.images[0]?.url);
+
+  const hasLastOne = product.variants.some((v) => getInventory(v.sku) === 1);
+  const hasAnyInStock = product.variants.some((v) => getInventory(v.sku) > 0);
+  const isReady = product.isReadyToShip && hasAnyInStock;
+
+  return (
+    <div
+      onMouseEnter={() => {
+        setIsHovered(true);
+        if (!hasHoveredOnce) setHasHoveredOnce(true);
+      }}
+      onMouseLeave={() => setIsHovered(false)}
+      className="flex-shrink-0 w-[80vw] sm:w-[48vw] md:w-[35vw] lg:w-[310px] snap-start group flex flex-col justify-between"
+    >
+      {/* Image Stage Container */}
+      <div className="relative aspect-[3/4] overflow-hidden bg-atelier-cream border border-atelier-parchment/70 group-hover:border-atelier-agedgold/50 transition-all duration-500 shadow-xs group-hover:shadow-luxury">
+        {/* Modern Throbber with Shimmer */}
+        {!isLoaded && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-atelier-cream z-10 pointer-events-none">
+            <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-atelier-parchment/40 to-transparent animate-shimmer" />
+            <ModernThrobber size="md" label="Atelier" />
+          </div>
+        )}
+
+        <Link to={`/product/${product.slug}`} className="block w-full h-full">
+          {/* Primary Image */}
+          <img
+            src={primaryImage}
+            srcSet={primarySrcSet || undefined}
+            sizes="(max-width: 640px) 80vw, (max-width: 1024px) 35vw, 310px"
+            alt={product.name}
+            onLoad={() => setIsLoaded(true)}
+            className={`w-full h-full object-cover object-center transition-all duration-700 ease-out ${
+              !isLoaded ? 'opacity-0' : isHovered ? 'opacity-0 scale-105' : 'opacity-100 scale-100'
+            }`}
+            loading={idx < 2 ? 'eager' : 'lazy'}
+            fetchPriority={idx < 2 ? 'high' : 'auto'}
+            decoding="async"
+          />
+
+          {/* Secondary Image on Hover */}
+          {hasHoveredOnce && (
+            <img
+              src={secondaryImage}
+              alt={`${product.name} alternate view`}
+              className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-700 ease-out ${
+                isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
+              }`}
+              loading="lazy"
+              decoding="async"
+            />
+          )}
+        </Link>
+
+        {/* Top Left: Stock Badge */}
+        <div className="absolute top-3.5 left-3.5 z-10 flex items-center space-x-2">
+          <StockBadge
+            isReadyToShip={isReady}
+            inventory={hasLastOne ? 1 : hasAnyInStock ? undefined : 0}
+          />
+        </div>
+
+        {/* Top Right: Wishlist Heart Button */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleWishlist(product.id);
+          }}
+          className="absolute top-3.5 right-3.5 z-10 w-8 h-8 rounded-full bg-atelier-ivory/85 backdrop-blur-md flex items-center justify-center text-atelier-charcoal hover:text-red-700 hover:bg-atelier-ivory transition-all shadow-xs"
+          aria-label={isFavorited ? 'Remove from wishlist' : 'Add to wishlist'}
+        >
+          <Heart
+            size={14}
+            className={`transition-colors ${
+              isFavorited ? 'fill-red-700 text-red-700' : ''
+            }`}
+            strokeWidth={1.5}
+          />
+        </button>
+
+        {/* Hover Quick View Pill Button */}
+        <div
+          className={`absolute bottom-3.5 inset-x-3.5 z-10 transition-all duration-300 transform ${
+            isHovered
+              ? 'opacity-100 translate-y-0'
+              : 'opacity-0 translate-y-2 pointer-events-none'
+          }`}
+        >
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              setQuickViewProduct(product);
+            }}
+            className="w-full py-2.5 px-3 bg-atelier-ivory/95 backdrop-blur-md border border-atelier-parchment text-atelier-softblack text-[11px] tracking-widest uppercase hover:bg-atelier-softblack hover:text-atelier-parchment hover:border-atelier-softblack transition-all flex items-center justify-center font-medium shadow-sm"
+          >
+            <Eye size={13} className="mr-1.5 text-atelier-agedgold" />
+            <span>Quick View</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Card Content & Narrative Meta */}
+      <div className="pt-4 pb-1 space-y-1.5">
+        {/* Technique & Material Dual-Tone Line */}
+        <div className="text-[10px] tracking-[0.25em] uppercase font-medium flex items-center space-x-1.5">
+          <span className="text-atelier-agedgold">{product.technique}</span>
+          <span className="text-atelier-taupe/40">·</span>
+          <span className="text-atelier-taupe truncate max-w-[170px] font-normal">
+            {product.material.split('&')[0]}
+          </span>
+        </div>
+
+        {/* Product Title */}
+        <Link to={`/product/${product.slug}`} className="block group-hover:underline">
+          <h4 className="font-serif text-xl sm:text-2xl text-atelier-softblack font-light leading-snug group-hover:text-atelier-darkbrown transition-colors">
+            {product.name}
+          </h4>
+        </Link>
+
+        {/* Price & Dimension Footnote */}
+        <div className="flex items-baseline justify-between pt-1.5 border-t border-atelier-parchment/60">
+          <div className="flex items-baseline space-x-1.5">
+            <span className="text-[11px] uppercase tracking-wider text-atelier-taupe font-normal">From</span>
+            <span className="font-sans text-sm sm:text-base text-atelier-softblack font-medium tracking-normal">
+              {formatPrice(startingPrice)}
+            </span>
+          </div>
+          <span className="text-[11px] font-sans text-atelier-taupe font-normal">
+            {product.variants[0]?.dimensionsFt || product.variants[0]?.size || "8' × 10'"}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => {
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
@@ -211,132 +379,18 @@ export const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products
                     <div className="h-3 bg-atelier-parchment/50 w-1/2" />
                   </div>
                 ))
-              : featuredRugs.map((product, idx) => {
-                  const isHovered = hoveredCardId === product.id;
-                  const isFavorited = isInWishlist(product.id);
-                  const startingPrice = product.variants[0]?.priceUSD || 0;
-                  const primaryImage = product.images[0]?.url || '';
-                  const secondaryImage = product.images[1]?.url || primaryImage;
-
-                  const hasLastOne = product.variants.some((v) => getInventory(v.sku) === 1);
-                  const hasAnyInStock = product.variants.some((v) => getInventory(v.sku) > 0);
-                  const isReady = product.isReadyToShip && hasAnyInStock;
-
-                  return (
-                    <div
-                      key={product.id}
-                      onMouseEnter={() => setHoveredCardId(product.id)}
-                      onMouseLeave={() => setHoveredCardId(null)}
-                      className="flex-shrink-0 w-[80vw] sm:w-[48vw] md:w-[35vw] lg:w-[310px] snap-start group flex flex-col justify-between"
-                    >
-                      {/* Image Stage Container */}
-                      <div className="relative aspect-[3/4] overflow-hidden bg-atelier-cream border border-atelier-parchment/70 group-hover:border-atelier-agedgold/50 transition-all duration-500 shadow-xs group-hover:shadow-luxury">
-                        <Link to={`/product/${product.slug}`} className="block w-full h-full">
-                          {/* Primary Image */}
-                          <img
-                            src={primaryImage}
-                            alt={product.name}
-                            className={`w-full h-full object-cover object-center transition-all duration-700 ease-out ${
-                              isHovered ? 'opacity-0 scale-105' : 'opacity-100 scale-100'
-                            }`}
-                            loading="lazy"
-                          />
-
-                          {/* Secondary Image on Hover */}
-                          <img
-                            src={secondaryImage}
-                            alt={`${product.name} alternate view`}
-                            className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-700 ease-out ${
-                              isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
-                            }`}
-                            loading="lazy"
-                          />
-                        </Link>
-
-                        {/* Top Left: Stock Badge */}
-                        <div className="absolute top-3.5 left-3.5 z-10 flex items-center space-x-2">
-                          <StockBadge
-                            isReadyToShip={isReady}
-                            inventory={hasLastOne ? 1 : hasAnyInStock ? undefined : 0}
-                          />
-                        </div>
-
-                        {/* Top Right: Wishlist Heart Button */}
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            toggleWishlist(product.id);
-                          }}
-                          className="absolute top-3.5 right-3.5 z-10 w-8 h-8 rounded-full bg-atelier-ivory/85 backdrop-blur-md flex items-center justify-center text-atelier-charcoal hover:text-red-700 hover:bg-atelier-ivory transition-all shadow-xs"
-                          aria-label={isFavorited ? 'Remove from wishlist' : 'Add to wishlist'}
-                        >
-                          <Heart
-                            size={14}
-                            className={`transition-colors ${
-                              isFavorited ? 'fill-red-700 text-red-700' : ''
-                            }`}
-                            strokeWidth={1.5}
-                          />
-                        </button>
-
-                        {/* Hover Quick View Pill Button */}
-                        <div
-                          className={`absolute bottom-3.5 inset-x-3.5 z-10 transition-all duration-300 transform ${
-                            isHovered
-                              ? 'opacity-100 translate-y-0'
-                              : 'opacity-0 translate-y-2 pointer-events-none'
-                          }`}
-                        >
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              setQuickViewProduct(product);
-                            }}
-                            className="w-full py-2.5 px-3 bg-atelier-ivory/95 backdrop-blur-md border border-atelier-parchment text-atelier-softblack text-[11px] tracking-widest uppercase hover:bg-atelier-softblack hover:text-atelier-parchment hover:border-atelier-softblack transition-all flex items-center justify-center font-medium shadow-sm"
-                          >
-                            <Eye size={13} className="mr-1.5 text-atelier-agedgold" />
-                            <span>Quick View</span>
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Card Content & Narrative Meta */}
-                      <div className="pt-4 pb-1 space-y-1.5">
-                        {/* Technique & Material Dual-Tone Line */}
-                        <div className="text-[10px] tracking-[0.25em] uppercase font-medium flex items-center space-x-1.5">
-                          <span className="text-atelier-agedgold">{product.technique}</span>
-                          <span className="text-atelier-taupe/40">·</span>
-                          <span className="text-atelier-taupe truncate max-w-[170px] font-normal">
-                            {product.material.split('&')[0]}
-                          </span>
-                        </div>
-
-                        {/* Product Title */}
-                        <Link to={`/product/${product.slug}`} className="block group-hover:underline">
-                          <h4 className="font-serif text-xl sm:text-2xl text-atelier-softblack font-light leading-snug group-hover:text-atelier-darkbrown transition-colors">
-                            {product.name}
-                          </h4>
-                        </Link>
-
-                        {/* Price & Dimension Footnote */}
-                        <div className="flex items-baseline justify-between pt-1.5 border-t border-atelier-parchment/60">
-                          <div className="flex items-baseline space-x-1.5">
-                            <span className="text-[11px] uppercase tracking-wider text-atelier-taupe font-normal">From</span>
-                            <span className="font-sans text-sm sm:text-base text-atelier-softblack font-medium tracking-normal">
-                              {formatPrice(startingPrice)}
-                            </span>
-                          </div>
-                          <span className="text-[11px] font-sans text-atelier-taupe font-normal">
-                            {product.variants[0]?.dimensionsFt || product.variants[0]?.size || "8' × 10'"}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+              : featuredRugs.map((product, idx) => (
+                  <FeaturedCardItem
+                    key={product.id}
+                    product={product}
+                    idx={idx}
+                    isFavorited={isInWishlist(product.id)}
+                    toggleWishlist={toggleWishlist}
+                    setQuickViewProduct={setQuickViewProduct}
+                    getInventory={getInventory}
+                    formatPrice={formatPrice}
+                  />
+                ))}
           </div>
         </div>
 

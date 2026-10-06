@@ -744,74 +744,74 @@ export const AccountPage: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
               {/* Sidebar Tabs (3 cols) */}
-              <div className="md:col-span-3 bg-atelier-cream border border-atelier-parchment p-4 space-y-1">
+              <div className="md:col-span-3 bg-atelier-cream border border-atelier-parchment p-2 sm:p-3 md:p-4 flex md:flex-col overflow-x-auto gap-1.5 md:gap-1 md:space-y-1 scrollbar-none">
                 <button
                   onClick={() => setActiveTab('orders')}
-                  className={`w-full text-left px-4 py-3 text-xs flex items-center space-x-2.5 transition-colors ${
+                  className={`shrink-0 md:w-full text-left px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs flex items-center space-x-2.5 transition-colors whitespace-nowrap ${
                     activeTab === 'orders'
-                      ? 'bg-atelier-ivory text-atelier-softblack font-medium border-l-2 border-atelier-softblack'
+                      ? 'bg-atelier-ivory text-atelier-softblack font-medium border-b-2 md:border-b-0 md:border-l-2 border-atelier-softblack shadow-xs'
                       : 'text-atelier-charcoal hover:bg-atelier-ivory/60'
                   }`}
                 >
-                  <Package size={15} />
+                  <Package size={15} className="shrink-0" />
                   <span>My Orders ({orders.length})</span>
                 </button>
 
                 <button
                   onClick={() => setActiveTab('quotes')}
-                  className={`w-full text-left px-4 py-3 text-xs flex items-center space-x-2.5 transition-colors ${
+                  className={`shrink-0 md:w-full text-left px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs flex items-center space-x-2.5 transition-colors whitespace-nowrap ${
                     activeTab === 'quotes'
-                      ? 'bg-atelier-ivory text-atelier-softblack font-medium border-l-2 border-atelier-softblack'
+                      ? 'bg-atelier-ivory text-atelier-softblack font-medium border-b-2 md:border-b-0 md:border-l-2 border-atelier-softblack shadow-xs'
                       : 'text-atelier-charcoal hover:bg-atelier-ivory/60'
                   }`}
                 >
-                  <FileText size={15} />
+                  <FileText size={15} className="shrink-0" />
                   <span>Custom Quotes ({customQuotes.length})</span>
                 </button>
 
                 <button
                   onClick={() => setActiveTab('wishlist')}
-                  className={`w-full text-left px-4 py-3 text-xs flex items-center space-x-2.5 transition-colors ${
+                  className={`shrink-0 md:w-full text-left px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs flex items-center space-x-2.5 transition-colors whitespace-nowrap ${
                     activeTab === 'wishlist'
-                      ? 'bg-atelier-ivory text-atelier-softblack font-medium border-l-2 border-atelier-softblack'
+                      ? 'bg-atelier-ivory text-atelier-softblack font-medium border-b-2 md:border-b-0 md:border-l-2 border-atelier-softblack shadow-xs'
                       : 'text-atelier-charcoal hover:bg-atelier-ivory/60'
                   }`}
                 >
-                  <Heart size={15} />
+                  <Heart size={15} className="shrink-0" />
                   <span>Wishlist ({wishlistIds.length})</span>
                 </button>
 
                 <button
                   onClick={() => setActiveTab('addresses')}
-                  className={`w-full text-left px-4 py-3 text-xs flex items-center space-x-2.5 transition-colors ${
+                  className={`shrink-0 md:w-full text-left px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs flex items-center space-x-2.5 transition-colors whitespace-nowrap ${
                     activeTab === 'addresses'
-                      ? 'bg-atelier-ivory text-atelier-softblack font-medium border-l-2 border-atelier-softblack'
+                      ? 'bg-atelier-ivory text-atelier-softblack font-medium border-b-2 md:border-b-0 md:border-l-2 border-atelier-softblack shadow-xs'
                       : 'text-atelier-charcoal hover:bg-atelier-ivory/60'
                   }`}
                 >
-                  <MapPin size={15} />
+                  <MapPin size={15} className="shrink-0" />
                   <span>Saved Addresses</span>
                 </button>
 
                 {/* Staff Portal Link (Exclusive to Owner) */}
                 {isOwner && (
-                  <div className="pt-2 border-t border-atelier-parchment/60 mt-2">
+                  <div className="shrink-0 md:w-full md:pt-2 md:border-t md:border-atelier-parchment/60 md:mt-2">
                     <Link
                       to="/admin"
-                      className="w-full text-left px-4 py-3 text-xs flex items-center justify-between transition-colors bg-atelier-softblack text-atelier-agedgold hover:bg-stone-900 font-medium"
+                      className="w-full text-left px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs flex items-center justify-between transition-colors bg-atelier-softblack text-atelier-agedgold hover:bg-stone-900 font-medium whitespace-nowrap"
                     >
-                      <div className="flex items-center space-x-2.5">
-                        <ShieldCheck size={15} className="text-atelier-agedgold" />
+                      <div className="flex items-center space-x-2">
+                        <ShieldCheck size={15} className="text-atelier-agedgold shrink-0" />
                         <span>Admin Console</span>
                       </div>
-                      <ArrowUpRight size={13} />
+                      <ArrowUpRight size={13} className="ml-1.5 shrink-0" />
                     </Link>
                   </div>
                 )}
               </div>
 
             {/* Content Area (9 cols) */}
-            <div className="md:col-span-9 bg-atelier-ivory border border-atelier-parchment p-8 shadow-subtle min-h-[400px]">
+            <div className="md:col-span-9 bg-atelier-ivory border border-atelier-parchment p-5 sm:p-8 shadow-subtle min-h-[400px]">
               {/* TAB 1: Orders */}
               {activeTab === 'orders' && (
                 <div className="space-y-6">

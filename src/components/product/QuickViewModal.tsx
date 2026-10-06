@@ -8,7 +8,8 @@ import { useCurrency } from '../../context/CurrencyContext';
 import { useInventory } from '../../context/InventoryContext';
 import { SizeSelector } from './SizeSelector';
 import { StockBadge } from './StockBadge';
-import { getDetailImageUrl, getThumbnailUrl } from '../../utils/imageOptimizer';
+import { getDetailImageUrl, getThumbnailUrl, getDetailSrcSet } from '../../utils/imageOptimizer';
+import { ModernThrobber } from '../common/ModernThrobber';
 
 interface QuickViewModalProps {
   product: Product | null;
@@ -28,6 +29,11 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isAdded, setIsAdded] = useState(false);
+  const [isImgLoaded, setIsImgLoaded] = useState(false);
+
+  useEffect(() => {
+    setIsImgLoaded(false);
+  }, [activeImageIndex, product?.id]);
 
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
@@ -126,11 +132,22 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Left: Gallery preview */}
           <div className="space-y-3">
-            <div className="aspect-[4/5] bg-atelier-cream border border-atelier-parchment overflow-hidden">
+            <div className="relative aspect-[4/5] bg-atelier-cream border border-atelier-parchment overflow-hidden">
+              {!isImgLoaded && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-atelier-cream z-10 pointer-events-none">
+                  <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-atelier-parchment/40 to-transparent animate-shimmer" />
+                  <ModernThrobber size="md" label="Atelier" />
+                </div>
+              )}
               <img
                 src={getDetailImageUrl(safeImages[activeImageIndex]?.url || safeImages[0]?.url)}
+                srcSet={getDetailSrcSet(safeImages[activeImageIndex]?.url || safeImages[0]?.url) || undefined}
+                sizes="(max-width: 768px) 100vw, 50vw"
                 alt={product.name}
-                className="w-full h-full object-cover"
+                onLoad={() => setIsImgLoaded(true)}
+                className={`w-full h-full object-cover transition-opacity duration-500 ${
+                  isImgLoaded ? 'opacity-100' : 'opacity-0'
+                }`}
                 decoding="async"
               />
             </div>

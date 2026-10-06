@@ -35,6 +35,18 @@ export const ShopPage: React.FC = () => {
   const [sortBy, setSortBy] = useState<string>('featured');
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
+  // Lock body scroll on mobile filter drawer
+  useEffect(() => {
+    if (mobileFilterOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [mobileFilterOpen]);
+
   // Modals
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [customSizeProduct, setCustomSizeProduct] = useState<Product | null>(null);
@@ -195,7 +207,7 @@ export const ShopPage: React.FC = () => {
             </div>
 
             {/* Availability Tabs */}
-            <div className="flex items-center space-x-2 text-xs">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs">
               <button
                 onClick={() => setSelectedAvailability('all')}
                 className={`px-3 py-1.5 border transition-colors ${
@@ -487,6 +499,255 @@ export const ShopPage: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Mobile & Tablet Filter Drawer */}
+      {mobileFilterOpen && (
+        <div className="fixed inset-0 z-50 md:hidden animate-fadeIn">
+          {/* Backdrop */}
+          <div
+            onClick={() => setMobileFilterOpen(false)}
+            className="fixed inset-0 bg-atelier-softblack/60 backdrop-blur-sm transition-opacity"
+          />
+
+          {/* Drawer Slide-in */}
+          <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10">
+            <div className="w-screen max-w-md bg-atelier-ivory border-l border-atelier-parchment shadow-drawer flex flex-col animate-slideRight">
+              {/* Header */}
+              <div className="p-5 border-b border-atelier-parchment bg-atelier-cream/60 flex items-center justify-between flex-shrink-0">
+                <div className="space-y-0.5">
+                  <div className="flex items-center space-x-2">
+                    <SlidersHorizontal size={15} className="text-atelier-agedgold" />
+                    <h3 className="font-serif text-lg tracking-wide text-atelier-softblack font-medium">
+                      Filter Catalog
+                    </h3>
+                  </div>
+                  <p className="text-[10px] text-atelier-taupe font-mono">
+                    {filteredProducts.length} {filteredProducts.length === 1 ? 'rug matches' : 'rugs match'} criteria
+                  </p>
+                </div>
+                <button
+                  onClick={() => setMobileFilterOpen(false)}
+                  className="p-1.5 text-atelier-charcoal hover:text-atelier-softblack rounded-full hover:bg-atelier-parchment/60 transition-colors"
+                  aria-label="Close filters"
+                >
+                  <X size={18} strokeWidth={1.5} />
+                </button>
+              </div>
+
+              {/* Scrollable Filter Options */}
+              <div className="flex-1 overflow-y-auto p-5 space-y-6">
+                {/* 1. Sort By */}
+                <div className="space-y-2">
+                  <label className="text-[10px] tracking-widest uppercase font-mono text-atelier-taupe font-semibold block">
+                    Sort Order
+                  </label>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="w-full bg-atelier-cream border border-atelier-parchment text-xs text-atelier-softblack py-2.5 px-3 focus:outline-none"
+                  >
+                    <option value="featured">Featured Atelier Pieces</option>
+                    <option value="newest">Newest Releases</option>
+                    <option value="best-selling">Best Selling</option>
+                    <option value="price-asc">Price: Low to High</option>
+                    <option value="price-desc">Price: High to Low</option>
+                  </select>
+                </div>
+
+                {/* 2. Availability */}
+                <div className="space-y-2 pt-2 border-t border-atelier-parchment/60">
+                  <label className="text-[10px] tracking-widest uppercase font-mono text-atelier-taupe font-semibold block">
+                    Availability
+                  </label>
+                  <div className="grid grid-cols-3 gap-2 text-xs">
+                    {[
+                      { id: 'all', label: 'All Works' },
+                      { id: 'ready-to-ship', label: 'Ready to Ship' },
+                      { id: 'made-to-order', label: 'Made to Order' },
+                    ].map((opt) => (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => setSelectedAvailability(opt.id)}
+                        className={`py-2 px-2 text-center border text-[11px] transition-colors ${
+                          selectedAvailability === opt.id
+                            ? 'bg-atelier-softblack text-atelier-parchment border-atelier-softblack font-medium'
+                            : 'bg-atelier-cream border-atelier-parchment text-atelier-charcoal hover:border-atelier-taupe'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 3. Collection */}
+                <div className="space-y-2 pt-2 border-t border-atelier-parchment/60">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] tracking-widest uppercase font-mono text-atelier-taupe font-semibold">
+                      Collection
+                    </label>
+                    {selectedCollection !== 'all' && (
+                      <button
+                        onClick={() => setSelectedCollection('all')}
+                        className="text-[10px] text-atelier-taupe hover:text-black underline"
+                      >
+                        Reset
+                      </button>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedCollection('all')}
+                      className={`px-3 py-1.5 text-xs border rounded-xs transition-colors ${
+                        selectedCollection === 'all'
+                          ? 'bg-atelier-softblack text-atelier-parchment border-atelier-softblack font-medium'
+                          : 'bg-atelier-cream border-atelier-parchment text-atelier-charcoal hover:border-atelier-taupe'
+                      }`}
+                    >
+                      All
+                    </button>
+                    {COLLECTIONS.map((c) => (
+                      <button
+                        key={c.slug}
+                        type="button"
+                        onClick={() => setSelectedCollection(c.slug)}
+                        className={`px-3 py-1.5 text-xs border rounded-xs transition-colors ${
+                          selectedCollection === c.slug
+                            ? 'bg-atelier-softblack text-atelier-parchment border-atelier-softblack font-medium'
+                            : 'bg-atelier-cream border-atelier-parchment text-atelier-charcoal hover:border-atelier-taupe'
+                        }`}
+                      >
+                        {c.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 4. Technique */}
+                <div className="space-y-2 pt-2 border-t border-atelier-parchment/60">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] tracking-widest uppercase font-mono text-atelier-taupe font-semibold">
+                      Loom Technique
+                    </label>
+                    {selectedTechnique !== 'all' && (
+                      <button
+                        onClick={() => setSelectedTechnique('all')}
+                        className="text-[10px] text-atelier-taupe hover:text-black underline"
+                      >
+                        Reset
+                      </button>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {techniques.map((t) => (
+                      <button
+                        key={t}
+                        type="button"
+                        onClick={() => setSelectedTechnique(t)}
+                        className={`px-3 py-1.5 text-xs border rounded-xs transition-colors ${
+                          selectedTechnique === t
+                            ? 'bg-atelier-softblack text-atelier-parchment border-atelier-softblack font-medium'
+                            : 'bg-atelier-cream border-atelier-parchment text-atelier-charcoal hover:border-atelier-taupe'
+                        }`}
+                      >
+                        {t === 'all' ? 'All Techniques' : t}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 5. Material */}
+                <div className="space-y-2 pt-2 border-t border-atelier-parchment/60">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] tracking-widest uppercase font-mono text-atelier-taupe font-semibold">
+                      Material
+                    </label>
+                    {selectedMaterial !== 'all' && (
+                      <button
+                        onClick={() => setSelectedMaterial('all')}
+                        className="text-[10px] text-atelier-taupe hover:text-black underline"
+                      >
+                        Reset
+                      </button>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {materials.map((m) => (
+                      <button
+                        key={m}
+                        type="button"
+                        onClick={() => setSelectedMaterial(m)}
+                        className={`px-2.5 py-1.5 text-xs border rounded-xs transition-colors text-left ${
+                          selectedMaterial === m
+                            ? 'bg-atelier-softblack text-atelier-parchment border-atelier-softblack font-medium'
+                            : 'bg-atelier-cream border-atelier-parchment text-atelier-charcoal hover:border-atelier-taupe'
+                        }`}
+                      >
+                        {m === 'all' ? 'All Materials' : m}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 6. Size */}
+                <div className="space-y-2 pt-2 border-t border-atelier-parchment/60">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] tracking-widest uppercase font-mono text-atelier-taupe font-semibold">
+                      Dimensions
+                    </label>
+                    {selectedSize !== 'all' && (
+                      <button
+                        onClick={() => setSelectedSize('all')}
+                        className="text-[10px] text-atelier-taupe hover:text-black underline"
+                      >
+                        Reset
+                      </button>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    {sizes.map((s) => (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => setSelectedSize(s)}
+                        className={`py-2 px-1 text-center font-mono text-xs border rounded-xs transition-colors ${
+                          selectedSize === s
+                            ? 'bg-atelier-softblack text-atelier-parchment border-atelier-softblack font-medium'
+                            : 'bg-atelier-cream border-atelier-parchment text-atelier-charcoal hover:border-atelier-taupe'
+                        }`}
+                      >
+                        {s === 'all' ? 'All Sizes' : s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Actions */}
+              <div className="p-4 bg-atelier-cream border-t border-atelier-parchment flex items-center gap-3 flex-shrink-0">
+                {hasActiveFilters && (
+                  <button
+                    type="button"
+                    onClick={clearAllFilters}
+                    className="py-3 px-4 text-xs font-mono uppercase tracking-wider text-atelier-taupe hover:text-atelier-softblack border border-atelier-parchment bg-atelier-ivory transition-colors"
+                  >
+                    Reset
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setMobileFilterOpen(false)}
+                  className="flex-1 py-3 px-6 bg-atelier-softblack text-atelier-parchment text-xs tracking-widest uppercase font-medium hover:bg-atelier-darkbrown transition-colors text-center"
+                >
+                  Show {filteredProducts.length} {filteredProducts.length === 1 ? 'Rug' : 'Rugs'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Quick View Modal */}
       <QuickViewModal

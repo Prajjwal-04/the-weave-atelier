@@ -65,10 +65,10 @@ export const CartDrawer: React.FC = () => {
       />
 
       {/* Drawer Container */}
-      <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
+      <div className="fixed inset-y-0 right-0 max-w-full flex pl-0 sm:pl-10">
         <div className="w-screen max-w-md bg-atelier-ivory border-l border-atelier-parchment shadow-drawer flex flex-col">
           {/* Header */}
-          <div className="p-6 border-b border-atelier-parchment flex items-center justify-between">
+          <div className="p-4 sm:p-6 border-b border-atelier-parchment flex items-center justify-between">
             <div className="flex items-baseline space-x-2">
               <h3 className="font-serif text-xl tracking-wider text-atelier-softblack font-medium">
                 Shopping Bag
@@ -87,16 +87,16 @@ export const CartDrawer: React.FC = () => {
           </div>
 
           {/* Dispatch Notice */}
-          <div className="px-6 py-2.5 bg-atelier-cream/80 border-b border-atelier-parchment text-[11px] text-atelier-charcoal flex items-center justify-between">
+          <div className="px-4 sm:px-6 py-2.5 bg-atelier-cream/80 border-b border-atelier-parchment text-[11px] text-atelier-charcoal flex items-center justify-between">
             <span className="flex items-center">
-              <Truck size={13} className="mr-1.5 text-atelier-agedgold" />
-              <span>Insured International Express Air Dispatch</span>
+              <Truck size={13} className="mr-1.5 text-atelier-agedgold shrink-0" />
+              <span className="truncate">Insured International Air Dispatch</span>
             </span>
-            <span className="text-atelier-taupe font-mono text-[10px]">Door-to-door tracking</span>
+            <span className="text-atelier-taupe font-mono text-[10px] shrink-0 ml-2">Tracked</span>
           </div>
 
           {/* Cart Items List */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
             {items.length === 0 ? (
               <div className="py-20 text-center space-y-4">
                 <div className="w-12 h-12 mx-auto rounded-full border border-atelier-parchment flex items-center justify-center text-atelier-taupe">
@@ -226,7 +226,7 @@ export const CartDrawer: React.FC = () => {
 
           {/* Footer / Summary */}
           {items.length > 0 && (
-            <div className="p-6 bg-atelier-cream border-t border-atelier-parchment space-y-4">
+            <div className="p-4 sm:p-6 bg-atelier-cream border-t border-atelier-parchment space-y-4">
               {/* Shipping Destination Selector */}
               <div className="space-y-1">
                 <label className="text-[10px] uppercase tracking-wider text-atelier-taupe font-medium block">

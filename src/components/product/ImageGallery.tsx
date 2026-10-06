@@ -54,12 +54,18 @@ export const getCleanPerspectiveLabel = (label?: string, viewType?: string): str
   return 'Perspective';
 };
 
-import { getThumbnailUrl, getDetailImageUrl, getFullscreenImageUrl } from '../../utils/imageOptimizer';
+import { getThumbnailUrl, getDetailImageUrl, getFullscreenImageUrl, getDetailSrcSet } from '../../utils/imageOptimizer';
+import { ModernThrobber } from '../common/ModernThrobber';
 
 export const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
+  const [isMainLoaded, setIsMainLoaded] = useState(false);
+
+  React.useEffect(() => {
+    setIsMainLoaded(false);
+  }, [selectedIndex]);
 
   const safeImages =
     images && images.length > 0
@@ -126,13 +132,25 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName 
           onMouseLeave={() => setIsZoomed(false)}
           onMouseMove={handleMouseMove}
         >
+          {/* Modern Throbber with Shimmer */}
+          {!isMainLoaded && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-atelier-cream z-10 pointer-events-none">
+              <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-atelier-parchment/40 to-transparent animate-shimmer" />
+              <ModernThrobber size="lg" label="Bhadohi Loom" />
+            </div>
+          )}
+
           {/* Main Image */}
           <img
             src={activeImageUrl}
+            srcSet={getDetailSrcSet(rawActiveUrl) || undefined}
+            sizes="(max-width: 1024px) 100vw, 65vw"
             alt={activeImage.alt || `${productName} presentation`}
-            className={`w-full h-full object-cover transition-transform duration-200 ${
-              isZoomed ? 'opacity-0' : 'opacity-100'
+            onLoad={() => setIsMainLoaded(true)}
+            className={`w-full h-full object-cover transition-opacity duration-500 ${
+              !isMainLoaded ? 'opacity-0' : isZoomed ? 'opacity-0' : 'opacity-100'
             }`}
+            decoding="async"
           />
 
           {/* High-Resolution Zoom Stage */}

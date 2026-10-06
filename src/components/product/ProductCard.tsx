@@ -6,7 +6,8 @@ import { useCurrency } from '../../context/CurrencyContext';
 import { useWishlist } from '../../context/WishlistContext';
 import { StockBadge } from './StockBadge';
 import { useInventory } from '../../context/InventoryContext';
-import { getCardImageUrl } from '../../utils/imageOptimizer';
+import { getCardImageUrl, getCardSrcSet } from '../../utils/imageOptimizer';
+import { ModernThrobber } from '../common/ModernThrobber';
 
 interface ProductCardProps {
   product: Product;
@@ -21,6 +22,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [hasHoveredOnce, setHasHoveredOnce] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
   const { formatPrice } = useCurrency();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { getInventory } = useInventory();
@@ -28,6 +30,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   const isFavorited = isInWishlist(product.id);
   const startingPrice = product.variants[0]?.priceUSD || 0;
   const primaryImage = getCardImageUrl(product.images[0]?.url || '');
+  const primarySrcSet = getCardSrcSet(product.images[0]?.url);
   const secondaryImage = getCardImageUrl(product.images[1]?.url || product.images[0]?.url || '');
 
   // Check live reactive inventory
@@ -51,13 +54,24 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           aspectRatio === 'portrait' ? 'aspect-[4/5]' : 'aspect-square'
         }`}
       >
+        {/* Modern Throbber with Shimmer */}
+        {!isLoaded && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-atelier-cream z-10 pointer-events-none">
+            <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-atelier-parchment/40 to-transparent animate-shimmer" />
+            <ModernThrobber size="sm" />
+          </div>
+        )}
+
         <Link to={`/product/${product.slug}`} className="block w-full h-full">
           {/* Primary Image */}
           <img
             src={primaryImage}
+            srcSet={primarySrcSet || undefined}
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             alt={product.name}
+            onLoad={() => setIsLoaded(true)}
             className={`w-full h-full object-cover object-center transition-all duration-700 ease-out ${
-              isHovered ? 'opacity-0 scale-105' : 'opacity-100 scale-100'
+              !isLoaded ? 'opacity-0' : isHovered ? 'opacity-0 scale-105' : 'opacity-100 scale-100'
             }`}
             loading="lazy"
             decoding="async"

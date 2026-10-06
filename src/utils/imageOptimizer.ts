@@ -69,3 +69,26 @@ export function getDetailImageUrl(url: string): string {
 export function getFullscreenImageUrl(url: string): string {
   return optimizeImageUrl(url, { width: 1800, quality: 85 });
 }
+
+/**
+ * Generate responsive srcSet for Unsplash and responsive image providers.
+ * Allows browsers on mobile and tablet to fetch smaller file sizes matching their DPI.
+ */
+export function generateSrcSet(
+  url: string | undefined | null,
+  widths: number[] = [320, 480, 640, 800, 1080],
+  quality: number = 75
+): string {
+  if (!url || !url.includes('images.unsplash.com')) return '';
+  return widths
+    .map((w) => `${optimizeImageUrl(url, { width: w, quality, format: 'auto' })} ${w}w`)
+    .join(', ');
+}
+
+export function getCardSrcSet(url: string | undefined | null): string {
+  return generateSrcSet(url, [320, 480, 640, 800], 75);
+}
+
+export function getDetailSrcSet(url: string | undefined | null): string {
+  return generateSrcSet(url, [640, 960, 1200, 1600], 80);
+}

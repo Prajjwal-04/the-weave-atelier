@@ -87,14 +87,14 @@ export const OrderConfirmationPage: React.FC = () => {
 
         {/* Order Details Card */}
         {order && (
-          <div className="bg-atelier-cream border border-atelier-parchment p-8 sm:p-10 space-y-8 shadow-subtle">
+          <div className="bg-atelier-cream border border-atelier-parchment p-5 sm:p-8 md:p-10 space-y-8 shadow-subtle">
             {order.syncStatus === 'pending_reconciliation' && (
               <div className="p-3.5 bg-atelier-ivory border border-atelier-parchment text-xs text-atelier-charcoal leading-relaxed">
                 <span className="font-medium text-atelier-softblack">Payment Authorized:</span> Your transaction was recorded with reference <span className="font-mono text-atelier-softblack">{order.paymentId}</span>. Studio dispatch and tracking will be updated automatically.
               </div>
             )}
 
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-atelier-parchment pb-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 border-b border-atelier-parchment pb-6">
               <div>
                 <div className="text-xs text-atelier-taupe">Date Placed</div>
                 <div className="font-medium text-sm text-atelier-softblack">{order.date}</div>
