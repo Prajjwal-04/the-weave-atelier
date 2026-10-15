@@ -152,7 +152,9 @@ export const OrderConfirmationPage: React.FC = () => {
                       <div className="text-[11px] text-atelier-charcoal mt-1">
                         Status:{' '}
                         <span className="font-medium">
-                          {item.isReadyToShip ? 'Ready to Ship · Conditioning' : 'Made to Order · Loom Scheduled'}
+                          {item.isReadyToShip
+                            ? 'Ready to Ship · Conditioning'
+                            : `Made to Order (${item.productionTimeWeeks || (item.estimatedDispatch?.includes('Made to Order') ? item.estimatedDispatch.replace(/^Made to Order\s*\(?|\)?$/gi, '') : 'Loom Scheduled')})`}
                         </span>
                       </div>
                     </div>

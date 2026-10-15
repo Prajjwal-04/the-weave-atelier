@@ -171,7 +171,9 @@ export const CartDrawer: React.FC = () => {
                             : 'bg-amber-50 text-amber-900'
                         }`}
                       >
-                        {item.isReadyToShip ? 'Ready to Ship (2–4 days)' : 'Made to Order (4–6 weeks)'}
+                        {item.isReadyToShip
+                          ? 'Ready to Ship (2–4 days)'
+                          : `Made to Order (${item.productionTimeWeeks || (item.estimatedDispatch?.includes('Made to Order') ? item.estimatedDispatch.replace(/^Made to Order\s*\(?|\)?$/gi, '') : '3–4 weeks')})`}
                       </span>
                     </div>
 

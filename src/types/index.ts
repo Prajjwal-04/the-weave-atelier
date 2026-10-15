@@ -101,6 +101,7 @@ export interface CartItem {
   isReadyToShip: boolean;
   estimatedDispatch: string;
   quantity: number;
+  productionTimeWeeks?: string;
 }
 
 export interface CustomQuoteRequest {

@@ -287,9 +287,10 @@ export const AccountPage: React.FC = () => {
       priceUSD: Number(defaultVariant.priceUSD) || 1500,
       technique: product.technique || 'Hand-Tufted',
       isReadyToShip: Boolean(defaultVariant.isReadyToShip),
+      productionTimeWeeks: defaultVariant.productionTimeWeeks,
       estimatedDispatch: defaultVariant.isReadyToShip
         ? 'Dispatches in 2–4 business days'
-        : 'Made to order (4–6 weeks)',
+        : `Made to Order (${defaultVariant.productionTimeWeeks || '4–6 weeks'})`,
     });
     toggleWishlist(product.id);
   };

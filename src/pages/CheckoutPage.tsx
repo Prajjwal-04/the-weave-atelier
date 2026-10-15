@@ -105,17 +105,33 @@ export const CheckoutPage: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [checkoutOrderNumber] = useState(() => `PR-2026-${Math.floor(1000 + Math.random() * 9000)}`);
 
-  const calculateEstimatedDeliveryDate = (isMadeToOrder: boolean): string => {
+  const hasLongLead = effectiveItems.some(
+    (i) =>
+      !i.isReadyToShip &&
+      (i.productionTimeWeeks?.includes('month') ||
+        i.estimatedDispatch?.toLowerCase().includes('month'))
+  );
+  const hasMadeToOrder = effectiveItems.some((i) => !i.isReadyToShip);
+
+  const calculateEstimatedDeliveryDate = (): string => {
     const now = new Date();
-    if (isMadeToOrder) {
+    if (hasLongLead) {
+      // 3 to 6 months production + international courier air transit
+      const start = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000);
+      const end = new Date(now.getTime() + 180 * 24 * 60 * 60 * 1000);
+      const startMonth = start.toLocaleDateString('en-US', { month: 'short' });
+      const endMonth = end.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+      return `${startMonth} – ${endMonth} (3–6 months handcrafted)`;
+    } else if (hasMadeToOrder) {
+      // Standard 4 to 6 weeks
       const start = new Date(now.getTime() + 35 * 24 * 60 * 60 * 1000);
       const end = new Date(now.getTime() + 49 * 24 * 60 * 60 * 1000);
       const startMonth = start.toLocaleDateString('en-US', { month: 'short' });
       const endMonth = end.toLocaleDateString('en-US', { month: 'short' });
       if (startMonth === endMonth) {
-        return `${startMonth} ${start.getDate()}–${end.getDate()}, ${end.getFullYear()}`;
+        return `${startMonth} ${start.getDate()}–${end.getDate()}, ${end.getFullYear()} (4–6 weeks)`;
       }
-      return `${startMonth} ${start.getDate()} – ${endMonth} ${end.getDate()}, ${end.getFullYear()}`;
+      return `${startMonth} ${start.getDate()} – ${endMonth} ${end.getDate()}, ${end.getFullYear()} (4–6 weeks)`;
     } else {
       const start = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
       const end = new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000);
@@ -172,8 +188,7 @@ export const CheckoutPage: React.FC = () => {
 
     try {
       const orderNum = checkoutOrderNumber;
-      const hasMadeToOrder = effectiveItems.some((i) => !i.isReadyToShip);
-      const deliveryTimeline = calculateEstimatedDeliveryDate(hasMadeToOrder);
+      const deliveryTimeline = calculateEstimatedDeliveryDate();
 
       // 1. Process payment via Razorpay All-In-One Checkout
       const paymentRes = await paymentService.processPayment({
@@ -227,7 +242,11 @@ export const CheckoutPage: React.FC = () => {
         },
         shippingMethod: {
           name: 'Atelier Insured Express Air Delivery',
-          estimatedDays: hasMadeToOrder ? '4–6 weeks handcrafted' : '5–7 business days',
+          estimatedDays: hasLongLead
+            ? '3–6 months handcrafted (Hand-Knotted Loom)'
+            : hasMadeToOrder
+            ? '4–6 weeks handcrafted'
+            : '5–7 business days',
           costUSD: shippingUSD,
         },
         items: [...effectiveItems],
@@ -243,7 +262,47 @@ export const CheckoutPage: React.FC = () => {
         isMadeToOrder: hasMadeToOrder,
         paymentProvider: paymentService.isLive() ? 'Razorpay Live' : 'Razorpay Test',
         paymentId: paymentRes.transactionId,
-        timeline: hasMadeToOrder
+        timeline: hasLongLead
+          ? [
+              {
+                title: 'Order Placed & Payment Confirmed',
+                date: 'Today · Confirmed',
+                description: 'Order confirmed and registered at our Bhadohi studio for master hand-knotted weaving.',
+                completed: true,
+                current: true,
+              },
+              {
+                title: 'Loom Warping & Yarn Dyeing',
+                date: 'Estimated Month 1',
+                description: 'Pot dyeing hand-carded wool lots and silk accents with botanical pigments; vertical loom warping in Bhadohi.',
+                completed: false,
+              },
+              {
+                title: 'Master Hand-Knotted Weaving',
+                date: 'Estimated Months 2–4',
+                description: 'Master artisans weaving knot-by-knot on traditional upright looms (~100 knots per square inch).',
+                completed: false,
+              },
+              {
+                title: 'Artisanal Washing & Rooftop Sun Curing',
+                date: 'Estimated Month 5',
+                description: 'Purified soft-water wash to reveal natural luster and open-air rooftop sun curing in Bhadohi.',
+                completed: false,
+              },
+              {
+                title: 'Final Shearing & Quality Audit',
+                date: 'Estimated Month 6',
+                description: 'Precision pile beveling, hand-binding fringes, and heirloom certificate issuance.',
+                completed: false,
+              },
+              {
+                title: 'Dispatched via Express Air Courier',
+                date: 'Estimated Month 6',
+                description: 'Double wrapped in protective barrier canvas and dispatched with door-to-door air tracking.',
+                completed: false,
+              },
+            ]
+          : hasMadeToOrder
           ? [
               {
                 title: 'Order Placed & Payment Confirmed',
@@ -606,7 +665,7 @@ export const CheckoutPage: React.FC = () => {
                     )}
                   </div>
                   <div className="text-[11px] text-atelier-taupe font-light">
-                    Includes full transit cargo insurance, door-to-door tracking, and signature on delivery.
+                    Estimated Delivery: <strong className="text-atelier-softblack">{calculateEstimatedDeliveryDate()}</strong> · Includes full transit cargo insurance, door-to-door tracking, and signature on delivery.
                   </div>
                 </div>
 
@@ -663,7 +722,7 @@ export const CheckoutPage: React.FC = () => {
                       {firstName} {lastName} · <span className="font-normal text-atelier-charcoal">{address}{apartment ? `, ${apartment}` : ''}, {city}, {state} {postalCode}, {country}</span>
                     </div>
                     <div className="text-[11px] text-atelier-taupe font-light">
-                      Carrier: Atelier Insured Express Air{phone ? ` · Contact: ${phone}` : ''}
+                      Carrier: Atelier Insured Express Air · Estimated Delivery: <strong className="text-atelier-softblack font-medium">{calculateEstimatedDeliveryDate()}</strong>{phone ? ` · Contact: ${phone}` : ''}
                     </div>
                   </div>
                   <button
@@ -1059,7 +1118,9 @@ export const CheckoutPage: React.FC = () => {
                       {item.size} · Qty: {item.quantity}
                     </div>
                     <div className="text-[10px] text-atelier-taupe font-mono">
-                      {item.isReadyToShip ? 'Ready to Ship' : 'Made to Order'}
+                      {item.isReadyToShip
+                        ? 'Ready to Ship (2–4 days)'
+                        : `Made to Order (${item.productionTimeWeeks || (item.estimatedDispatch?.includes('Made to Order') ? item.estimatedDispatch.replace(/^Made to Order\s*\(?|\)?$/gi, '') : '3–4 weeks')})`}
                     </div>
                   </div>
                 </div>

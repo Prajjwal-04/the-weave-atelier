@@ -211,6 +211,7 @@ export const ProductDetailPage: React.FC = () => {
         priceUSD: Number(activeVariant.priceUSD) || 1500,
         technique: product.technique,
         isReadyToShip: Boolean(activeVariant.isReadyToShip),
+        productionTimeWeeks: activeVariant.productionTimeWeeks,
         estimatedDispatch: activeVariant.isReadyToShip
           ? 'Dispatches in 2–4 business days from Bhadohi'
           : `Made to Order (${activeVariant.productionTimeWeeks || '3–4 weeks'})`,

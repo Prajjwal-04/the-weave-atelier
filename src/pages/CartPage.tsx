@@ -148,7 +148,9 @@ export const CartPage: React.FC = () => {
                               : 'bg-amber-50 text-amber-900'
                           }`}
                         >
-                          {item.isReadyToShip ? 'Ready to Ship (2–4 days)' : 'Made to Order (4–6 weeks handcrafted)'}
+                          {item.isReadyToShip
+                            ? 'Ready to Ship (2–4 days)'
+                            : `Made to Order (${item.productionTimeWeeks || '3–4 weeks'})`}
                         </span>
                       </div>
 

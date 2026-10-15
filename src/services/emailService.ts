@@ -290,7 +290,7 @@ ${quote.notes || 'None provided'}
     const itemsSummary = order.items
       .map(
         (i, idx) =>
-          `${idx + 1}. ${i.productName} | Size: ${i.size} | SKU: ${i.sku} | Qty: ${i.quantity} | Price: $${i.priceUSD * i.quantity} USD | (${i.isReadyToShip ? 'Ready to Ship' : 'Made to Order'})`
+          `${idx + 1}. ${i.productName} | Size: ${i.size} | SKU: ${i.sku} | Qty: ${i.quantity} | Price: $${i.priceUSD * i.quantity} USD | (${i.isReadyToShip ? 'Ready to Ship' : `Made to Order (${i.productionTimeWeeks || 'Handcrafted'})`})`
       )
       .join('\n');
 
@@ -418,7 +418,7 @@ Carrier Assigned: ${order.carrier}
           <td style="padding: 12px 0; border-bottom: 1px solid #EDE6DD;">
             <strong style="color: #1A1918; font-size: 14px;">${i.productName}</strong><br/>
             <span style="color: #8A7B6E; font-size: 12px;">Size: ${i.size} · SKU: ${i.sku}</span><br/>
-            <span style="color: #5C4D43; font-size: 11px;">${i.isReadyToShip ? 'Ready to Ship' : 'Made to Order Handcrafted'}</span>
+            <span style="color: #5C4D43; font-size: 11px;">${i.isReadyToShip ? 'Ready to Ship' : `Made to Order (${i.productionTimeWeeks || 'Handcrafted'})`}</span>
           </td>
           <td style="padding: 12px 0; border-bottom: 1px solid #EDE6DD; text-align: center; color: #1A1918; font-size: 13px;">
             ${i.quantity}
