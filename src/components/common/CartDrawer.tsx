@@ -255,8 +255,8 @@ export const CartDrawer: React.FC = () => {
                 </div>
                 <div className="flex justify-between text-atelier-charcoal">
                   <span>{destinationCountry === 'India' ? 'Domestic Express Delivery' : 'Insured Express International Delivery'}</span>
-                  <span className="font-mono text-atelier-softblack">
-                    {formatPrice(shippingUSD)}
+                  <span className={`font-mono ${shippingUSD === 0 ? 'text-emerald-700 font-medium' : 'text-atelier-softblack'}`}>
+                    {shippingUSD === 0 ? 'Free' : formatPrice(shippingUSD)}
                   </span>
                 </div>
                 <div className="flex justify-between text-atelier-taupe text-[11px]">

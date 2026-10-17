@@ -12,7 +12,7 @@ export const shippingService = {
     let carrier = 'Insured Express International';
 
     if (country.includes('india')) {
-      baseCost = 35;
+      baseCost = 0;
       days = '3–5 business days';
       carrier = 'Express Air (Domestic)';
     } else if (country.includes('united states') || country.includes('canada')) {
@@ -44,7 +44,7 @@ export const shippingService = {
       costUSD: Math.round(baseCost),
       carrier,
       estimatedDays: days,
-      isComplimentary: false,
+      isComplimentary: baseCost === 0,
     };
   },
 

@@ -139,7 +139,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   let shippingUSD = 0;
   if (items.length > 0) {
     if (destinationCountry === 'India') {
-      shippingUSD = 35; // Standard domestic express across India
+      shippingUSD = 0; // Testing / Promotional: Free domestic express delivery across India
     } else if (['United States', 'Canada'].includes(destinationCountry)) {
       shippingUSD = 120; // Express insured air courier
     } else if (['United Kingdom', 'Germany', 'France', 'Italy', 'Netherlands', 'Switzerland'].includes(destinationCountry)) {
@@ -150,8 +150,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       shippingUSD = 150;
     }
 
-    // Additional rugs add consolidated air freight (+ $40 per additional piece)
-    if (totalItemCount > 1) {
+    // Additional rugs add consolidated air freight (+ $40 per additional piece for international)
+    if (totalItemCount > 1 && destinationCountry !== 'India') {
       shippingUSD += (totalItemCount - 1) * 40;
     }
   }

@@ -658,9 +658,13 @@ export const CheckoutPage: React.FC = () => {
                       <Truck size={14} className="mr-1.5 text-atelier-gold" />
                       Atelier Insured Express Air Delivery
                     </span>
-                    {shippingUSD > 0 && (
+                    {shippingUSD > 0 ? (
                       <span className="font-mono text-atelier-darkbrown">
                         {formatPrice(shippingUSD)}
+                      </span>
+                    ) : (
+                      <span className="font-mono text-emerald-700 font-medium">
+                        Free
                       </span>
                     )}
                   </div>
@@ -1133,14 +1137,12 @@ export const CheckoutPage: React.FC = () => {
                 <span>Subtotal</span>
                 <span className="font-mono text-atelier-softblack">{formatPrice(effectiveSubtotalUSD)}</span>
               </div>
-              {shippingUSD > 0 && (
-                <div className="flex justify-between">
-                  <span>Shipping & Delivery</span>
-                  <span className="font-mono text-atelier-softblack">
-                    {formatPrice(shippingUSD)}
-                  </span>
-                </div>
-              )}
+              <div className="flex justify-between">
+                <span>Shipping & Delivery</span>
+                <span className={`font-mono ${shippingUSD === 0 ? 'text-emerald-700 font-medium' : 'text-atelier-softblack'}`}>
+                  {shippingUSD === 0 ? 'Free' : formatPrice(shippingUSD)}
+                </span>
+              </div>
               <div className="flex justify-between items-start text-atelier-taupe text-[11px] gap-2">
                 <span>{country === 'India' ? 'Customs & Taxes' : 'Import Duties & VAT'}</span>
                 <span className="text-right">

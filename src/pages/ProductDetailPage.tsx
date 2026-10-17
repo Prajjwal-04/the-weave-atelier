@@ -235,7 +235,7 @@ export const ProductDetailPage: React.FC = () => {
         estimatedDispatch: activeVariant.isReadyToShip
           ? 'Dispatches in 2–4 business days from Bhadohi'
           : `Made to Order (${activeVariant.productionTimeWeeks || '3–4 weeks'})`,
-        shippingDomesticUSD: product.shippingDomesticUSD ?? 35,
+        shippingDomesticUSD: product.shippingDomesticUSD ?? 0,
         shippingInternationalUSD: product.shippingInternationalUSD ?? 120,
       },
       quantity,
@@ -547,7 +547,7 @@ export const ProductDetailPage: React.FC = () => {
               </div>
               <div className="flex items-center space-x-3 text-xs">
                 <span className="text-atelier-softblack">
-                  🇮🇳 India: <strong className="font-mono text-atelier-agedgold">{formatPrice(35)}</strong>
+                  🇮🇳 India: <strong className="font-mono text-emerald-700">Free</strong>
                 </span>
                 <span className="text-atelier-parchment">|</span>
                 <span className="text-atelier-softblack">
@@ -655,8 +655,8 @@ export const ProductDetailPage: React.FC = () => {
                     <div className="p-3 bg-atelier-cream border border-atelier-parchment space-y-2">
                       <div className="flex justify-between items-center text-xs">
                         <span className="font-medium text-atelier-softblack">🇮🇳 India Domestic Courier:</span>
-                        <span className="font-mono font-semibold text-atelier-agedgold">
-                          {formatPrice(35)}
+                        <span className="font-mono font-semibold text-emerald-700">
+                          Free
                         </span>
                       </div>
                       <div className="flex justify-between items-center text-xs">

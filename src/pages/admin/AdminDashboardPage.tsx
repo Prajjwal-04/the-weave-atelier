@@ -1819,7 +1819,7 @@ export const AdminDashboardPage: React.FC = () => {
                             </div>
                             <div className="text-[9px] text-atelier-darkbrown flex items-center space-x-1 mt-1 font-mono">
                               <Truck size={10} className="text-atelier-agedgold flex-shrink-0" />
-                              <span>IN: {p.shippingDomesticUSD === 0 ? 'Free' : `$${p.shippingDomesticUSD ?? 35}`} · Int: {p.shippingInternationalUSD === 0 ? 'Free' : `$${p.shippingInternationalUSD ?? 120}`}</span>
+                              <span>IN: {p.shippingDomesticUSD === 0 || p.shippingDomesticUSD === undefined ? 'Free' : `$${p.shippingDomesticUSD}`} · Int: {p.shippingInternationalUSD === 0 ? 'Free' : `$${p.shippingInternationalUSD ?? 120}`}</span>
                             </div>
                           </td>
 

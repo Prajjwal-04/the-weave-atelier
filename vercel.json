@@ -37,7 +37,7 @@
       "destination": "/api/$1"
     },
     {
-      "source": "/(shop|product/.*|collections|collections/.*|custom-rugs|the-atelier|about|craft|journal|journal/.*|size-guide|rug-care|shipping-returns|terms|privacy|wishlist|contact|cart|checkout|order-confirmation|order-tracking|track-order|account|admin|admin/.*)",
+      "source": "/((?!api/|.*\\..*).*)",
       "destination": "/index.html"
     }
   ]
