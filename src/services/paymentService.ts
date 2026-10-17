@@ -28,6 +28,7 @@ export interface RazorpayPaymentParams {
   preferredMethod?: 'upi' | 'card' | 'netbanking' | 'wallet';
   upiVpa?: string;
   notes?: Record<string, string>;
+  orderPayload?: any;
 }
 
 export interface RazorpayBackendOrderResponse {
@@ -115,6 +116,7 @@ export const paymentService = {
     currency?: string;
     receipt: string;
     notes?: Record<string, string>;
+    orderPayload?: any;
   }): Promise<RazorpayBackendOrderResponse> {
     const response = await fetch('/api/create-order', {
       method: 'POST',
@@ -126,6 +128,7 @@ export const paymentService = {
         currency: params.currency || 'INR',
         receipt: params.receipt,
         notes: params.notes,
+        orderPayload: params.orderPayload,
       }),
     });
 
@@ -213,8 +216,12 @@ export const paymentService = {
         notes: {
           order_number: params.orderNumber,
           amount_usd: `$${params.amountUSD} USD`,
+          customer_name: params.customer.name,
+          customer_email: params.customer.email,
+          customer_phone: params.customer.phone || '',
           ...params.notes,
         },
+        orderPayload: params.orderPayload,
       });
     } catch (orderErr: any) {
       console.error('[Create Order Failed]:', orderErr);
@@ -244,6 +251,9 @@ export const paymentService = {
         }
 
         const activeKey = (backendOrder.key_id || keyId).trim();
+        const callbackUrl = typeof window !== 'undefined'
+          ? `${window.location.origin}/api/razorpay-callback?orderNumber=${encodeURIComponent(params.orderNumber)}`
+          : undefined;
 
         const options: any = {
           key: activeKey,
@@ -253,6 +263,7 @@ export const paymentService = {
           description: `Handcrafted Rug Order (${params.orderNumber})`,
           image: '/images/prasri-medallion.jpg',
           order_id: backendOrder.order_id,
+          callback_url: callbackUrl,
           prefill: prefillData,
           notes: {
             order_number: params.orderNumber,

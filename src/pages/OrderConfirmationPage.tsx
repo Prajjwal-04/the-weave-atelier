@@ -3,28 +3,69 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { Check, ShieldCheck, Truck, Clock, Printer, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCurrency } from '../context/CurrencyContext';
+import { useCart } from '../context/CartContext';
 import { orderService } from '../services/orderService';
 import { Order } from '../types';
 
 export const OrderConfirmationPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const orderNumber = searchParams.get('orderNumber') || '';
-  const { getOrder, isLoggedIn } = useAuth();
+  const { getOrder, isLoggedIn, addOrder } = useAuth();
+  const { clearCart } = useCart();
   const { formatPrice } = useCurrency();
-  const [order, setOrder] = useState<Order | null>(() => (orderNumber ? getOrder(orderNumber) || null : null));
+  const [order, setOrder] = useState<Order | null>(() => {
+    if (!orderNumber) return null;
+    const fromAuth = getOrder(orderNumber);
+    if (fromAuth) return fromAuth;
+    try {
+      const pendingRaw = localStorage.getItem('twa_pending_order');
+      if (pendingRaw) {
+        const pending = JSON.parse(pendingRaw);
+        if (pending?.orderNumber === orderNumber) return pending;
+      }
+    } catch (_) {}
+    return null;
+  });
 
   useEffect(() => {
     if (orderNumber) {
+      // Clear shopping bag now that purchase is confirmed
+      clearCart();
+
       const existing = getOrder(orderNumber);
       if (existing) {
         setOrder(existing);
-      } else {
-        orderService.getOrderByNumber(orderNumber).then((found) => {
-          if (found) setOrder(found);
-        });
+        return;
       }
+
+      // Check localStorage pending order backup
+      try {
+        const pendingRaw = localStorage.getItem('twa_pending_order');
+        if (pendingRaw) {
+          const pending = JSON.parse(pendingRaw);
+          if (pending && pending.orderNumber === orderNumber) {
+            setOrder(pending);
+            addOrder(pending);
+            // Ensure persisted in Supabase in background
+            orderService.createOrder(pending).catch(() => {});
+          }
+        }
+      } catch (e) {
+        console.warn('Pending order check warning:', e);
+      }
+
+      // Query database
+      orderService.getOrderByNumber(orderNumber).then((found) => {
+        if (found) {
+          setOrder(found);
+          addOrder(found);
+          try {
+            localStorage.removeItem('twa_pending_order');
+          } catch (_) {}
+        }
+      });
     }
-  }, [orderNumber, getOrder]);
+  }, [orderNumber, getOrder, clearCart, addOrder]);
 
   if (!orderNumber) {
     return (

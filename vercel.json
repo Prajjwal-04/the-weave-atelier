@@ -37,6 +37,14 @@
       "destination": "/api/$1"
     },
     {
+      "source": "/razorpay-callback",
+      "destination": "/api/razorpay-callback"
+    },
+    {
+      "source": "/checkout-callback",
+      "destination": "/api/razorpay-callback"
+    },
+    {
       "source": "/((?!api/|.*\\..*).*)",
       "destination": "/index.html"
     }

@@ -190,34 +190,6 @@ export const CheckoutPage: React.FC = () => {
       const orderNum = checkoutOrderNumber;
       const deliveryTimeline = calculateEstimatedDeliveryDate();
 
-      // 1. Process payment via Razorpay All-In-One Checkout
-      const paymentRes = await paymentService.processPayment({
-        amountUSD: totalUSD,
-        amountINR,
-        currency,
-        customer: {
-          name: `${firstName} ${lastName}`.trim(),
-          email,
-          phone,
-        },
-        orderNumber: orderNum,
-        preferredMethod: paymentMethod === 'upi' ? 'upi' : paymentMethod === 'card' ? 'card' : paymentMethod === 'netbanking' ? 'netbanking' : undefined,
-        upiVpa: paymentMethod === 'upi' && upiMode === 'vpa' ? upiVpa.trim() : undefined,
-        notes: {
-          shipping_city: city,
-          shipping_state: state,
-          shipping_country: country,
-          payment_channel: paymentMethod,
-          bank_selected: paymentMethod === 'netbanking' ? selectedBank : '',
-        },
-      });
-
-      if (!paymentRes.success) {
-        setErrorMessage(paymentRes.message || 'Payment processing was cancelled or failed.');
-        setIsProcessing(false);
-        return;
-      }
-
       const newOrder: Order = {
         id: `order-${Date.now()}`,
         orderNumber: orderNum,
@@ -241,11 +213,13 @@ export const CheckoutPage: React.FC = () => {
           country,
         },
         shippingMethod: {
-          name: 'Atelier Insured Express Air Delivery',
+          name: country === 'India' ? 'Domestic Express Air Courier' : 'Atelier Insured Express Air Delivery',
           estimatedDays: hasLongLead
             ? '3–6 months handcrafted (Hand-Knotted Loom)'
             : hasMadeToOrder
             ? '4–6 weeks handcrafted'
+            : country === 'India'
+            ? '3–5 business days'
             : '5–7 business days',
           costUSD: shippingUSD,
         },
@@ -256,12 +230,12 @@ export const CheckoutPage: React.FC = () => {
         taxUSD: 0,
         totalUSD,
         status: hasMadeToOrder ? 'IN PRODUCTION' : 'PROCESSING',
-        carrier: 'Insured Express Air',
+        carrier: country === 'India' ? 'Domestic Express Air Courier' : 'Insured Express Air',
         trackingNumber: '',
         estimatedDeliveryDate: deliveryTimeline,
         isMadeToOrder: hasMadeToOrder,
         paymentProvider: paymentService.isLive() ? 'Razorpay Live' : 'Razorpay Test',
-        paymentId: paymentRes.transactionId,
+        paymentId: '',
         timeline: hasLongLead
           ? [
               {
@@ -376,6 +350,54 @@ export const CheckoutPage: React.FC = () => {
               },
             ],
       };
+
+      // Safely pre-cache order in localStorage & server backup before opening payment window
+      try {
+        localStorage.setItem('twa_pending_order', JSON.stringify(newOrder));
+        fetch('/api/backup-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newOrder),
+        }).catch(() => {});
+      } catch (_) {}
+
+      // 1. Process payment via Razorpay All-In-One Checkout
+      const paymentRes = await paymentService.processPayment({
+        amountUSD: totalUSD,
+        amountINR,
+        currency,
+        customer: {
+          name: `${firstName} ${lastName}`.trim(),
+          email,
+          phone,
+        },
+        orderNumber: orderNum,
+        orderPayload: newOrder,
+        preferredMethod: paymentMethod === 'upi' ? 'upi' : paymentMethod === 'card' ? 'card' : paymentMethod === 'netbanking' ? 'netbanking' : undefined,
+        upiVpa: paymentMethod === 'upi' && upiMode === 'vpa' ? upiVpa.trim() : undefined,
+        notes: {
+          customer_first_name: firstName,
+          customer_last_name: lastName,
+          customer_name: `${firstName} ${lastName}`.trim(),
+          customer_email: email,
+          customer_phone: phone || '',
+          shipping_address: address,
+          shipping_city: city,
+          shipping_state: state,
+          shipping_postal_code: postalCode,
+          shipping_country: country,
+          payment_channel: paymentMethod,
+          bank_selected: paymentMethod === 'netbanking' ? selectedBank : '',
+        },
+      });
+
+      if (!paymentRes.success) {
+        setErrorMessage(paymentRes.message || 'Payment processing was cancelled or failed.');
+        setIsProcessing(false);
+        return;
+      }
+
+      newOrder.paymentId = paymentRes.transactionId;
 
       // 2. Persist order to Supabase and Local Storage (also updates inventory in orderService)
       let persistedOrder = newOrder;

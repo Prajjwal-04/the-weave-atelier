@@ -183,3 +183,103 @@ export async function handleSendEmail(req, res) {
     });
   }
 }
+
+export function generateOrderEmailHtml(order) {
+  const itemsHtml = (order.items || [])
+    .map(
+      (item) => `
+      <tr>
+        <td style="padding: 10px 0; border-bottom: 1px solid #EDE6DD;">
+          <strong>${item.productName || 'Artisan Rug'}</strong><br/>
+          <span style="font-size: 11px; color: #8A7B6E;">Size: ${item.size || 'Custom'} · Qty: ${item.quantity || 1} · SKU: ${item.sku || 'N/A'}</span>
+        </td>
+        <td align="right" style="padding: 10px 0; border-bottom: 1px solid #EDE6DD; font-family: monospace;">
+          $${Number(item.priceUSD || 0).toLocaleString()} USD
+        </td>
+      </tr>`
+    )
+    .join('');
+
+  return `
+    <div style="font-family: Georgia, serif; max-width: 620px; margin: 0 auto; background: #FFFFFF; border: 1px solid #EDE6DD; padding: 35px; color: #1A1918;">
+      <div style="text-align: center; border-bottom: 1px solid #EDE6DD; padding-bottom: 25px;">
+        <h1 style="letter-spacing: 0.25em; font-size: 22px; font-weight: normal; margin: 0;">PRASRI RUGS</h1>
+        <div style="font-size: 9px; letter-spacing: 0.35em; color: #8A7B6E; margin-top: 4px;">BHADOHI · INDIA</div>
+      </div>
+      <div style="padding: 25px 0;">
+        <h2 style="font-size: 18px; font-weight: normal; color: #1A1918; margin-bottom: 8px;">Order Confirmed: ${order.orderNumber}</h2>
+        <p style="font-size: 13px; color: #5C5248; line-height: 1.6;">
+          Dear ${order.customer?.firstName || 'Valued Collector'},<br/><br/>
+          Your order has been registered at our Bhadohi studio in Uttar Pradesh, India. Your payment of <strong>$${order.totalUSD} USD</strong> has been confirmed (Ref: ${order.paymentId || 'Captured'}).
+        </p>
+
+        <div style="background: #FAF8F5; border: 1px solid #EDE6DD; padding: 18px; margin: 20px 0;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="font-size: 12px;">
+            ${itemsHtml}
+            <tr>
+              <td style="padding: 8px 0; color: #8A7B6E;">Shipping (Domestic India Express)</td>
+              <td align="right" style="padding: 8px 0; font-family: monospace;">${order.shippingUSD === 0 ? 'Complimentary (Free)' : `$${order.shippingUSD} USD`}</td>
+            </tr>
+            <tr>
+              <td style="padding: 10px 0 0; font-weight: bold; font-size: 14px;">Total Paid</td>
+              <td align="right" style="padding: 10px 0 0; font-weight: bold; font-size: 14px; font-family: monospace;">$${order.totalUSD} USD</td>
+            </tr>
+          </table>
+        </div>
+
+        <div style="font-size: 12px; color: #5C5248; line-height: 1.6; border-top: 1px solid #EDE6DD; padding-top: 15px;">
+          <strong>Shipping Destination:</strong><br/>
+          ${order.shippingAddress?.address || ''} ${order.shippingAddress?.apartment || ''}<br/>
+          ${order.shippingAddress?.city || ''}, ${order.shippingAddress?.state || ''} ${order.shippingAddress?.postalCode || ''}<br/>
+          ${order.shippingAddress?.country || 'India'}
+        </div>
+      </div>
+      <div style="border-top: 1px solid #EDE6DD; padding-top: 20px; text-align: center; font-size: 11px; color: #8A7B6E;">
+        Prasri Rugs Atelier · Bhadohi 221401, UP, India · <a href="mailto:prasrirugs@gmail.com" style="color: #8A7B6E;">prasrirugs@gmail.com</a>
+      </div>
+    </div>`;
+}
+
+export async function dispatchOrderEmailsDirect(order) {
+  const transporter = getTransporter();
+  if (!transporter) {
+    console.warn('[Direct Email] Gmail transporter not configured in environment.');
+    return false;
+  }
+
+  const gmailUser = (process.env.GMAIL_USER || process.env.VITE_ADMIN_EMAIL || 'prasrirugs@gmail.com').toLowerCase().trim();
+  const customerEmail = order.customer?.email;
+
+  const html = generateOrderEmailHtml(order);
+
+  // 1. Send confirmation to customer
+  if (customerEmail) {
+    try {
+      await transporter.sendMail({
+        from: `"Prasri Rugs Atelier" <${gmailUser}>`,
+        to: customerEmail,
+        subject: `Order Confirmed: ${order.orderNumber} · Prasri Rugs`,
+        html,
+      });
+      console.log(`[Direct Email] Customer confirmation delivered to ${customerEmail}`);
+    } catch (err) {
+      console.warn(`[Direct Email] Failed customer dispatch to ${customerEmail}:`, err.message);
+    }
+  }
+
+  // 2. Send notification to admin
+  try {
+    await transporter.sendMail({
+      from: `"Prasri Rugs Atelier" <${gmailUser}>`,
+      to: gmailUser,
+      subject: `[NEW ORDER] ${order.orderNumber} — ${order.customer?.firstName || ''} ${order.customer?.lastName || ''} ($${order.totalUSD} USD)`,
+      html,
+    });
+    console.log(`[Direct Email] Admin alert delivered to ${gmailUser}`);
+  } catch (adminErr) {
+    console.warn('[Direct Email] Failed admin dispatch:', adminErr.message);
+  }
+
+  return true;
+}
+
