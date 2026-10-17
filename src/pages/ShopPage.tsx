@@ -181,12 +181,51 @@ export const ShopPage: React.FC = () => {
     selectedAvailability !== 'all' ||
     !!searchQuery;
 
+  // Dynamic SEO Title, Description, and Canonical URL
+  const { seoTitle, seoDescription, seoCanonical } = useMemo(() => {
+    if (searchQuery) {
+      return {
+        seoTitle: `Search: "${searchQuery}" — Contemporary Rug Catalog`,
+        seoDescription: `Browse artisan handcrafted rugs matching "${searchQuery}". Handcrafted in Bhadohi, India with bespoke custom sizing.`,
+        seoCanonical: '/shop',
+      };
+    }
+    if (selectedCollection !== 'all') {
+      const colObj = COLLECTIONS.find((c) => c.slug === selectedCollection);
+      const name = colObj ? colObj.name : selectedCollection.replace(/-/g, ' ');
+      return {
+        seoTitle: `${name} Rugs Collection — Handcrafted Contemporary Works`,
+        seoDescription: colObj?.description || `Explore our ${name} collection of contemporary handmade rugs woven slowly in Bhadohi, India.`,
+        seoCanonical: `/collections/${selectedCollection}`,
+      };
+    }
+    if (selectedTechnique !== 'all') {
+      return {
+        seoTitle: `Handmade ${selectedTechnique} Rugs — Contemporary Works`,
+        seoDescription: `Discover our collection of ${selectedTechnique.toLowerCase()} rugs woven from pure and blended wools in Bhadohi, India. Ready to ship and bespoke custom sizing.`,
+        seoCanonical: '/shop',
+      };
+    }
+    if (selectedAvailability === 'ready-to-ship') {
+      return {
+        seoTitle: 'Ready-to-Ship Contemporary Rugs — In-Stock Handcrafted Works',
+        seoDescription: 'Shop our curated gallery of in-stock contemporary wool rugs ready to dispatch immediately from our Bhadohi atelier with worldwide insured express shipping.',
+        seoCanonical: '/shop',
+      };
+    }
+    return {
+      seoTitle: 'Shop All Contemporary Rugs — Handcrafted Wool & Silk Collections',
+      seoDescription: 'Discover our complete gallery of contemporary hand-tufted, hand-knotted, and flatweave wool rugs handcrafted in Bhadohi, India. Ready to ship and bespoke custom sizing.',
+      seoCanonical: '/shop',
+    };
+  }, [searchQuery, selectedCollection, selectedTechnique, selectedAvailability]);
+
   return (
     <div className="pt-20 sm:pt-24 pb-20 bg-atelier-ivory min-h-screen">
       <SEO
-        title="Shop All Works — 17 Contemporary Rugs"
-        description="Discover all contemporary hand-tufted, hand-knotted, and flatweave wool rugs handcrafted in Bhadohi, India. Ready to ship and bespoke custom sizing."
-        canonicalPath="/shop"
+        title={seoTitle}
+        description={seoDescription}
+        canonicalPath={seoCanonical}
       />
       <div ref={catalogTopRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Page Header */}

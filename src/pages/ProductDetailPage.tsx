@@ -80,6 +80,21 @@ export const ProductDetailPage: React.FC = () => {
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { formatPrice } = useCurrency();
 
+  // Legacy URL redirection map for Google Search Console & bookmarked links
+  useEffect(() => {
+    const LEGACY_SLUG_MAP: Record<string, string> = {
+      'terralis-abstract-wool-rug': 'terra',
+      'arbor-flow-sculpted-wool-rug': 'arbor-flow',
+      'kanso-minimalist-linear-rug': 'sabhya',
+      'varanasi-serenade-hand-knotted-rug': 'the-artisan-mosaic',
+      'botanica-umber-hand-tufted-rug': 'verdant',
+      'bhadohi-earth-reversible-flatweave': 'earthscape',
+    };
+    if (slug && LEGACY_SLUG_MAP[slug]) {
+      navigate(`/product/${LEGACY_SLUG_MAP[slug]}`, { replace: true });
+    }
+  }, [slug, navigate]);
+
   // Reset selected variant when slug or products change
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -158,6 +173,11 @@ export const ProductDetailPage: React.FC = () => {
   if (!product) {
     return (
       <div className="pt-36 pb-28 text-center bg-atelier-ivory min-h-screen px-4">
+        <SEO
+          title="Rug Not Found — Atelier Catalog"
+          description="The requested artisan rug is currently unavailable or has been archived. Explore our full catalog of contemporary handmade rugs."
+          canonicalPath="/shop"
+        />
         <div className="max-w-md mx-auto space-y-6 bg-atelier-cream border border-atelier-parchment p-10 shadow-subtle">
           <div className="text-[10px] tracking-widest uppercase text-atelier-taupe font-mono">
             Atelier Catalog Notice
@@ -215,6 +235,8 @@ export const ProductDetailPage: React.FC = () => {
         estimatedDispatch: activeVariant.isReadyToShip
           ? 'Dispatches in 2–4 business days from Bhadohi'
           : `Made to Order (${activeVariant.productionTimeWeeks || '3–4 weeks'})`,
+        shippingDomesticUSD: product.shippingDomesticUSD ?? 35,
+        shippingInternationalUSD: product.shippingInternationalUSD ?? 120,
       },
       quantity,
       openDrawer
@@ -517,6 +539,23 @@ export const ProductDetailPage: React.FC = () => {
               </div>
             </div>
 
+            {/* Standard Fixed Atelier Shipping Rate Badge */}
+            <div className="bg-atelier-cream/80 border border-atelier-parchment px-3.5 py-2.5 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+              <div className="flex items-center space-x-2 text-atelier-charcoal font-medium">
+                <Truck size={14} className="text-atelier-agedgold flex-shrink-0" />
+                <span>Atelier Shipping:</span>
+              </div>
+              <div className="flex items-center space-x-3 text-xs">
+                <span className="text-atelier-softblack">
+                  🇮🇳 India: <strong className="font-mono text-atelier-agedgold">{formatPrice(35)}</strong>
+                </span>
+                <span className="text-atelier-parchment">|</span>
+                <span className="text-atelier-softblack">
+                  ✈️ Global: <strong className="font-mono text-atelier-agedgold">{formatPrice(120)}</strong>
+                </span>
+              </div>
+            </div>
+
             {/* Collapsible Accordions: Specs, Craft, Care, Shipping */}
             <div className="border-t border-atelier-parchment divide-y divide-atelier-parchment pt-4 text-xs">
               {/* Accordion 1: Specifications */}
@@ -597,13 +636,13 @@ export const ProductDetailPage: React.FC = () => {
                 )}
               </div>
 
-              {/* Accordion 4: International Delivery & Duties */}
+              {/* Accordion 4: International Delivery & Shipping Rates */}
               <div>
                 <button
                   onClick={() => toggleAccordion('shipping')}
                   className="w-full py-3 flex items-center justify-between text-left font-serif text-base text-atelier-softblack font-medium"
                 >
-                  <span>International Shipping & Returns</span>
+                  <span>Shipping Rates & Delivery</span>
                   <ChevronDown
                     size={16}
                     className={`transition-transform duration-200 ${
@@ -612,14 +651,28 @@ export const ProductDetailPage: React.FC = () => {
                   />
                 </button>
                 {openAccordion === 'shipping' && (
-                  <div className="pb-4 space-y-2 text-atelier-charcoal font-light leading-relaxed">
+                  <div className="pb-4 space-y-3 text-atelier-charcoal font-light leading-relaxed">
+                    <div className="p-3 bg-atelier-cream border border-atelier-parchment space-y-2">
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="font-medium text-atelier-softblack">🇮🇳 India Domestic Courier:</span>
+                        <span className="font-mono font-semibold text-atelier-agedgold">
+                          {formatPrice(35)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="font-medium text-atelier-softblack">✈️ Worldwide Express Air (DHL / FedEx):</span>
+                        <span className="font-mono font-semibold text-atelier-agedgold">
+                          {formatPrice(120)}
+                        </span>
+                      </div>
+                    </div>
                     <p>
-                      Shipped via insured international express air courier with full door-to-door tracking. Transit time to USA and Europe is 5–7 business days.
+                      Shipped via insured express air courier with complete door-to-door tracking. International transit time to USA and Europe is 5–7 business days; domestic transit across India is 2–4 business days.
                     </p>
                     <p>
-                      Returns are accepted within 14 calendar days of delivery. Return shipping must be handled and covered by the buyer. A refund will be placed once the product is received back by our atelier in the same quality without any damage.
+                      Returns are accepted within 14 calendar days of delivery. Return shipping must be handled and covered by the buyer. A refund will be placed once the product is received back by our atelier in the same quality without damage.
                     </p>
-                    <div className="pt-2">
+                    <div className="pt-1">
                       <Link to="/shipping-returns" className="underline text-atelier-darkbrown hover:text-black">
                         Learn more about customs, packaging and returns →
                       </Link>

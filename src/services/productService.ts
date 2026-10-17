@@ -377,30 +377,32 @@ export const productService = {
         }
 
         // 1. Update all product specifications
+        const updatePayload: Record<string, any> = {
+          name: updatedProduct.name,
+          slug: updatedProduct.slug,
+          subtitle: updatedProduct.subtitle,
+          collection_slug: updatedProduct.collectionSlug,
+          technique: updatedProduct.technique,
+          technique_description: updatedProduct.techniqueDescription,
+          material: updatedProduct.material,
+          material_composition: updatedProduct.materialComposition,
+          colors: updatedProduct.colors,
+          pile_height: updatedProduct.pileHeight,
+          knot_density: updatedProduct.knotDensity,
+          origin: updatedProduct.origin,
+          description: updatedProduct.description,
+          design_story: updatedProduct.designStory,
+          craft_notes: updatedProduct.craftNotes,
+          care_summary: updatedProduct.careSummary,
+          is_ready_to_ship: updatedProduct.isReadyToShip,
+          featured: updatedProduct.featured,
+          best_seller: updatedProduct.bestSeller,
+          is_new: updatedProduct.isNew,
+        };
+
         await supabase
           .from('products')
-          .update({
-            name: updatedProduct.name,
-            slug: updatedProduct.slug,
-            subtitle: updatedProduct.subtitle,
-            collection_slug: updatedProduct.collectionSlug,
-            technique: updatedProduct.technique,
-            technique_description: updatedProduct.techniqueDescription,
-            material: updatedProduct.material,
-            material_composition: updatedProduct.materialComposition,
-            colors: updatedProduct.colors,
-            pile_height: updatedProduct.pileHeight,
-            knot_density: updatedProduct.knotDensity,
-            origin: updatedProduct.origin,
-            description: updatedProduct.description,
-            design_story: updatedProduct.designStory,
-            craft_notes: updatedProduct.craftNotes,
-            care_summary: updatedProduct.careSummary,
-            is_ready_to_ship: updatedProduct.isReadyToShip,
-            featured: updatedProduct.featured,
-            best_seller: updatedProduct.bestSeller,
-            is_new: updatedProduct.isNew,
-          })
+          .update(updatePayload)
           .eq('id', targetId);
 
         // 2. Fully sync product images if provided in updates

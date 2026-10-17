@@ -1817,6 +1817,10 @@ export const AdminDashboardPage: React.FC = () => {
                             <div className="text-[10px] text-atelier-taupe">
                               {totalStock} in stock total
                             </div>
+                            <div className="text-[9px] text-atelier-darkbrown flex items-center space-x-1 mt-1 font-mono">
+                              <Truck size={10} className="text-atelier-agedgold flex-shrink-0" />
+                              <span>IN: {p.shippingDomesticUSD === 0 ? 'Free' : `$${p.shippingDomesticUSD ?? 35}`} · Int: {p.shippingInternationalUSD === 0 ? 'Free' : `$${p.shippingInternationalUSD ?? 120}`}</span>
+                            </div>
                           </td>
 
                           <td className="py-3 px-4 font-mono font-medium text-atelier-softblack">

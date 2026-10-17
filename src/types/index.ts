@@ -86,6 +86,8 @@ export interface Product {
   isReadyToShip: boolean;
   images: ProductImage[];
   variants: ProductVariant[];
+  shippingDomesticUSD?: number; // Configurable per-rug domestic shipping cost in USD
+  shippingInternationalUSD?: number; // Configurable per-rug international shipping cost in USD
 }
 
 export interface CartItem {
@@ -102,6 +104,8 @@ export interface CartItem {
   estimatedDispatch: string;
   quantity: number;
   productionTimeWeeks?: string;
+  shippingDomesticUSD?: number;
+  shippingInternationalUSD?: number;
 }
 
 export interface CustomQuoteRequest {

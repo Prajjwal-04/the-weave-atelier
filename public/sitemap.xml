@@ -1,87 +1,88 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <!-- Core Atelier Pages -->
   <url>
     <loc>https://www.prasrirugs.com/</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-17</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.prasrirugs.com/shop</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-17</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.95</priority>
   </url>
   <url>
     <loc>https://www.prasrirugs.com/collections</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://www.prasrirugs.com/the-atelier</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.prasrirugs.com/about</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.prasrirugs.com/craft</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.prasrirugs.com/custom-rugs</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.prasrirugs.com/size-guide</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://www.prasrirugs.com/rug-care</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://www.prasrirugs.com/journal</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.prasrirugs.com/shipping-returns</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://www.prasrirugs.com/contact</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://www.prasrirugs.com/terms</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://www.prasrirugs.com/privacy</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -89,161 +90,535 @@
   <!-- Curated Collection Pages -->
   <url>
     <loc>https://www.prasrirugs.com/collections/modern-forms</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.prasrirugs.com/collections/quiet-neutrals</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.prasrirugs.com/collections/botanical-studies</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.prasrirugs.com/collections/texture-sculpture</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.prasrirugs.com/collections/heritage-reimagined</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.prasrirugs.com/collections/hand-knotted-collection</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
 
-  <!-- Individual Artisan Rug Pieces (All 17 Products) -->
+  <!-- Individual Artisan Rug Pieces (24 Products with Image Sitemaps) -->
   <url>
-    <loc>https://www.prasrirugs.com/product/terralis-abstract-wool-rug</loc>
+    <loc>https://www.prasrirugs.com/product/arbor-flow</loc>
     <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/arbor-flow/living-room-1790773813733-nv0hw.jpg</image:loc>
+      <image:title>Arbor Flow — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/arbor-flow/reading-nook-1790773818040-hsgfd.jpg</image:loc>
+      <image:title>Arbor Flow — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/arbor-flow/dining-1790773858740-w3tyt.jpg</image:loc>
+      <image:title>Arbor Flow — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/arbor-flow/dining-1790773892812-bbr9v.jpg</image:loc>
+      <image:title>Arbor Flow — Contemporary Handcrafted Rug</image:title>
+    </image:image>
   </url>
   <url>
-    <loc>https://www.prasrirugs.com/product/arbor-flow-sculpted-wool-rug</loc>
-    <lastmod>2026-10-04</lastmod>
+    <loc>https://www.prasrirugs.com/product/the-artisan-mosaic</loc>
+    <lastmod>2026-10-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/the-artisan-mosaic/full-1792043240818-seekz.webp</image:loc>
+      <image:title>Artisan Mosaic — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/the-artisan-mosaic/living-room-1792043242746-0oqtk.webp</image:loc>
+      <image:title>Artisan Mosaic — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/the-artisan-mosaic/bedroom-1792043244082-pf8gl.webp</image:loc>
+      <image:title>Artisan Mosaic — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/the-artisan-mosaic/reading-nook-1792043245507-lvs50.webp</image:loc>
+      <image:title>Artisan Mosaic — Contemporary Handcrafted Rug</image:title>
+    </image:image>
   </url>
   <url>
-    <loc>https://www.prasrirugs.com/product/kanso-minimalist-linear-rug</loc>
-    <lastmod>2026-10-04</lastmod>
+    <loc>https://www.prasrirugs.com/product/ashen-mosaic</loc>
+    <lastmod>2026-10-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://www.prasrirugs.com/product/varanasi-serenade-hand-knotted-rug</loc>
-    <lastmod>2026-10-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://www.prasrirugs.com/product/botanica-umber-hand-tufted-rug</loc>
-    <lastmod>2026-10-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://www.prasrirugs.com/product/bhadohi-earth-reversible-flatweave</loc>
-    <lastmod>2026-10-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/ashen-mosaic/full-1792132853170-dgskw.webp</image:loc>
+      <image:title>Ashen Mosaic — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/ashen-mosaic/living-room-1792132854516-72jhm.webp</image:loc>
+      <image:title>Ashen Mosaic — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/ashen-mosaic/bedroom-1792132856909-ngqy1.webp</image:loc>
+      <image:title>Ashen Mosaic — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/ashen-mosaic/reading-nook-1792132858806-plw1v.webp</image:loc>
+      <image:title>Ashen Mosaic — Contemporary Handcrafted Rug</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.prasrirugs.com/product/aura</loc>
     <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://www.prasrirugs.com/product/verdant</loc>
-    <lastmod>2026-10-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://www.prasrirugs.com/product/sabhya</loc>
-    <lastmod>2026-10-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://www.prasrirugs.com/product/aurelle</loc>
     <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/aurelle/living-room-1790443186962-t2h1o.jpg</image:loc>
+      <image:title>AURELLE — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/aurelle/reading-nook-1790443199963-vmazj.jpg</image:loc>
+      <image:title>AURELLE — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/aurelle/dining-1790443213688-1d8hy.jpg</image:loc>
+      <image:title>AURELLE — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/aurelle/texture-1790443231784-3stni.jpg</image:loc>
+      <image:title>AURELLE — Contemporary Handcrafted Rug</image:title>
+    </image:image>
   </url>
   <url>
-    <loc>https://www.prasrirugs.com/product/terra</loc>
-    <lastmod>2026-10-04</lastmod>
+    <loc>https://www.prasrirugs.com/product/bluebell-reverie</loc>
+    <lastmod>2026-10-15</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/full-1792057474173-pk97s.webp</image:loc>
+      <image:title>Bluebell Reverie — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/living-room-1792057475918-ju5pe.webp</image:loc>
+      <image:title>Bluebell Reverie — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/bedroom-1792057477737-1xe22.webp</image:loc>
+      <image:title>Bluebell Reverie — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/reading-nook-1792057479836-0kynm.webp</image:loc>
+      <image:title>Bluebell Reverie — Contemporary Handcrafted Rug</image:title>
+    </image:image>
   </url>
   <url>
-    <loc>https://www.prasrirugs.com/product/pebble</loc>
-    <lastmod>2026-10-04</lastmod>
+    <loc>https://www.prasrirugs.com/product/cloud-atelier</loc>
+    <lastmod>2026-10-16</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://www.prasrirugs.com/product/sakura</loc>
-    <lastmod>2026-10-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://www.prasrirugs.com/product/organica</loc>
-    <lastmod>2026-10-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://www.prasrirugs.com/product/nocturne</loc>
-    <lastmod>2026-10-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://www.prasrirugs.com/product/arbor-flow</loc>
-    <lastmod>2026-10-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/full-1792134260842-ym9f2.webp</image:loc>
+      <image:title>Cloud Atelier — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/living-room-1792134262868-7i3s2.webp</image:loc>
+      <image:title>Cloud Atelier — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/bedroom-1792134265428-6incu.webp</image:loc>
+      <image:title>Cloud Atelier — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/reading-nook-1792134269033-8g30m.webp</image:loc>
+      <image:title>Cloud Atelier — Contemporary Handcrafted Rug</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.prasrirugs.com/product/earthscape</loc>
     <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/full-1790769512031-orqlw.jpg</image:loc>
+      <image:title>EarthScape — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/living-room-1790769520676-ovre8.jpg</image:loc>
+      <image:title>EarthScape — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/reading-nook-1790769537143-xyyuh.jpg</image:loc>
+      <image:title>EarthScape — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/dining-1790769544297-br53w.jpg</image:loc>
+      <image:title>EarthScape — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.prasrirugs.com/product/folk-mosaic</loc>
+    <lastmod>2026-10-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/folk-mosaic/full-1792216356074-o3e86.webp</image:loc>
+      <image:title>Folk Mosaic — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/folk-mosaic/living-room-1792216359094-k9wsy.webp</image:loc>
+      <image:title>Folk Mosaic — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/folk-mosaic/bedroom-1792216361136-crlyx.webp</image:loc>
+      <image:title>Folk Mosaic — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/folk-mosaic/reading-nook-1792216363804-gcx4y.webp</image:loc>
+      <image:title>Folk Mosaic — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.prasrirugs.com/product/garnet-reserve</loc>
+    <lastmod>2026-10-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/garnet-reserve/full-1792134119320-i73i4.webp</image:loc>
+      <image:title>Garnet Reserve — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/garnet-reserve/living-room-1792134120425-4lo8l.webp</image:loc>
+      <image:title>Garnet Reserve — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/garnet-reserve/bedroom-1792134121750-tj26h.webp</image:loc>
+      <image:title>Garnet Reserve — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/garnet-reserve/reading-nook-1792134122860-sxwh5.webp</image:loc>
+      <image:title>Garnet Reserve — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.prasrirugs.com/product/ivory-nomad</loc>
+    <lastmod>2026-10-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/full-1792056801664-tjaek.webp</image:loc>
+      <image:title>Ivory Nomad — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/living-room-1792056812834-ld04h.webp</image:loc>
+      <image:title>Ivory Nomad — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/bedroom-1792056823821-zcidl.webp</image:loc>
+      <image:title>Ivory Nomad — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/reading-nook-1792056835653-dv006.webp</image:loc>
+      <image:title>Ivory Nomad — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.prasrirugs.com/product/midnight-azure</loc>
+    <lastmod>2026-10-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/midnight-azure/full-1792134549394-dbco3.webp</image:loc>
+      <image:title>Midnight Azure — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/midnight-azure/living-room-1792134550915-waqhs.webp</image:loc>
+      <image:title>Midnight Azure — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/midnight-azure/bedroom-1792134552041-j72f8.webp</image:loc>
+      <image:title>Midnight Azure — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/midnight-azure/reading-nook-1792134553135-rao0q.webp</image:loc>
+      <image:title>Midnight Azure — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.prasrirugs.com/product/nocturne</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/nocturne/full-1790770298493-1k7d0.jpg</image:loc>
+      <image:title>Nocturne — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/nocturne/living-room-1790770304163-mxgzd.jpg</image:loc>
+      <image:title>Nocturne — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/nocturne/bedroom-1790770310258-r2b15.jpg</image:loc>
+      <image:title>Nocturne — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/nocturne/reading-nook-1790770316381-tjznq.jpg</image:loc>
+      <image:title>Nocturne — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.prasrirugs.com/product/nomad-s-mosaic</loc>
+    <lastmod>2026-10-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/full-1792057744740-oihup.webp</image:loc>
+      <image:title>Nomad&apos;s Mosaic — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/living-room-1792057747666-j4w3a.webp</image:loc>
+      <image:title>Nomad&apos;s Mosaic — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/bedroom-1792057752702-7n273.webp</image:loc>
+      <image:title>Nomad&apos;s Mosaic — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/reading-nook-1792057756387-n05zx.webp</image:loc>
+      <image:title>Nomad&apos;s Mosaic — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.prasrirugs.com/product/obsidian-tapestry</loc>
+    <lastmod>2026-10-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/full-1792056467364-16u0x.webp</image:loc>
+      <image:title>Obsidian Tapestry — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/living-room-1792056470626-nuq8q.webp</image:loc>
+      <image:title>Obsidian Tapestry — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/bedroom-1792056475963-rv9qp.webp</image:loc>
+      <image:title>Obsidian Tapestry — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/reading-nook-1792056481095-o23up.webp</image:loc>
+      <image:title>Obsidian Tapestry — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.prasrirugs.com/product/organica</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/full-1790770804034-4qs0w.jpg</image:loc>
+      <image:title>Organica — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/living-room-1790770818245-t1a6c.jpg</image:loc>
+      <image:title>Organica — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/bedroom-1790770826156-ccg92.jpg</image:loc>
+      <image:title>Organica — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/reading-nook-1790770835283-wvk9q.jpg</image:loc>
+      <image:title>Organica — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.prasrirugs.com/product/pebble</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/pebble/full-1790768572135-iqsfn.jpg</image:loc>
+      <image:title>Pebble — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/pebble/living-room-1790768579474-6z5ij.jpg</image:loc>
+      <image:title>Pebble — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/pebble/dining-1790768593127-f6v4i.jpg</image:loc>
+      <image:title>Pebble — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/pebble/entryway-1790768598108-fob1y.jpg</image:loc>
+      <image:title>Pebble — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.prasrirugs.com/product/sabhya</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.prasrirugs.com/product/sable-mosaic</loc>
+    <lastmod>2026-10-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/full-1792047882611-snjir.webp</image:loc>
+      <image:title>Sable Mosaic — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/living-room-1792047884542-acuz3.webp</image:loc>
+      <image:title>Sable Mosaic — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/bedroom-1792047886219-251om.webp</image:loc>
+      <image:title>Sable Mosaic — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/reading-nook-1792047890381-k9px6.webp</image:loc>
+      <image:title>Sable Mosaic — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.prasrirugs.com/product/sakura</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/living-room-1790773093000-stg6d.jpg</image:loc>
+      <image:title>Sakura — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/bedroom-1790773100074-4m1ck.jpg</image:loc>
+      <image:title>Sakura — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/reading-nook-1790773108614-0r6zj.jpg</image:loc>
+      <image:title>Sakura — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/sakura/dining-1790773283142-ju98i.jpg</image:loc>
+      <image:title>Sakura — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.prasrirugs.com/product/the-dune-essential</loc>
+    <lastmod>2026-10-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/full-1792057266301-owt7k.webp</image:loc>
+      <image:title>The Dune Essential — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/living-room-1792057273101-a7jkb.webp</image:loc>
+      <image:title>The Dune Essential — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/bedroom-1792057276744-fag1i.webp</image:loc>
+      <image:title>The Dune Essential — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.prasrirugs.com/product/the-russet-heirloom</loc>
+    <lastmod>2026-10-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/the-russet-heirloom/bedroom-1792046346153-1w5gq.webp</image:loc>
+      <image:title>The Russet Heirloom — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/the-russet-heirloom/living-room-1792046594119-itayj.webp</image:loc>
+      <image:title>The Russet Heirloom — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/the-russet-heirloom/bedroom-1792046595422-a5dkp.webp</image:loc>
+      <image:title>The Russet Heirloom — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/the-russet-heirloom/reading-nook-1792046597667-8uivj.webp</image:loc>
+      <image:title>The Russet Heirloom — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.prasrirugs.com/product/verdant</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.prasrirugs.com/product/willow-reverie</loc>
+    <lastmod>2026-10-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/full-1792056995564-s75wx.webp</image:loc>
+      <image:title>Willow Reverie — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/living-room-1792057000999-b9iz6.webp</image:loc>
+      <image:title>Willow Reverie — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/bedroom-1792057009839-7qpkk.webp</image:loc>
+      <image:title>Willow Reverie — Contemporary Handcrafted Rug</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://femavdznbdfncnajvrye.supabase.co/storage/v1/object/public/rug-images/new-rug/reading-nook-1792057012134-oq8hv.webp</image:loc>
+      <image:title>Willow Reverie — Contemporary Handcrafted Rug</image:title>
+    </image:image>
   </url>
 
   <!-- Editorial Journal Articles -->
   <url>
     <loc>https://www.prasrirugs.com/journal/hand-knotted-vs-hand-tufted-rugs</loc>
-    <lastmod>2026-10-05</lastmod>
+    <lastmod>2026-10-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://www.prasrirugs.com/journal/the-story-of-bhadohi-carpet-making</loc>
-    <lastmod>2026-10-05</lastmod>
+    <lastmod>2026-10-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
     <loc>https://www.prasrirugs.com/journal/choosing-the-right-rug-size-architects-guide</loc>
-    <lastmod>2026-10-05</lastmod>
+    <lastmod>2026-10-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
   </url>

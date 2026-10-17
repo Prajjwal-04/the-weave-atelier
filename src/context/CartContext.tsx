@@ -132,27 +132,27 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const subtotalUSD = items.reduce((acc, i) => acc + i.priceUSD * i.quantity, 0);
   const totalItemCount = items.reduce((acc, i) => acc + i.quantity, 0);
 
-  // Free shipping threshold: $1500 USD worldwide
-  const freeShippingThresholdUSD = 1500;
-  const amountNeededForFreeShippingUSD = Math.max(0, freeShippingThresholdUSD - subtotalUSD);
+  const freeShippingThresholdUSD = 0;
+  const amountNeededForFreeShippingUSD = 0;
 
-  // Dynamic shipping calculation by destination country
+  // Base shipping calculation by destination country
   let shippingUSD = 0;
   if (items.length > 0) {
-    if (subtotalUSD >= freeShippingThresholdUSD) {
-      shippingUSD = 0; // Complimentary international express shipping!
+    if (destinationCountry === 'India') {
+      shippingUSD = 35; // Standard domestic express across India
+    } else if (['United States', 'Canada'].includes(destinationCountry)) {
+      shippingUSD = 120; // Express insured air courier
+    } else if (['United Kingdom', 'Germany', 'France', 'Italy', 'Netherlands', 'Switzerland'].includes(destinationCountry)) {
+      shippingUSD = 110;
+    } else if (['Australia', 'New Zealand', 'Japan', 'Singapore'].includes(destinationCountry)) {
+      shippingUSD = 140;
     } else {
-      if (destinationCountry === 'India') {
-        shippingUSD = 40; // Domestic express
-      } else if (['United States', 'Canada'].includes(destinationCountry)) {
-        shippingUSD = 120; // Express insured air courier
-      } else if (['United Kingdom', 'Germany', 'France', 'Italy', 'Netherlands', 'Switzerland'].includes(destinationCountry)) {
-        shippingUSD = 110;
-      } else if (['Australia', 'New Zealand', 'Japan', 'Singapore'].includes(destinationCountry)) {
-        shippingUSD = 140;
-      } else {
-        shippingUSD = 150;
-      }
+      shippingUSD = 150;
+    }
+
+    // Additional rugs add consolidated air freight (+ $40 per additional piece)
+    if (totalItemCount > 1) {
+      shippingUSD += (totalItemCount - 1) * 40;
     }
   }
 

@@ -6,17 +6,6 @@ export const shippingService = {
     subtotalUSD: number;
     freeShippingThresholdUSD?: number;
   }): { costUSD: number; carrier: string; estimatedDays: string; isComplimentary: boolean } {
-    const threshold = params.freeShippingThresholdUSD || 1500;
-
-    if (params.subtotalUSD >= threshold) {
-      return {
-        costUSD: 0,
-        carrier: 'Insured Express International',
-        estimatedDays: '5–7 business days',
-        isComplimentary: true,
-      };
-    }
-
     const country = params.destinationCountry.toLowerCase();
     let baseCost = 120; // Default international air freight
     let days = '5–7 business days';

@@ -228,9 +228,9 @@ export const CartPage: React.FC = () => {
                   <span className="font-mono text-atelier-softblack">{formatPrice(subtotalUSD)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>International Express Courier</span>
+                  <span>{destinationCountry === 'India' ? 'Domestic Express Courier' : 'Insured Express International Courier'}</span>
                   <span className="font-mono text-atelier-softblack">
-                    {shippingUSD === 0 ? 'Complimentary' : formatPrice(shippingUSD)}
+                    {formatPrice(shippingUSD)}
                   </span>
                 </div>
                 <div className="flex justify-between text-atelier-taupe text-[11px]">

@@ -54,7 +54,7 @@ const FeaturedCardItem: React.FC<FeaturedCardItemProps> = ({
         if (!hasHoveredOnce) setHasHoveredOnce(true);
       }}
       onMouseLeave={() => setIsHovered(false)}
-      className="flex-shrink-0 w-[80vw] sm:w-[48vw] md:w-[35vw] lg:w-[310px] snap-start group flex flex-col justify-between"
+      className="featured-card-item flex-shrink-0 w-[80vw] sm:w-[48vw] md:w-[35vw] lg:w-[310px] snap-start group flex flex-col justify-between select-none"
     >
       {/* Image Stage Container */}
       <div className="relative aspect-[3/4] overflow-hidden bg-atelier-cream border border-atelier-parchment/70 group-hover:border-atelier-agedgold/50 transition-all duration-500 shadow-xs group-hover:shadow-luxury">
@@ -66,15 +66,21 @@ const FeaturedCardItem: React.FC<FeaturedCardItemProps> = ({
           </div>
         )}
 
-        <Link to={`/product/${product.slug}`} className="block w-full h-full">
+        <Link
+          to={`/product/${product.slug}`}
+          draggable={false}
+          className="block w-full h-full"
+        >
           {/* Primary Image */}
           <img
             src={primaryImage}
             srcSet={primarySrcSet || undefined}
             sizes="(max-width: 640px) 80vw, (max-width: 1024px) 35vw, 310px"
             alt={product.name}
+            draggable={false}
+            onDragStart={(e) => e.preventDefault()}
             onLoad={() => setIsLoaded(true)}
-            className={`w-full h-full object-cover object-center transition-all duration-700 ease-out ${
+            className={`w-full h-full object-cover object-center transition-all duration-700 ease-out pointer-events-none select-none ${
               !isLoaded ? 'opacity-0' : isHovered ? 'opacity-0 scale-105' : 'opacity-100 scale-100'
             }`}
             loading={idx < 2 ? 'eager' : 'lazy'}
@@ -87,8 +93,10 @@ const FeaturedCardItem: React.FC<FeaturedCardItemProps> = ({
             <img
               src={secondaryImage}
               alt={`${product.name} alternate view`}
-              className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-700 ease-out ${
-                isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
+              draggable={false}
+              onDragStart={(e) => e.preventDefault()}
+              className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-700 ease-out pointer-events-none select-none ${
+                isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
               }`}
               loading="lazy"
               decoding="async"
@@ -186,6 +194,7 @@ export const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products
   const [customSizeProduct, setCustomSizeProduct] = useState<Product | null>(null);
   const [activeCardIndex, setActiveCardIndex] = useState(0);
   const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
+  const [isPointerDragging, setIsPointerDragging] = useState(false);
 
   const { isLoading, getInventory } = useInventory();
   const { formatPrice } = useCurrency();
@@ -195,20 +204,20 @@ export const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
-  // Mouse drag support
+  // Robust pointer drag tracking
   const isDragging = useRef(false);
   const startX = useRef(0);
   const scrollLeftPos = useRef(0);
   const hasMoved = useRef(false);
 
-  // Feature 8 rugs for an extensive showcase
+  // Showcase all featured rugs without arbitrary 8-item cut-off
   const featuredRugs = React.useMemo(() => {
     const featuredOnly = (products || []).filter((p) => p.featured);
-    if (featuredOnly.length >= 8) {
-      return featuredOnly.slice(0, 8);
+    if (featuredOnly.length > 0) {
+      return featuredOnly;
     }
-    const otherProducts = (products || []).filter((p) => !p.featured);
-    return [...featuredOnly, ...otherProducts].slice(0, 8);
+    // Fallback if no products are flagged featured
+    return (products || []).slice(0, 10);
   }, [products]);
 
   // Total cards in track: strictly the featured rugs
@@ -217,12 +226,25 @@ export const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products
   const checkScroll = useCallback(() => {
     if (!sliderRef.current) return;
     const { scrollLeft, scrollWidth, clientWidth } = sliderRef.current;
-    setCanScrollLeft(scrollLeft > 15);
-    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 15);
+    const maxScroll = Math.max(0, scrollWidth - clientWidth);
 
-    // Approximate active card
-    const cardWidth = clientWidth < 640 ? clientWidth * 0.8 : clientWidth * 0.32;
-    const index = Math.round(scrollLeft / (cardWidth + 24));
+    setCanScrollLeft(scrollLeft > 15);
+    setCanScrollRight(scrollLeft < maxScroll - 15);
+
+    if (maxScroll <= 0 || totalCards <= 1) {
+      setActiveCardIndex(0);
+      return;
+    }
+
+    // When scrolled near the end, reliably activate the last card!
+    if (scrollLeft >= maxScroll - 35) {
+      setActiveCardIndex(totalCards - 1);
+      return;
+    }
+
+    // Proportional progress between 0 and totalCards - 1
+    const progress = Math.max(0, Math.min(1, scrollLeft / maxScroll));
+    const index = Math.round(progress * (totalCards - 1));
     setActiveCardIndex(Math.min(totalCards - 1, Math.max(0, index)));
   }, [totalCards]);
 
@@ -234,45 +256,102 @@ export const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products
 
   const scrollToCard = (index: number) => {
     if (!sliderRef.current) return;
-    const clientWidth = sliderRef.current.clientWidth;
-    const cardWidth = clientWidth < 640 ? clientWidth * 0.8 : clientWidth * 0.32;
-    const targetLeft = index * (cardWidth + 24);
-    sliderRef.current.scrollTo({
-      left: targetLeft,
-      behavior: 'smooth',
-    });
+    const { scrollWidth, clientWidth } = sliderRef.current;
+    const maxScroll = Math.max(0, scrollWidth - clientWidth);
+
+    if (index <= 0) {
+      sliderRef.current.scrollTo({
+        left: 0,
+        behavior: 'smooth',
+      });
+      return;
+    }
+
+    // When selecting the last card, scroll all the way to maxScroll
+    if (index >= totalCards - 1) {
+      sliderRef.current.scrollTo({
+        left: maxScroll,
+        behavior: 'smooth',
+      });
+      return;
+    }
+
+    // Target the specific DOM card element
+    const cards = sliderRef.current.querySelectorAll('.featured-card-item');
+    if (cards && cards[index]) {
+      const cardEl = cards[index] as HTMLElement;
+      sliderRef.current.scrollTo({
+        left: Math.min(maxScroll, cardEl.offsetLeft - 16),
+        behavior: 'smooth',
+      });
+    } else {
+      const targetLeft = (index / (totalCards - 1)) * maxScroll;
+      sliderRef.current.scrollTo({
+        left: targetLeft,
+        behavior: 'smooth',
+      });
+    }
   };
 
   const handleScroll = (direction: 'left' | 'right') => {
     if (!sliderRef.current) return;
-    const scrollAmount = sliderRef.current.clientWidth * 0.75;
-    sliderRef.current.scrollBy({
-      left: direction === 'left' ? -scrollAmount : scrollAmount,
-      behavior: 'smooth',
-    });
+    const { scrollLeft, scrollWidth, clientWidth } = sliderRef.current;
+    const maxScroll = Math.max(0, scrollWidth - clientWidth);
+    const scrollStep = clientWidth < 640 ? clientWidth * 0.85 : 340 * 2;
+
+    if (direction === 'right') {
+      const target = Math.min(maxScroll, scrollLeft + scrollStep);
+      sliderRef.current.scrollTo({
+        left: target,
+        behavior: 'smooth',
+      });
+    } else {
+      const target = Math.max(0, scrollLeft - scrollStep);
+      sliderRef.current.scrollTo({
+        left: target,
+        behavior: 'smooth',
+      });
+    }
   };
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (!sliderRef.current) return;
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.button !== 0 || !sliderRef.current) return;
     isDragging.current = true;
     hasMoved.current = false;
-    startX.current = e.pageX - sliderRef.current.offsetLeft;
+    startX.current = e.clientX;
     scrollLeftPos.current = sliderRef.current.scrollLeft;
+    setIsPointerDragging(true);
+
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch (_) {}
   };
 
-  const handleMouseLeaveOrUp = () => {
-    isDragging.current = false;
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!isDragging.current || !sliderRef.current) return;
-    e.preventDefault();
-    const x = e.pageX - sliderRef.current.offsetLeft;
-    const walk = (x - startX.current) * 1.3;
-    if (Math.abs(walk) > 6) {
+    const deltaX = e.clientX - startX.current;
+    if (Math.abs(deltaX) > 4) {
       hasMoved.current = true;
     }
-    sliderRef.current.scrollLeft = scrollLeftPos.current - walk;
+    // 1:1 direct scrolling without animation lag
+    sliderRef.current.scrollLeft = scrollLeftPos.current - deltaX;
+  };
+
+  const handlePointerUpOrCancel = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDragging.current) return;
+    isDragging.current = false;
+    setIsPointerDragging(false);
+
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch (_) {}
+
+    // Allow a small delay before clearing hasMoved so onClickCapture can swallow accidental card navigation
+    if (hasMoved.current) {
+      setTimeout(() => {
+        hasMoved.current = false;
+      }, 150);
+    }
   };
 
   return (
@@ -361,11 +440,22 @@ export const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products
           <div
             ref={sliderRef}
             onScroll={checkScroll}
-            onMouseDown={handleMouseDown}
-            onMouseLeave={handleMouseLeaveOrUp}
-            onMouseUp={handleMouseLeaveOrUp}
-            onMouseMove={handleMouseMove}
-            className="flex space-x-6 sm:space-x-7 overflow-x-auto scroll-smooth scrollbar-none snap-x snap-mandatory pb-6 pt-2 cursor-grab active:cursor-grabbing select-none"
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUpOrCancel}
+            onPointerCancel={handlePointerUpOrCancel}
+            onClickCapture={(e) => {
+              if (hasMoved.current) {
+                e.preventDefault();
+                e.stopPropagation();
+              }
+            }}
+            onDragStart={(e) => e.preventDefault()}
+            className={`flex space-x-6 sm:space-x-7 overflow-x-auto scrollbar-none pb-6 pt-2 select-none cursor-grab active:cursor-grabbing touch-pan-x ${
+              isPointerDragging
+                ? 'scroll-auto snap-none'
+                : 'scroll-smooth snap-x snap-mandatory'
+            }`}
           >
             {/* Product Cards 1 to N */}
             {isLoading
@@ -391,6 +481,9 @@ export const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products
                     formatPrice={formatPrice}
                   />
                 ))}
+
+            {/* Generous Trailing Spacer to ensure the last card can be scrolled fully into view without clipping */}
+            <div className="flex-shrink-0 w-8 sm:w-16 pointer-events-none select-none" aria-hidden="true" />
           </div>
         </div>
 

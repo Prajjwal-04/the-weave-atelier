@@ -4,10 +4,19 @@ Allow: /
 Disallow: /admin
 Disallow: /admin/*
 Disallow: /api/*
+Disallow: /checkout
+Disallow: /cart
+Disallow: /account
+Disallow: /order-confirmation
+Disallow: /order-tracking
+Disallow: /track-order
 
-# AI & Search Engine Crawlers
+# Allow all major search engine crawlers & AI discovery bots
 User-agent: Googlebot
 Allow: /
+Allow: /*.js$
+Allow: /*.css$
+Allow: /images/
 
 User-agent: Google-Extended
 Allow: /
@@ -28,3 +37,4 @@ User-agent: Bingbot
 Allow: /
 
 Sitemap: https://www.prasrirugs.com/sitemap.xml
+Host: https://www.prasrirugs.com

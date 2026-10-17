@@ -24,9 +24,9 @@ export const SEO: React.FC<SEOProps> = ({
   jsonLd,
 }) => {
   useEffect(() => {
-    // 1. Update Title
+    // 1. Update Title (prevent double suffixing of PRASRI RUGS)
     const formattedTitle = title
-      ? `${title} — PRASRI RUGS`
+      ? (title.includes('PRASRI RUGS') ? title : `${title} — PRASRI RUGS`)
       : DEFAULT_TITLE;
     document.title = formattedTitle;
 
@@ -41,9 +41,11 @@ export const SEO: React.FC<SEOProps> = ({
       element.setAttribute('content', content);
     };
 
-    // 3. Primary Meta Tags
+    // 3. Primary Meta Tags & Crawler Directives
     setMetaTag('meta[name="description"]', 'name', 'description', description);
     setMetaTag('meta[name="title"]', 'name', 'title', formattedTitle);
+    setMetaTag('meta[name="robots"]', 'name', 'robots', 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1');
+    setMetaTag('meta[name="googlebot"]', 'name', 'googlebot', 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1');
 
     // 4. Canonical Tag (Always points to https://www.prasrirugs.com + canonicalPath)
     const cleanPath = canonicalPath.startsWith('/') ? canonicalPath : `/${canonicalPath}`;

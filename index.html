@@ -9,6 +9,8 @@
 
   <!-- Primary Meta Tags -->
   <title>PRASRI RUGS — Contemporary Handmade Rugs from Bhadohi, India</title>
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
   <meta name="title" content="PRASRI RUGS — Contemporary Handmade Rugs from Bhadohi, India" />
   <meta name="description"
     content="Contemporary rugs, rooted in Indian craftsmanship. Handcrafted slowly in Bhadohi, India for discerning architectural spaces worldwide. Ready-to-ship collections and bespoke custom sizing." />
@@ -62,6 +64,14 @@
         "@id": "https://www.prasrirugs.com/#website",
         "url": "https://www.prasrirugs.com",
         "name": "Prasri Rugs",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": "https://www.prasrirugs.com/shop?search={search_term_string}"
+          },
+          "query-input": "required name=search_term_string"
+        },
         "publisher": {
           "@id": "https://www.prasrirugs.com/#organization"
         }
@@ -103,7 +113,33 @@
 <body
   class="bg-atelier-ivory text-atelier-softblack font-sans antialiased selection:bg-atelier-parchment selection:text-atelier-darkbrown">
   <div id="root">
-    <!-- Prerendered Semantic Fallback for Search Engines and AI Crawlers (Googlebot, Gemini, Claude, etc.) -->
+    <!-- Luxury Atelier Wheel Loading Experience -->
+    <div id="initial-atelier-loader" style="position: fixed; inset: 0; background: #FAF8F5; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;">
+      <div style="position: relative; width: 68px; height: 68px; margin-bottom: 24px;">
+        <!-- Loom Spindle Outer Ring -->
+        <div style="position: absolute; inset: 0; border: 2.5px solid #EAE3D9; border-radius: 50%;"></div>
+        <!-- Spinning Wheel Accent -->
+        <div style="position: absolute; inset: 0; border: 2.5px solid transparent; border-top-color: #8C6D4F; border-right-color: #C5A880; border-radius: 50%; animation: atelier-wheel-spin 0.9s cubic-bezier(0.5, 0.1, 0.5, 0.9) infinite;"></div>
+        <!-- Center Spindle Hub -->
+        <div style="position: absolute; top: 50%; left: 50%; width: 10px; height: 10px; margin-top: -5px; margin-left: -5px; background: #8C6D4F; border-radius: 50%; box-shadow: 0 0 10px rgba(140, 109, 79, 0.3);"></div>
+      </div>
+      <div style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px; letter-spacing: 0.28em; color: #1E1C1A; font-weight: 400; text-transform: uppercase;">
+        PRASRI RUGS
+      </div>
+      <div style="font-size: 9px; letter-spacing: 0.38em; color: #8C6D4F; text-transform: uppercase; margin-top: 6px; font-weight: 500;">
+        BHADOHI · INDIA
+      </div>
+    </div>
+    <style>
+      @keyframes atelier-wheel-spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+  </div>
+
+  <!-- Fallback Semantic Content for Search Engine Crawlers without JavaScript -->
+  <noscript>
     <header style="padding: 24px 20px; text-align: center; border-bottom: 1px solid #EAE3D9;">
       <a href="/" style="text-decoration: none; color: #1E1C1A; font-family: serif; font-size: 24px; letter-spacing: 0.28em;">PRASRI RUGS</a>
       <p style="margin: 4px 0 0; font-size: 11px; letter-spacing: 0.3em; color: #8C6D4F; text-transform: uppercase;">BHADOHI · INDIA</p>
@@ -129,32 +165,158 @@
 
       <section style="margin-bottom: 48px;">
         <h2 style="font-family: serif; font-size: 26px; border-bottom: 1px solid #EAE3D9; padding-bottom: 12px; margin-bottom: 24px;">
-          Artisan Rug Masterpieces
+          Curated Rug Collections
         </h2>
-        <ul style="list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
-          <li style="border: 1px solid #EAE3D9; padding: 20px; background: #FAF7F2;">
-            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 8px;"><a href="/product/terralis-abstract-wool-rug" style="color: #1E1C1A; text-decoration: none;">Terralis Abstract Wool Rug</a></h3>
-            <p style="font-size: 13px; color: #665D55; margin: 0;">Flowing topographical contours rendered in hand-tufted New Zealand and Indian highland wool.</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 40px;">
+          <div style="border: 1px solid #EAE3D9; padding: 18px; background: #FAF7F2;">
+            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 6px;"><a href="/collections/modern-forms" style="color: #1E1C1A; text-decoration: none;">Modern Forms</a></h3>
+            <p style="font-size: 13px; color: #665D55; margin: 0;">Abstract, fluid lines, and architectural minimalism.</p>
+          </div>
+          <div style="border: 1px solid #EAE3D9; padding: 18px; background: #FAF7F2;">
+            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 6px;"><a href="/collections/quiet-neutrals" style="color: #1E1C1A; text-decoration: none;">Quiet Neutrals</a></h3>
+            <p style="font-size: 13px; color: #665D55; margin: 0;">Restrained tones in un-dyed wools, soft bone, and oatmeal.</p>
+          </div>
+          <div style="border: 1px solid #EAE3D9; padding: 18px; background: #FAF7F2;">
+            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 6px;"><a href="/collections/botanical-studies" style="color: #1E1C1A; text-decoration: none;">Botanical Studies</a></h3>
+            <p style="font-size: 13px; color: #665D55; margin: 0;">Nature-inspired Gangetic flora motifs.</p>
+          </div>
+          <div style="border: 1px solid #EAE3D9; padding: 18px; background: #FAF7F2;">
+            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 6px;"><a href="/collections/texture-sculpture" style="color: #1E1C1A; text-decoration: none;">Texture & Sculpture</a></h3>
+            <p style="font-size: 13px; color: #665D55; margin: 0;">High-low carved channels and dimensional relief piles.</p>
+          </div>
+          <div style="border: 1px solid #EAE3D9; padding: 18px; background: #FAF7F2;">
+            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 6px;"><a href="/collections/heritage-reimagined" style="color: #1E1C1A; text-decoration: none;">Heritage Reimagined</a></h3>
+            <p style="font-size: 13px; color: #665D55; margin: 0;">Centuries of Indian weaving heritage filtered through modern restraint.</p>
+          </div>
+          <div style="border: 1px solid #EAE3D9; padding: 18px; background: #FAF7F2;">
+            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 6px;"><a href="/collections/hand-knotted-collection" style="color: #1E1C1A; text-decoration: none;">Hand-Knotted Collection</a></h3>
+            <p style="font-size: 13px; color: #665D55; margin: 0;">Masterpiece rugs individually knotted by hand on vertical timber looms.</p>
+          </div>
+        </div>
+
+        <h2 style="font-family: serif; font-size: 26px; border-bottom: 1px solid #EAE3D9; padding-bottom: 12px; margin-bottom: 24px;">
+          Artisan Rug Gallery (24 Handcrafted Works)
+        </h2>
+        <ul style="list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
+          <li style="border: 1px solid #EAE3D9; padding: 18px; background: #FAF7F2;">
+            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 6px;"><a href="/product/folk-mosaic" style="color: #1E1C1A; text-decoration: none;">Folk Mosaic</a></h3>
+            <p style="font-size: 12px; color: #8C6D4F; margin: 0 0 4px; text-transform: uppercase; font-family: monospace;">Hand-Knotted · hand knotted collection</p>
+            <p style="font-size: 13px; color: #665D55; margin: 0;">The Folk Mosaic celebrates the beauty of traditional motifs through a bold patchwork border and a refined ivory cen...</p>
           </li>
-          <li style="border: 1px solid #EAE3D9; padding: 20px; background: #FAF7F2;">
-            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 8px;"><a href="/product/arbor-flow-sculpted-wool-rug" style="color: #1E1C1A; text-decoration: none;">Arbor Flow Sculpted Wool Rug</a></h3>
-            <p style="font-size: 13px; color: #665D55; margin: 0;">Organic botanical silhouettes sculpted with dimensional low and high loop piles.</p>
+          <li style="border: 1px solid #EAE3D9; padding: 18px; background: #FAF7F2;">
+            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 6px;"><a href="/product/midnight-azure" style="color: #1E1C1A; text-decoration: none;">Midnight Azure</a></h3>
+            <p style="font-size: 12px; color: #8C6D4F; margin: 0 0 4px; text-transform: uppercase; font-family: monospace;">Hand-Knotted · quiet neutrals</p>
+            <p style="font-size: 13px; color: #665D55; margin: 0;">Bold and quietly luxurious, The Midnight Azure makes a striking statement through its saturated blue palette and un...</p>
           </li>
-          <li style="border: 1px solid #EAE3D9; padding: 20px; background: #FAF7F2;">
-            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 8px;"><a href="/product/kanso-minimalist-linear-rug" style="color: #1E1C1A; text-decoration: none;">Kanso Minimalist Linear Rug</a></h3>
-            <p style="font-size: 13px; color: #665D55; margin: 0;">Architectural minimalism featuring alternating ribbed textures and subtle earthen contrasts.</p>
+          <li style="border: 1px solid #EAE3D9; padding: 18px; background: #FAF7F2;">
+            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 6px;"><a href="/product/cloud-atelier" style="color: #1E1C1A; text-decoration: none;">Cloud Atelier</a></h3>
+            <p style="font-size: 12px; color: #8C6D4F; margin: 0 0 4px; text-transform: uppercase; font-family: monospace;">Hand-Knotted · quiet neutrals</p>
+            <p style="font-size: 13px; color: #665D55; margin: 0;">Defined by its serene palette and understated surface, The Cloud Atelier brings softness and warmth to contemporary...</p>
           </li>
-          <li style="border: 1px solid #EAE3D9; padding: 20px; background: #FAF7F2;">
-            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 8px;"><a href="/product/varanasi-serenade-hand-knotted-rug" style="color: #1E1C1A; text-decoration: none;">Varanasi Serenade Hand-Knotted Rug</a></h3>
-            <p style="font-size: 13px; color: #665D55; margin: 0;">Heirloom hand-knotted pure wool with fine luster wash and vintage riverbed character.</p>
+          <li style="border: 1px solid #EAE3D9; padding: 18px; background: #FAF7F2;">
+            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 6px;"><a href="/product/garnet-reserve" style="color: #1E1C1A; text-decoration: none;">Garnet Reserve</a></h3>
+            <p style="font-size: 12px; color: #8C6D4F; margin: 0 0 4px; text-transform: uppercase; font-family: monospace;">Hand-Knotted · quiet neutrals</p>
+            <p style="font-size: 13px; color: #665D55; margin: 0;">Bold yet refined, The Garnet Reserve brings depth and warmth to an interior through its rich burgundy palette and c...</p>
           </li>
-          <li style="border: 1px solid #EAE3D9; padding: 20px; background: #FAF7F2;">
-            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 8px;"><a href="/product/botanica-umber-hand-tufted-rug" style="color: #1E1C1A; text-decoration: none;">Botanica Umber Hand-Tufted Rug</a></h3>
-            <p style="font-size: 13px; color: #665D55; margin: 0;">Warm terracotta and umber tones harmonized for modern dining and open-concept living.</p>
+          <li style="border: 1px solid #EAE3D9; padding: 18px; background: #FAF7F2;">
+            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 6px;"><a href="/product/ashen-mosaic" style="color: #1E1C1A; text-decoration: none;">Ashen Mosaic</a></h3>
+            <p style="font-size: 12px; color: #8C6D4F; margin: 0 0 4px; text-transform: uppercase; font-family: monospace;">Hand-Knotted · heritage reimagined</p>
+            <p style="font-size: 13px; color: #665D55; margin: 0;">The Ashen Mosaic pairs a softly weathered central field with bold charcoal framing and delicate geometric accents. ...</p>
           </li>
-          <li style="border: 1px solid #EAE3D9; padding: 20px; background: #FAF7F2;">
-            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 8px;"><a href="/product/bhadohi-earth-reversible-flatweave" style="color: #1E1C1A; text-decoration: none;">Bhadohi Earth Reversible Flatweave</a></h3>
-            <p style="font-size: 13px; color: #665D55; margin: 0;">Zero-pile geometric kilim woven from unbleached natural fibers, reversible and resilient.</p>
+          <li style="border: 1px solid #EAE3D9; padding: 18px; background: #FAF7F2;">
+            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 6px;"><a href="/product/nomad-s-mosaic" style="color: #1E1C1A; text-decoration: none;">Nomad's Mosaic</a></h3>
+            <p style="font-size: 12px; color: #8C6D4F; margin: 0 0 4px; text-transform: uppercase; font-family: monospace;">Hand-Knotted · heritage reimagined</p>
+            <p style="font-size: 13px; color: #665D55; margin: 0;">The Nomad's Mosaic brings together rich earthy hues and expressive patterns. Its layered design celebrates artisana...</p>
+          </li>
+          <li style="border: 1px solid #EAE3D9; padding: 18px; background: #FAF7F2;">
+            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 6px;"><a href="/product/bluebell-reverie" style="color: #1E1C1A; text-decoration: none;">Bluebell Reverie</a></h3>
+            <p style="font-size: 12px; color: #8C6D4F; margin: 0 0 4px; text-transform: uppercase; font-family: monospace;">Hand-Knotted · botanical studies</p>
+            <p style="font-size: 13px; color: #665D55; margin: 0;">The Bluebell Reverie, punctuated by warm terracotta and ochre accents. Its softly weathered appearance blends vinta...</p>
+          </li>
+          <li style="border: 1px solid #EAE3D9; padding: 18px; background: #FAF7F2;">
+            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 6px;"><a href="/product/the-dune-essential" style="color: #1E1C1A; text-decoration: none;">The Dune Essential</a></h3>
+            <p style="font-size: 12px; color: #8C6D4F; margin: 0 0 4px; text-transform: uppercase; font-family: monospace;">Hand-Knotted · quiet neutrals</p>
+            <p style="font-size: 13px; color: #665D55; margin: 0;">The Dune Essential celebrates the beauty of simplicity through its warm sand-toned palette and understated surface ...</p>
+          </li>
+          <li style="border: 1px solid #EAE3D9; padding: 18px; background: #FAF7F2;">
+            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 6px;"><a href="/product/willow-reverie" style="color: #1E1C1A; text-decoration: none;">Willow Reverie</a></h3>
+            <p style="font-size: 12px; color: #8C6D4F; margin: 0 0 4px; text-transform: uppercase; font-family: monospace;">Hand-Knotted · quiet neutrals</p>
+            <p style="font-size: 13px; color: #665D55; margin: 0;">The Willow Reverie blends a soft ivory ground with faded sage and blush detailing. Its delicate pattern and gently ...</p>
+          </li>
+          <li style="border: 1px solid #EAE3D9; padding: 18px; background: #FAF7F2;">
+            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 6px;"><a href="/product/ivory-nomad" style="color: #1E1C1A; text-decoration: none;">Ivory Nomad</a></h3>
+            <p style="font-size: 12px; color: #8C6D4F; margin: 0 0 4px; text-transform: uppercase; font-family: monospace;">Hand-Knotted · hand knotted collection</p>
+            <p style="font-size: 13px; color: #665D55; margin: 0;">A soft ivory ground meets a richly detailed central mosaic in The Ivory Nomad. Faded borders, delicate geometric mo...</p>
+          </li>
+          <li style="border: 1px solid #EAE3D9; padding: 18px; background: #FAF7F2;">
+            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 6px;"><a href="/product/obsidian-tapestry" style="color: #1E1C1A; text-decoration: none;">Obsidian Tapestry</a></h3>
+            <p style="font-size: 12px; color: #8C6D4F; margin: 0 0 4px; text-transform: uppercase; font-family: monospace;">Hand-Knotted · hand knotted collection</p>
+            <p style="font-size: 13px; color: #665D55; margin: 0;"> The Obsidian Tapestry pairs a richly layered dark ground with framed geometric motifs and subtle earthy accents. I...</p>
+          </li>
+          <li style="border: 1px solid #EAE3D9; padding: 18px; background: #FAF7F2;">
+            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 6px;"><a href="/product/sable-mosaic" style="color: #1E1C1A; text-decoration: none;">Sable Mosaic</a></h3>
+            <p style="font-size: 12px; color: #8C6D4F; margin: 0 0 4px; text-transform: uppercase; font-family: monospace;">Hand-Knotted · modern forms</p>
+            <p style="font-size: 13px; color: #665D55; margin: 0;">An expressive interplay of abstract geometry and distressed detailing, The Sable Mosaic combines a soft neutral pal...</p>
+          </li>
+          <li style="border: 1px solid #EAE3D9; padding: 18px; background: #FAF7F2;">
+            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 6px;"><a href="/product/the-russet-heirloom" style="color: #1E1C1A; text-decoration: none;">The Russet Heirloom</a></h3>
+            <p style="font-size: 12px; color: #8C6D4F; margin: 0 0 4px; text-transform: uppercase; font-family: monospace;">Hand-Knotted · heritage reimagined</p>
+            <p style="font-size: 13px; color: #665D55; margin: 0;">A celebration of timeless craftsmanship, The Russet Heirloom blends rich burgundy tones, soft ivory framing, and in...</p>
+          </li>
+          <li style="border: 1px solid #EAE3D9; padding: 18px; background: #FAF7F2;">
+            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 6px;"><a href="/product/the-artisan-mosaic" style="color: #1E1C1A; text-decoration: none;">Artisan Mosaic</a></h3>
+            <p style="font-size: 12px; color: #8C6D4F; margin: 0 0 4px; text-transform: uppercase; font-family: monospace;">Hand-Knotted · heritage reimagined</p>
+            <p style="font-size: 13px; color: #665D55; margin: 0;">A celebration of colour, pattern, and artisanal craftsmanship, The Artisan Mosaic brings a distinctive character to...</p>
+          </li>
+          <li style="border: 1px solid #EAE3D9; padding: 18px; background: #FAF7F2;">
+            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 6px;"><a href="/product/arbor-flow" style="color: #1E1C1A; text-decoration: none;">Arbor Flow</a></h3>
+            <p style="font-size: 12px; color: #8C6D4F; margin: 0 0 4px; text-transform: uppercase; font-family: monospace;">Hand-Tufted · quiet neutrals</p>
+            <p style="font-size: 13px; color: #665D55; margin: 0;">A modern organic study in gentle wave motions and river currents. Hand-tufted in Bhadohi from durable blended wool,...</p>
+          </li>
+          <li style="border: 1px solid #EAE3D9; padding: 18px; background: #FAF7F2;">
+            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 6px;"><a href="/product/sakura" style="color: #1E1C1A; text-decoration: none;">Sakura</a></h3>
+            <p style="font-size: 12px; color: #8C6D4F; margin: 0 0 4px; text-transform: uppercase; font-family: monospace;">Hand-Tufted · botanical studies</p>
+            <p style="font-size: 13px; color: #665D55; margin: 0;">A poetic ode to transient spring blooms, Sakura blends antique ivory, delicate blush, and earthy walnut branches. R...</p>
+          </li>
+          <li style="border: 1px solid #EAE3D9; padding: 18px; background: #FAF7F2;">
+            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 6px;"><a href="/product/organica" style="color: #1E1C1A; text-decoration: none;">Organica</a></h3>
+            <p style="font-size: 12px; color: #8C6D4F; margin: 0 0 4px; text-transform: uppercase; font-family: monospace;">Hand-Tufted · modern forms</p>
+            <p style="font-size: 13px; color: #665D55; margin: 0;">Celebrating the irregular grace of natural landscape formations, Organica layers warm cream, dusty terracotta, and ...</p>
+          </li>
+          <li style="border: 1px solid #EAE3D9; padding: 18px; background: #FAF7F2;">
+            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 6px;"><a href="/product/nocturne" style="color: #1E1C1A; text-decoration: none;">Nocturne</a></h3>
+            <p style="font-size: 12px; color: #8C6D4F; margin: 0 0 4px; text-transform: uppercase; font-family: monospace;">Hand-Tufted · modern forms</p>
+            <p style="font-size: 13px; color: #665D55; margin: 0;">An evocative Mediterranean color-block composition exploring twilight contrasts. Deep burgundy and charcoal fields ...</p>
+          </li>
+          <li style="border: 1px solid #EAE3D9; padding: 18px; background: #FAF7F2;">
+            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 6px;"><a href="/product/earthscape" style="color: #1E1C1A; text-decoration: none;">EarthScape</a></h3>
+            <p style="font-size: 12px; color: #8C6D4F; margin: 0 0 4px; text-transform: uppercase; font-family: monospace;">Hand-Tufted · botanical studies</p>
+            <p style="font-size: 13px; color: #665D55; margin: 0;">An aerial study of Gangetic terrain and alluvial riverbeds. EarthScape unites muted sage, greige, and soft charcoal...</p>
+          </li>
+          <li style="border: 1px solid #EAE3D9; padding: 18px; background: #FAF7F2;">
+            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 6px;"><a href="/product/pebble" style="color: #1E1C1A; text-decoration: none;">Pebble</a></h3>
+            <p style="font-size: 12px; color: #8C6D4F; margin: 0 0 4px; text-transform: uppercase; font-family: monospace;">Hand-Tufted · modern forms</p>
+            <p style="font-size: 13px; color: #665D55; margin: 0;">Inspired by smoothed riverbed stones along the sacred Ganges, Pebble explores soft organic silhouettes with dimensi...</p>
+          </li>
+          <li style="border: 1px solid #EAE3D9; padding: 18px; background: #FAF7F2;">
+            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 6px;"><a href="/product/aurelle" style="color: #1E1C1A; text-decoration: none;">AURELLE</a></h3>
+            <p style="font-size: 12px; color: #8C6D4F; margin: 0 0 4px; text-transform: uppercase; font-family: monospace;">Hand-Tufted · quiet neutrals</p>
+            <p style="font-size: 13px; color: #665D55; margin: 0;">A fluid abstract composition where subtle sea green nuances dissolve softly into warm ivory. Hand-tufted with fine ...</p>
+          </li>
+          <li style="border: 1px solid #EAE3D9; padding: 18px; background: #FAF7F2;">
+            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 6px;"><a href="/product/verdant" style="color: #1E1C1A; text-decoration: none;">Verdant</a></h3>
+            <p style="font-size: 12px; color: #8C6D4F; margin: 0 0 4px; text-transform: uppercase; font-family: monospace;">Hand-Tufted · texture sculpture</p>
+            <p style="font-size: 13px; color: #665D55; margin: 0;">Capturing the deep, renewing stillness of highland moss and woodland canopies, Verdant pairs rich botanical greens ...</p>
+          </li>
+          <li style="border: 1px solid #EAE3D9; padding: 18px; background: #FAF7F2;">
+            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 6px;"><a href="/product/sabhya" style="color: #1E1C1A; text-decoration: none;">Sabhya</a></h3>
+            <p style="font-size: 12px; color: #8C6D4F; margin: 0 0 4px; text-transform: uppercase; font-family: monospace;">Hand-Tufted · texture sculpture</p>
+            <p style="font-size: 13px; color: #665D55; margin: 0;">Rooted in refined simplicity, Sabhya harmonizes understated tribal line work with quiet neutral tones. Woven from s...</p>
+          </li>
+          <li style="border: 1px solid #EAE3D9; padding: 18px; background: #FAF7F2;">
+            <h3 style="font-family: serif; font-size: 18px; margin: 0 0 6px;"><a href="/product/aura" style="color: #1E1C1A; text-decoration: none;">Aura</a></h3>
+            <p style="font-size: 12px; color: #8C6D4F; margin: 0 0 4px; text-transform: uppercase; font-family: monospace;">Hand-Tufted · modern forms</p>
+            <p style="font-size: 13px; color: #665D55; margin: 0;">Defined by architectural arches and striking monochrome minimalism, the Aura rug balances bold geometric curves wit...</p>
           </li>
         </ul>
       </section>
@@ -168,7 +330,7 @@
         </p>
       </section>
     </main>
-  </div>
+  </noscript>
   <script type="module" src="/src/main.tsx"></script>
 </body>
 

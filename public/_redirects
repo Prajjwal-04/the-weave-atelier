@@ -1,3 +1,12 @@
+# 301 Permanent Redirects for Legacy Product URLs (Google Search Console SEO Health)
+/product/terralis-abstract-wool-rug /product/terra 301
+/product/arbor-flow-sculpted-wool-rug /product/arbor-flow 301
+/product/kanso-minimalist-linear-rug /product/sabhya 301
+/product/varanasi-serenade-hand-knotted-rug /product/the-artisan-mosaic 301
+/product/botanica-umber-hand-tufted-rug /product/verdant 301
+/product/bhadohi-earth-reversible-flatweave /product/earthscape 301
+
+# Core Atelier Pages to index.html (200)
 /shop /index.html 200
 /product/* /index.html 200
 /collections /index.html 200
@@ -23,4 +32,6 @@
 /account /index.html 200
 /admin /index.html 200
 /admin/* /index.html 200
-/* /404.html 404
+
+# SPA Catch-All fallback: ensures trailing slashes, deep links, and client routes resolve properly
+/* /index.html 200

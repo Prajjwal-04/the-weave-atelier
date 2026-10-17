@@ -18,8 +18,8 @@ export const CollectionsPage: React.FC = () => {
     return (
       <div className="pt-20 sm:pt-24 pb-20 bg-atelier-ivory min-h-screen">
         <SEO
-          title={`${currentCollection.name} Collection`}
-          description={currentCollection.description}
+          title={`${currentCollection.name} Collection — Handcrafted Contemporary Rugs`}
+          description={`${currentCollection.description} Discover ${collectionProducts.length} bespoke contemporary rugs handcrafted in Bhadohi, India.`}
           canonicalPath={`/collections/${currentCollection.slug}`}
           image={currentCollection.heroImage}
         />
@@ -84,7 +84,7 @@ export const CollectionsPage: React.FC = () => {
   return (
     <div className="pt-20 sm:pt-24 pb-20 bg-atelier-ivory min-h-screen">
       <SEO
-        title="Curated Rug Collections"
+        title="Curated Rug Collections — Contemporary Handmade Rugs"
         description="Explore curated collections of contemporary handmade rugs: Modern Forms, Quiet Neutrals, Botanical Studies, Texture & Sculpture, Heritage Reimagined, and Hand-Knotted."
         canonicalPath="/collections"
       />
