@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Heart, Eye } from 'lucide-react';
 import { Product } from '../../types';
 import { useCurrency } from '../../context/CurrencyContext';
@@ -20,7 +20,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   onQuickView,
   aspectRatio = 'portrait',
 }) => {
+  const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
+  const [isToggled, setIsToggled] = useState(false);
   const [hasHoveredOnce, setHasHoveredOnce] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const { formatPrice } = useCurrency();
@@ -39,14 +41,31 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   const hasAnyInStock = totalStock > 0;
   const isReady = product.isReadyToShip && hasAnyInStock;
 
+  const isActive = isHovered || isToggled;
+
   return (
     <div
-      className="group relative flex flex-col"
+      className="group relative flex flex-col cursor-pointer select-none"
       onMouseEnter={() => {
         setIsHovered(true);
         if (!hasHoveredOnce) setHasHoveredOnce(true);
       }}
       onMouseLeave={() => setIsHovered(false)}
+      onDoubleClick={(e) => {
+        e.preventDefault();
+        navigate(`/product/${product.slug}`);
+      }}
+      onClick={(e) => {
+        const target = e.target as HTMLElement;
+        if (target.closest('button, a')) return;
+        // On touch screens: first tap toggles preview / Quick View, second tap navigates
+        if (isToggled) {
+          navigate(`/product/${product.slug}`);
+        } else {
+          setIsToggled(true);
+          if (!hasHoveredOnce) setHasHoveredOnce(true);
+        }
+      }}
     >
       {/* Image Container */}
       <div
@@ -71,19 +90,19 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             alt={product.name}
             onLoad={() => setIsLoaded(true)}
             className={`w-full h-full object-cover object-center transition-all duration-700 ease-out ${
-              !isLoaded ? 'opacity-0' : isHovered ? 'opacity-0 scale-105' : 'opacity-100 scale-100'
+              !isLoaded ? 'opacity-0' : isActive ? 'opacity-0 scale-105' : 'opacity-100 scale-100'
             }`}
             loading="lazy"
             decoding="async"
           />
 
-          {/* Secondary Image on Hover - Loaded On Demand */}
+          {/* Secondary Image on Hover / Toggle - Loaded On Demand */}
           {hasHoveredOnce && (
             <img
               src={secondaryImage}
               alt={`${product.name} alternate view`}
               className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-700 ease-out ${
-                isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
+                isActive ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
               }`}
               loading="lazy"
               decoding="async"
@@ -101,12 +120,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
         {/* Top Right: Wishlist Button */}
         <button
+          type="button"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
             toggleWishlist(product.id);
           }}
-          className="absolute top-3 right-3 z-10 p-2 bg-atelier-ivory/80 backdrop-blur-md rounded-full text-atelier-charcoal hover:text-red-700 hover:bg-atelier-ivory transition-all shadow-sm"
+          className="absolute top-3 right-3 z-10 p-2 bg-atelier-ivory/80 backdrop-blur-md rounded-full text-atelier-charcoal hover:text-red-700 hover:bg-atelier-ivory transition-all shadow-sm active:scale-90"
           aria-label={isFavorited ? 'Remove from wishlist' : 'Add to wishlist'}
         >
           <Heart
@@ -118,22 +138,23 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           />
         </button>
 
-        {/* Quick View Button on Hover */}
+        {/* Quick View Button on Hover / Toggle */}
         {onQuickView && (
           <div
             className={`absolute bottom-3 inset-x-3 z-10 transition-all duration-300 transform ${
-              isHovered
-                ? 'opacity-100 translate-y-0'
+              isActive
+                ? 'opacity-100 translate-y-0 pointer-events-auto'
                 : 'opacity-0 translate-y-2 pointer-events-none'
             }`}
           >
             <button
+              type="button"
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 onQuickView(product);
               }}
-              className="w-full py-2.5 bg-atelier-ivory/95 hover:bg-atelier-softblack hover:text-atelier-parchment text-atelier-softblack text-xs tracking-widest uppercase transition-all duration-200 border border-atelier-parchment shadow-md flex items-center justify-center font-medium"
+              className="w-full py-2.5 bg-atelier-ivory/95 hover:bg-atelier-softblack hover:text-atelier-parchment text-atelier-softblack text-xs tracking-widest uppercase transition-all duration-200 border border-atelier-parchment shadow-md flex items-center justify-center font-medium active:scale-95"
             >
               <Eye size={13} className="mr-1.5" />
               Quick View

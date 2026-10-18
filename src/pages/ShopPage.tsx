@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Filter, X, ChevronDown, SlidersHorizontal, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Filter, X, ChevronDown, SlidersHorizontal, ChevronLeft, ChevronRight, LayoutGrid, Square } from 'lucide-react';
 import { COLLECTIONS } from '../data/collections';
 import { Product, Technique, Material } from '../types';
 import { ProductCard } from '../components/product/ProductCard';
@@ -34,6 +34,7 @@ export const ShopPage: React.FC = () => {
   const [selectedAvailability, setSelectedAvailability] = useState<string>(initialAvailability);
   const [sortBy, setSortBy] = useState<string>('featured');
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+  const [mobileColumns, setMobileColumns] = useState<1 | 2>(2);
 
   // Lock body scroll on mobile filter drawer
   useEffect(() => {
@@ -362,9 +363,37 @@ export const ShopPage: React.FC = () => {
             )}
           </div>
 
-          {/* Sort Dropdown & Product Counter */}
-          <div className="flex items-center space-x-4 ml-auto">
-            <span className="text-atelier-taupe text-[11px] font-mono">
+          {/* Sort Dropdown, View Toggle & Product Counter */}
+          <div className="flex items-center space-x-2 sm:space-x-4 ml-auto">
+            {/* Mobile View Toggle (1 col vs 2 col) */}
+            <div className="flex sm:hidden items-center border border-atelier-parchment bg-atelier-cream p-0.5 rounded">
+              <button
+                type="button"
+                onClick={() => setMobileColumns(1)}
+                className={`p-1.5 transition-colors rounded-xs ${
+                  mobileColumns === 1
+                    ? 'bg-atelier-softblack text-atelier-parchment'
+                    : 'text-atelier-taupe hover:text-atelier-softblack'
+                }`}
+                aria-label="Single column view"
+              >
+                <Square size={13} />
+              </button>
+              <button
+                type="button"
+                onClick={() => setMobileColumns(2)}
+                className={`p-1.5 transition-colors rounded-xs ${
+                  mobileColumns === 2
+                    ? 'bg-atelier-softblack text-atelier-parchment'
+                    : 'text-atelier-taupe hover:text-atelier-softblack'
+                }`}
+                aria-label="Two column view"
+              >
+                <LayoutGrid size={13} />
+              </button>
+            </div>
+
+            <span className="text-atelier-taupe text-[11px] font-mono hidden xs:inline">
               {filteredProducts.length} {filteredProducts.length === 1 ? 'Design' : 'Designs'}
             </span>
 
@@ -375,7 +404,7 @@ export const ShopPage: React.FC = () => {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="bg-atelier-cream border border-atelier-parchment text-xs text-atelier-charcoal py-2 px-3 focus:outline-none rounded"
+                className="bg-atelier-cream border border-atelier-parchment text-xs text-atelier-charcoal py-2 px-2.5 sm:px-3 focus:outline-none rounded"
               >
                 <option value="featured">Featured Atelier</option>
                 <option value="newest">Newest Releases</option>
@@ -452,7 +481,11 @@ export const ShopPage: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-12">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+            <div className={`grid gap-x-4 sm:gap-x-8 gap-y-8 sm:gap-y-12 ${
+              mobileColumns === 1
+                ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+                : 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-3'
+            }`}>
               {paginatedProducts.map((product) => (
                 <ProductCard
                   key={product.id}
@@ -474,7 +507,7 @@ export const ShopPage: React.FC = () => {
                   {Math.min(currentPage * ITEMS_PER_PAGE, filteredProducts.length)}
                 </span>{' '}
                 of <span className="font-semibold text-atelier-softblack">{filteredProducts.length}</span> pieces
-                {filteredProducts.length > ITEMS_PER_PAGE && ` · 12 rugs per page`}
+                {filteredProducts.length > ITEMS_PER_PAGE && ` · ${ITEMS_PER_PAGE} pieces per page`}
               </div>
 
               {totalPages > 1 && (
@@ -765,7 +798,7 @@ export const ShopPage: React.FC = () => {
               </div>
 
               {/* Bottom Actions */}
-              <div className="p-4 bg-atelier-cream border-t border-atelier-parchment flex items-center gap-3 flex-shrink-0">
+              <div className="p-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] bg-atelier-cream border-t border-atelier-parchment flex items-center gap-3 flex-shrink-0">
                 {hasActiveFilters && (
                   <button
                     type="button"

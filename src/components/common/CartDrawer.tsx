@@ -41,6 +41,22 @@ export const CartDrawer: React.FC = () => {
   const { formatPrice } = useCurrency();
   const navigate = useNavigate();
 
+  React.useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') closeCart();
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.body.style.overflow = 'unset';
+        window.removeEventListener('keydown', handleKeyDown);
+      };
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+  }, [isOpen, closeCart]);
+
   if (!isOpen) return null;
 
   const totalUSD = subtotalUSD + shippingUSD;
@@ -228,7 +244,7 @@ export const CartDrawer: React.FC = () => {
 
           {/* Footer / Summary */}
           {items.length > 0 && (
-            <div className="p-4 sm:p-6 bg-atelier-cream border-t border-atelier-parchment space-y-4">
+            <div className="p-4 sm:p-6 pb-[max(1.25rem,env(safe-area-inset-bottom))] bg-atelier-cream border-t border-atelier-parchment space-y-4">
               {/* Shipping Destination Selector */}
               <div className="space-y-1">
                 <label className="text-[10px] uppercase tracking-wider text-atelier-taupe font-medium block">

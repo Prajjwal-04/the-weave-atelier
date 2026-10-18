@@ -10,7 +10,7 @@ export const WhatsAppFloating: React.FC = () => {
   );
 
   return (
-    <div className="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-40">
+    <div className="fixed bottom-[max(5.5rem,calc(env(safe-area-inset-bottom)+4.5rem))] sm:bottom-6 right-4 sm:right-6 z-40">
       {isOpen && (
         <div className="mb-3 bg-atelier-ivory border border-atelier-parchment shadow-luxury p-4 rounded w-[calc(100vw-2rem)] sm:w-80 max-w-xs text-xs space-y-2.5 animate-fadeIn">
           <div className="flex items-center justify-between border-b border-atelier-parchment pb-2">

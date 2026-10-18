@@ -41,6 +41,20 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
   const { getInventory } = useInventory();
 
   useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') onClose();
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.body.style.overflow = 'unset';
+        window.removeEventListener('keydown', handleKeyDown);
+      };
+    }
+  }, [isOpen, onClose]);
+
+  useEffect(() => {
     if (product && product.variants && product.variants.length > 0) {
       setSelectedVariant(product.variants[0]);
       setActiveImageIndex(0);
@@ -120,11 +134,16 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
         ];
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-atelier-softblack/75 backdrop-blur-sm flex justify-center items-center p-4 sm:p-6 animate-fadeIn">
-      <div className="bg-atelier-ivory border border-atelier-parchment shadow-2xl max-w-4xl w-full p-6 sm:p-8 relative max-h-[90vh] overflow-y-auto">
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 overflow-y-auto bg-atelier-softblack/75 backdrop-blur-sm flex justify-center items-center p-3 sm:p-6 animate-fadeIn"
+    >
+      <div className="bg-atelier-ivory border border-atelier-parchment shadow-2xl max-w-4xl w-full p-5 sm:p-8 relative max-h-[92vh] sm:max-h-[90vh] overflow-y-auto">
         <button
           onClick={onClose}
-          className="absolute top-6 right-6 text-atelier-charcoal hover:text-atelier-softblack p-1 transition-colors"
+          className="absolute top-4 right-4 sm:top-6 sm:right-6 text-atelier-charcoal hover:text-atelier-softblack p-1.5 transition-colors z-20 bg-atelier-ivory/80 rounded-full"
           aria-label="Close modal"
         >
           <X size={20} strokeWidth={1.5} />

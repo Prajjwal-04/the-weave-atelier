@@ -73,7 +73,7 @@ export const CraftPage: React.FC = () => {
             <div className="lg:col-span-7 order-2 lg:order-1 aspect-[16/11] overflow-hidden bg-atelier-cream border border-atelier-parchment">
               <img
                 src="/images/craft/hand-tufting.jpg"
-                alt="Hand-tufting and pile carving with shears"
+                alt="Master artisan operating hand-tufting gun on timber loom frame in Bhadohi"
                 className="w-full h-full object-cover"
               />
             </div>

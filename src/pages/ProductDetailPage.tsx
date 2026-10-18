@@ -742,12 +742,12 @@ export const ProductDetailPage: React.FC = () => {
       {/* Sticky Floating Purchase Bar (GPU-accelerated slide-in, 0 reflow) */}
       <aside
         aria-label="Quick purchase navigation"
-        className={`fixed bottom-0 left-0 right-0 z-30 bg-atelier-ivory/95 backdrop-blur-md border-t border-atelier-parchment py-3 px-4 sm:px-6 shadow-luxury transform transition-transform duration-300 ease-out ${
+        className={`fixed bottom-0 left-0 right-0 z-30 bg-atelier-ivory/95 backdrop-blur-md border-t border-atelier-parchment pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] px-4 sm:px-6 shadow-luxury transform transition-transform duration-300 ease-out ${
           showStickyBar ? 'translate-y-0' : 'translate-y-full pointer-events-none'
         }`}
       >
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-          <div className="flex items-center space-x-3.5 truncate">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 sm:gap-4">
+          <div className="flex items-center space-x-3.5 truncate min-w-0">
             {product && product.images && product.images[0]?.url && (
               <img
                 src={product.images[0].url}
@@ -755,25 +755,25 @@ export const ProductDetailPage: React.FC = () => {
                 className="w-10 h-10 object-cover border border-atelier-parchment flex-shrink-0"
               />
             )}
-            <div className="truncate">
+            <div className="truncate min-w-0">
               <div className="font-serif text-sm sm:text-base text-atelier-softblack truncate font-normal">
                 {product?.name}
               </div>
               <div className="text-xs text-atelier-taupe truncate flex items-center space-x-1.5">
-                <span>{activeVariant.dimensionsFt || activeVariant.size}</span>
+                <span className="truncate">{activeVariant.dimensionsFt || activeVariant.size}</span>
                 <span>·</span>
-                <span className="font-sans text-sm text-atelier-softblack font-medium">
+                <span className="font-sans text-sm text-atelier-softblack font-medium shrink-0">
                   {formatPrice(activeVariant.priceUSD)}
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center space-x-3 flex-shrink-0">
+          <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
             <button
               type="button"
               onClick={() => handleAddToCart(true)}
-              className="bg-atelier-softblack text-atelier-parchment py-2.5 px-5 sm:px-7 text-xs tracking-widest uppercase hover:bg-atelier-darkbrown transition-all font-medium flex items-center space-x-1.5 shadow-sm"
+              className="bg-atelier-softblack text-atelier-parchment py-3 sm:py-2.5 px-4 sm:px-7 text-xs tracking-widest uppercase hover:bg-atelier-darkbrown transition-all font-medium flex items-center justify-center space-x-1.5 shadow-sm min-h-[44px] min-w-[110px]"
             >
               {isAddedToBag ? (
                 <>

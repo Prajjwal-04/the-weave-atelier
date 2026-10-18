@@ -60,7 +60,7 @@ export const CraftsmanshipSection: React.FC = () => {
               <div className="aspect-[16/10] overflow-hidden bg-atelier-cream border border-atelier-parchment">
                 <img
                   src="/images/craft/hand-tufting.jpg"
-                  alt="Artisan sculpting high-low wool pile contours with hand shears"
+                  alt="Master artisan operating hand-tufting gun on timber loom frame in Bhadohi"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   loading="lazy"
                 />

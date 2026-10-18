@@ -4,7 +4,7 @@ import { ArrowRight } from 'lucide-react';
 
 export const HeroSection: React.FC = () => {
   return (
-    <section className="relative w-full h-[92vh] min-h-[640px] max-h-[960px] bg-atelier-deepblack overflow-hidden flex items-end">
+    <section className="relative w-full h-[92dvh] min-h-[560px] sm:min-h-[640px] max-h-[960px] bg-atelier-deepblack overflow-hidden flex items-end">
       {/* 4K Hero Editorial Background Image */}
       <div className="absolute inset-0 overflow-hidden">
         <img
@@ -25,7 +25,7 @@ export const HeroSection: React.FC = () => {
       </div>
 
       {/* Hero Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-24 w-full">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-24 w-full">
         <div className="max-w-2xl space-y-6 animate-fadeIn">
           <div className="text-[11px] sm:text-xs tracking-[0.3em] uppercase font-medium flex items-center space-x-2">
             <span className="w-8 h-[1px] bg-atelier-gold/60 inline-block" />

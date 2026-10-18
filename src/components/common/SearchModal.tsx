@@ -20,13 +20,18 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
     if (isOpen) {
       setTimeout(() => inputRef.current?.focus(), 50);
       document.body.style.overflow = 'hidden';
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') onClose();
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.body.style.overflow = 'unset';
+        window.removeEventListener('keydown', handleKeyDown);
+      };
     } else {
       document.body.style.overflow = 'unset';
     }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen]);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -54,12 +59,17 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
   ];
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-atelier-softblack/70 backdrop-blur-sm flex justify-center items-start pt-16 sm:pt-24 px-4 animate-fadeIn">
-      <div className="bg-atelier-ivory w-full max-w-3xl border border-atelier-parchment shadow-2xl p-6 sm:p-8 relative">
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 overflow-y-auto bg-atelier-softblack/70 backdrop-blur-sm flex justify-center items-start pt-12 sm:pt-24 px-3 sm:px-4 animate-fadeIn"
+    >
+      <div className="bg-atelier-ivory w-full max-w-3xl border border-atelier-parchment shadow-2xl p-5 sm:p-8 relative my-auto sm:my-0">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-6 right-6 text-atelier-charcoal hover:text-atelier-softblack p-1 transition-colors"
+          className="absolute top-4 right-4 sm:top-6 sm:right-6 text-atelier-charcoal hover:text-atelier-softblack p-1.5 transition-colors z-10 bg-atelier-ivory/80 rounded-full"
           aria-label="Close search"
         >
           <X size={20} strokeWidth={1.5} />

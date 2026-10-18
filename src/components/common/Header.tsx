@@ -48,6 +48,18 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [mobileMenuOpen]);
+
   // Close menus on route change
   useEffect(() => {
     setMobileMenuOpen(false);
@@ -711,7 +723,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
             </div>
 
             {/* Mobile Footer Drawer Strip */}
-            <div className="p-5 bg-atelier-cream border-t border-atelier-parchment text-xs space-y-2">
+            <div className="p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] bg-atelier-cream border-t border-atelier-parchment text-xs space-y-2">
               <div className="text-[10px] font-mono uppercase tracking-widest text-atelier-taupe">
                 Atelier Coordinates
               </div>

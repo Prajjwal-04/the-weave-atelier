@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { ProductImage } from '../../types';
-import { ZoomIn } from 'lucide-react';
 
 interface ImageGalleryProps {
   images: ProductImage[];
@@ -54,6 +53,7 @@ export const getCleanPerspectiveLabel = (label?: string, viewType?: string): str
   return 'Perspective';
 };
 
+import { ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
 import { getThumbnailUrl, getDetailImageUrl, getFullscreenImageUrl, getDetailSrcSet } from '../../utils/imageOptimizer';
 import { ModernThrobber } from '../common/ModernThrobber';
 
@@ -62,6 +62,10 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName 
   const [isZoomed, setIsZoomed] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
   const [isMainLoaded, setIsMainLoaded] = useState(false);
+
+  // Touch swipe support for mobile
+  const touchStartX = React.useRef(0);
+  const touchEndX = React.useRef(0);
 
   React.useEffect(() => {
     setIsMainLoaded(false);
@@ -80,6 +84,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName 
           },
         ];
 
+  const totalImages = safeImages.length;
   const activeImage = safeImages[selectedIndex] || safeImages[0];
   const rawActiveUrl = activeImage.url || 'https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=1200&q=80';
   const activeImageUrl = getDetailImageUrl(rawActiveUrl);
@@ -90,6 +95,36 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName 
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     const y = ((e.clientY - rect.top) / rect.height) * 100;
     setMousePos({ x, y });
+  };
+
+  const handlePrev = () => {
+    setSelectedIndex((prev) => (prev > 0 ? prev - 1 : totalImages - 1));
+  };
+
+  const handleNext = () => {
+    setSelectedIndex((prev) => (prev < totalImages - 1 ? prev + 1 : 0));
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartX.current || !touchEndX.current) return;
+    const diff = touchStartX.current - touchEndX.current;
+    if (Math.abs(diff) > 40) {
+      if (diff > 0) {
+        handleNext();
+      } else {
+        handlePrev();
+      }
+    }
+    touchStartX.current = 0;
+    touchEndX.current = 0;
   };
 
   return (
@@ -124,13 +159,16 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName 
         })}
       </div>
 
-      {/* Main Large Visual Stage with Zoom Capability */}
+      {/* Main Large Visual Stage with Zoom Capability & Mobile Touch Gestures */}
       <div className="flex-1">
         <div
-          className="relative w-full aspect-[4/5] bg-atelier-cream border border-atelier-parchment overflow-hidden cursor-crosshair group"
+          className="relative w-full aspect-[4/5] bg-atelier-cream border border-atelier-parchment overflow-hidden cursor-crosshair group touch-pan-y"
           onMouseEnter={() => setIsZoomed(true)}
           onMouseLeave={() => setIsZoomed(false)}
           onMouseMove={handleMouseMove}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
         >
           {/* Modern Throbber with Shimmer */}
           {!isMainLoaded && (
@@ -153,10 +191,10 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName 
             decoding="async"
           />
 
-          {/* High-Resolution Zoom Stage */}
+          {/* High-Resolution Zoom Stage (Desktop only) */}
           {isZoomed && (
             <div
-              className="absolute inset-0 w-full h-full pointer-events-none"
+              className="hidden lg:block absolute inset-0 w-full h-full pointer-events-none"
               style={{
                 backgroundImage: `url(${zoomImageUrl})`,
                 backgroundPosition: `${mousePos.x}% ${mousePos.y}%`,
@@ -166,10 +204,40 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName 
             />
           )}
 
-          {/* Zoom Instruction Pill */}
-          <div className="absolute bottom-3 right-3 bg-atelier-ivory/90 backdrop-blur-md px-3 py-1.5 border border-atelier-parchment text-[10px] text-atelier-charcoal tracking-wider uppercase flex items-center shadow-sm pointer-events-none opacity-80 group-hover:opacity-100 transition-opacity">
-            <ZoomIn size={12} className="mr-1 text-atelier-taupe" />
-            <span>Hover to Magnify Weave Detail</span>
+          {/* Mobile Swipe Navigation Edge Chevrons */}
+          {totalImages > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={handlePrev}
+                className="lg:hidden absolute left-2.5 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-atelier-ivory/85 backdrop-blur-md border border-atelier-parchment text-atelier-softblack flex items-center justify-center shadow-md active:scale-95"
+                aria-label="Previous image"
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <button
+                type="button"
+                onClick={handleNext}
+                className="lg:hidden absolute right-2.5 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-atelier-ivory/85 backdrop-blur-md border border-atelier-parchment text-atelier-softblack flex items-center justify-center shadow-md active:scale-95"
+                aria-label="Next image"
+              >
+                <ChevronRight size={18} />
+              </button>
+            </>
+          )}
+
+          {/* Zoom Instruction Pill (Desktop) / Image Counter Pill (Mobile) */}
+          <div className="absolute bottom-3 right-3 flex items-center space-x-2">
+            {/* Desktop zoom hint */}
+            <div className="hidden lg:flex bg-atelier-ivory/90 backdrop-blur-md px-3 py-1.5 border border-atelier-parchment text-[10px] text-atelier-charcoal tracking-wider uppercase items-center shadow-sm pointer-events-none opacity-80 group-hover:opacity-100 transition-opacity">
+              <ZoomIn size={12} className="mr-1 text-atelier-taupe" />
+              <span>Hover to Magnify Weave Detail</span>
+            </div>
+
+            {/* Mobile counter indicator */}
+            <div className="lg:hidden bg-atelier-softblack/80 backdrop-blur-md px-2.5 py-1 text-[10px] font-mono text-white tracking-widest shadow-sm">
+              {selectedIndex + 1} / {totalImages}
+            </div>
           </div>
 
           {/* Perspective Label */}

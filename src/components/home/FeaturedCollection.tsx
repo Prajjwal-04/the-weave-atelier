@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, ChevronLeft, ChevronRight, Eye, Heart } from 'lucide-react';
 import { Product } from '../../types';
 import { QuickViewModal } from '../product/QuickViewModal';
@@ -34,7 +34,9 @@ const FeaturedCardItem: React.FC<FeaturedCardItemProps> = ({
   getInventory,
   formatPrice,
 }) => {
+  const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
+  const [isToggled, setIsToggled] = useState(false);
   const [hasHoveredOnce, setHasHoveredOnce] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -47,14 +49,34 @@ const FeaturedCardItem: React.FC<FeaturedCardItemProps> = ({
   const hasAnyInStock = product.variants.some((v) => getInventory(v.sku) > 0);
   const isReady = product.isReadyToShip && hasAnyInStock;
 
+  const isActive = isHovered || isToggled;
+
   return (
     <div
       onMouseEnter={() => {
         setIsHovered(true);
         if (!hasHoveredOnce) setHasHoveredOnce(true);
       }}
-      onMouseLeave={() => setIsHovered(false)}
-      className="featured-card-item flex-shrink-0 w-[80vw] sm:w-[48vw] md:w-[35vw] lg:w-[310px] snap-start group flex flex-col justify-between select-none"
+      onMouseLeave={() => {
+        setIsHovered(false);
+      }}
+      onDoubleClick={(e) => {
+        e.preventDefault();
+        navigate(`/product/${product.slug}`);
+      }}
+      onClick={(e) => {
+        // If clicking on an anchor or button directly, let its native handler handle it
+        const target = e.target as HTMLElement;
+        if (target.closest('button, a')) return;
+        // On card click/tap: if already toggled, navigate to piece; otherwise toggle active preview
+        if (isToggled) {
+          navigate(`/product/${product.slug}`);
+        } else {
+          setIsToggled(true);
+          if (!hasHoveredOnce) setHasHoveredOnce(true);
+        }
+      }}
+      className="featured-card-item flex-shrink-0 w-[80vw] sm:w-[48vw] md:w-[35vw] lg:w-[310px] snap-start group flex flex-col justify-between select-none cursor-pointer"
     >
       {/* Image Stage Container */}
       <div className="relative aspect-[3/4] overflow-hidden bg-atelier-cream border border-atelier-parchment/70 group-hover:border-atelier-agedgold/50 transition-all duration-500 shadow-xs group-hover:shadow-luxury">
@@ -81,14 +103,14 @@ const FeaturedCardItem: React.FC<FeaturedCardItemProps> = ({
             onDragStart={(e) => e.preventDefault()}
             onLoad={() => setIsLoaded(true)}
             className={`w-full h-full object-cover object-center transition-all duration-700 ease-out pointer-events-none select-none ${
-              !isLoaded ? 'opacity-0' : isHovered ? 'opacity-0 scale-105' : 'opacity-100 scale-100'
+              !isLoaded ? 'opacity-0' : isActive ? 'opacity-0 scale-105' : 'opacity-100 scale-100'
             }`}
             loading={idx < 2 ? 'eager' : 'lazy'}
             fetchPriority={idx < 2 ? 'high' : 'auto'}
             decoding="async"
           />
 
-          {/* Secondary Image on Hover */}
+          {/* Secondary Image on Hover / Toggle */}
           {hasHoveredOnce && (
             <img
               src={secondaryImage}
@@ -96,7 +118,7 @@ const FeaturedCardItem: React.FC<FeaturedCardItemProps> = ({
               draggable={false}
               onDragStart={(e) => e.preventDefault()}
               className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-700 ease-out pointer-events-none select-none ${
-                isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+                isActive ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
               }`}
               loading="lazy"
               decoding="async"
@@ -132,11 +154,11 @@ const FeaturedCardItem: React.FC<FeaturedCardItemProps> = ({
           />
         </button>
 
-        {/* Hover Quick View Pill Button */}
+        {/* Quick View Pill Button */}
         <div
           className={`absolute bottom-3.5 inset-x-3.5 z-10 transition-all duration-300 transform ${
-            isHovered
-              ? 'opacity-100 translate-y-0'
+            isActive
+              ? 'opacity-100 translate-y-0 pointer-events-auto'
               : 'opacity-0 translate-y-2 pointer-events-none'
           }`}
         >
@@ -144,9 +166,10 @@ const FeaturedCardItem: React.FC<FeaturedCardItemProps> = ({
             type="button"
             onClick={(e) => {
               e.preventDefault();
+              e.stopPropagation();
               setQuickViewProduct(product);
             }}
-            className="w-full py-2.5 px-3 bg-atelier-ivory/95 backdrop-blur-md border border-atelier-parchment text-atelier-softblack text-[11px] tracking-widest uppercase hover:bg-atelier-softblack hover:text-atelier-parchment hover:border-atelier-softblack transition-all flex items-center justify-center font-medium shadow-sm"
+            className="w-full py-2.5 px-3 bg-atelier-ivory/95 backdrop-blur-md border border-atelier-parchment text-atelier-softblack text-[11px] tracking-widest uppercase hover:bg-atelier-softblack hover:text-atelier-parchment hover:border-atelier-softblack transition-all flex items-center justify-center font-medium shadow-sm active:scale-95 cursor-pointer"
           >
             <Eye size={13} className="mr-1.5 text-atelier-agedgold" />
             <span>Quick View</span>
@@ -204,11 +227,13 @@ export const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
-  // Robust pointer drag tracking
+  // Mouse drag tracking for slider without breaking clicks or touch interactions
+  const isPointerDown = useRef(false);
   const isDragging = useRef(false);
   const startX = useRef(0);
   const scrollLeftPos = useRef(0);
-  const hasMoved = useRef(false);
+  const dragDistance = useRef(0);
+  const dragThreshold = 10;
 
   // Showcase all featured rugs without arbitrary 8-item cut-off
   const featuredRugs = React.useMemo(() => {
@@ -315,42 +340,54 @@ export const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products
   };
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (e.button !== 0 || !sliderRef.current) return;
-    isDragging.current = true;
-    hasMoved.current = false;
+    // Only drag with primary mouse button. Touch devices use native CSS touch-pan-x snapping.
+    if (e.button !== 0 || !sliderRef.current || e.pointerType === 'touch') return;
+    // Don't drag if user pressed directly on an interactive control (button, link, input)
+    if ((e.target as HTMLElement).closest('button, a, input, select, textarea')) return;
+
+    isPointerDown.current = true;
+    isDragging.current = false;
+    dragDistance.current = 0;
     startX.current = e.clientX;
     scrollLeftPos.current = sliderRef.current.scrollLeft;
-    setIsPointerDragging(true);
-
-    try {
-      e.currentTarget.setPointerCapture(e.pointerId);
-    } catch (_) {}
   };
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!isDragging.current || !sliderRef.current) return;
+    if (!isPointerDown.current || !sliderRef.current) return;
     const deltaX = e.clientX - startX.current;
-    if (Math.abs(deltaX) > 4) {
-      hasMoved.current = true;
+    dragDistance.current = Math.abs(deltaX);
+
+    // Only engage drag scrolling once past threshold to avoid intercepting clicks/double-clicks
+    if (dragDistance.current > dragThreshold) {
+      if (!isDragging.current) {
+        isDragging.current = true;
+        setIsPointerDragging(true);
+        try {
+          e.currentTarget.setPointerCapture(e.pointerId);
+        } catch (_) {}
+      }
+      sliderRef.current.scrollLeft = scrollLeftPos.current - deltaX;
     }
-    // 1:1 direct scrolling without animation lag
-    sliderRef.current.scrollLeft = scrollLeftPos.current - deltaX;
   };
 
   const handlePointerUpOrCancel = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!isDragging.current) return;
-    isDragging.current = false;
-    setIsPointerDragging(false);
+    if (!isPointerDown.current) return;
+    isPointerDown.current = false;
 
-    try {
-      e.currentTarget.releasePointerCapture(e.pointerId);
-    } catch (_) {}
-
-    // Allow a small delay before clearing hasMoved so onClickCapture can swallow accidental card navigation
-    if (hasMoved.current) {
+    if (isDragging.current) {
+      try {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      } catch (_) {}
+      // Keep isDragging flag for 50ms to swallow trailing click event from drag release
       setTimeout(() => {
-        hasMoved.current = false;
-      }, 150);
+        isDragging.current = false;
+        dragDistance.current = 0;
+        setIsPointerDragging(false);
+      }, 50);
+    } else {
+      isDragging.current = false;
+      dragDistance.current = 0;
+      setIsPointerDragging(false);
     }
   };
 
@@ -445,7 +482,7 @@ export const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products
             onPointerUp={handlePointerUpOrCancel}
             onPointerCancel={handlePointerUpOrCancel}
             onClickCapture={(e) => {
-              if (hasMoved.current) {
+              if (dragDistance.current > dragThreshold || isDragging.current) {
                 e.preventDefault();
                 e.stopPropagation();
               }

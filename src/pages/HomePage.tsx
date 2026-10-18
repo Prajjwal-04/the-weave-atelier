@@ -5,7 +5,6 @@ import { FeaturedCollection } from '../components/home/FeaturedCollection';
 import { ShopByCollection } from '../components/home/ShopByCollection';
 import { CraftsmanshipSection } from '../components/home/CraftsmanshipSection';
 import { BhadohiNarrative } from '../components/home/BhadohiNarrative';
-import { MaterialsSection } from '../components/home/MaterialsSection';
 import { CustomRugsPreview } from '../components/home/CustomRugsPreview';
 import { EditorialJournalPreview } from '../components/home/EditorialJournalPreview';
 import { TrustBanner } from '../components/home/TrustBanner';
@@ -40,10 +39,7 @@ export const HomePage: React.FC = () => {
       {/* 6. From Bhadohi Story */}
       <BhadohiNarrative />
 
-      {/* 7. Materials Section */}
-      <MaterialsSection />
-
-      {/* 8. Custom Rugs Section */}
+      {/* 7. Custom Rugs Section */}
       <CustomRugsPreview />
 
       {/* 9. Editorial / Journal */}
