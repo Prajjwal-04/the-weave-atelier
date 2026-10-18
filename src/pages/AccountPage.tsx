@@ -463,7 +463,7 @@ export const AccountPage: React.FC = () => {
                     <input
                       type="email"
                       required
-                      placeholder="name@example.com"
+                      placeholder="yourname@gmail.com"
                       value={emailInput}
                       onChange={(e) => setEmailInput(e.target.value)}
                       className="w-full bg-atelier-ivory border border-atelier-parchment px-4 py-2.5 text-xs text-atelier-softblack focus:outline-none"
@@ -634,7 +634,7 @@ export const AccountPage: React.FC = () => {
                     <input
                       type="email"
                       required
-                      placeholder="name@example.com"
+                      placeholder="yourname@gmail.com"
                       value={emailInput}
                       onChange={(e) => setEmailInput(e.target.value)}
                       className="w-full bg-atelier-ivory border border-atelier-parchment px-4 py-2.5 text-xs text-atelier-softblack focus:outline-none"

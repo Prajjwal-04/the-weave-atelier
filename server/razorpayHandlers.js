@@ -376,7 +376,7 @@ export async function persistOrderToSupabase(order, paymentId) {
       .from('orders')
       .insert({
         order_number: orderNumber,
-        customer_email: order.customer?.email || 'collector@example.com',
+        customer_email: order.customer?.email || 'client@prasrirugs.com',
         customer_first_name: order.customer?.firstName || 'Atelier',
         customer_last_name: order.customer?.lastName || 'Client',
         customer_phone: order.customer?.phone || null,
@@ -411,7 +411,7 @@ export async function persistOrderToSupabase(order, paymentId) {
           product_slug: item.productSlug || 'artisan-rug',
           product_image: item.productImage || '/images/products/verdant-oasis.jpg',
           size: item.size || 'Standard',
-          sku: item.sku || 'TWA-RUG',
+          sku: item.sku || 'PR-RUG',
           technique: item.technique || 'Hand-Tufted / Hand-Knotted',
           price_usd: item.priceUSD || 0,
           quantity: item.quantity || 1,
@@ -583,7 +583,7 @@ export async function handleRazorpayCallback(req, res) {
             productSlug: 'artisan-rug',
             productImage: '/images/products/verdant-oasis.jpg',
             size: notes.rug_size || 'Custom Size',
-            sku: notes.sku || 'TWA-RUG-01',
+            sku: notes.sku || 'PR-RUG-01',
             technique: 'Hand-Tufted / Hand-Knotted',
             priceUSD: Number(notes.amount_usd?.replace(/[^0-9.]/g, '')) || (rzpOrder ? rzpOrder.amount / 100 / 84 : 1),
             quantity: 1,

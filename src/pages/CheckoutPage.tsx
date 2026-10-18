@@ -536,7 +536,7 @@ export const CheckoutPage: React.FC = () => {
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="you@example.com"
+                        placeholder="yourname@gmail.com"
                         className="w-full bg-atelier-ivory border border-atelier-parchment px-4 py-2.5 text-xs text-atelier-softblack focus:outline-none"
                       />
                     </div>
@@ -547,7 +547,7 @@ export const CheckoutPage: React.FC = () => {
                         required
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
-                        placeholder="+1 (555) 000-0000"
+                        placeholder="+91 98765 43210"
                         className="w-full bg-atelier-ivory border border-atelier-parchment px-4 py-2.5 text-xs text-atelier-softblack focus:outline-none"
                       />
                     </div>

@@ -257,7 +257,7 @@ export const ContactPage: React.FC = () => {
                       required
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      placeholder="you@domain.com"
+                      placeholder="yourname@gmail.com"
                       className="w-full bg-atelier-cream border border-atelier-parchment px-4 py-2.5 text-xs text-atelier-softblack focus:outline-none focus:border-atelier-softblack transition-colors"
                     />
                   </div>
@@ -270,7 +270,7 @@ export const ContactPage: React.FC = () => {
                       type="tel"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      placeholder="+1 (555) 000-0000"
+                      placeholder="+91 98765 43210"
                       className="w-full bg-atelier-cream border border-atelier-parchment px-4 py-2.5 text-xs text-atelier-softblack focus:outline-none focus:border-atelier-softblack transition-colors"
                     />
                   </div>

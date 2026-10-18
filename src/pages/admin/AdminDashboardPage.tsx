@@ -72,6 +72,9 @@ import { isStoreOwnerEmail } from '../../context/AuthContext';
 import { storageService } from '../../services/storageService';
 import { parseRugDimensions } from '../../utils/dimensionHelper';
 
+const FALLBACK_IMAGE_PLACEHOLDER =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 100' fill='%23F6F3EE'%3E%3Crect width='80' height='100' fill='%23F6F3EE'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='serif' font-size='10' fill='%23A4998E'%3EPRASRI%3C/text%3E%3C/svg%3E";
+
 // Helper to optimize and convert local file to high-res data URL
 const processLocalImageFile = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -3578,7 +3581,7 @@ VITE_RAZORPAY_KEY_ID=rzp_live_...`}
                       {/* Image Thumbnail with Perspective Badge Preview */}
                       <div className="relative w-16 h-20 bg-neutral-100 border border-atelier-parchment flex-shrink-0 overflow-hidden group">
                         <img
-                          src={img.url || 'https://via.placeholder.com/80x100?text=No+Image'}
+                          src={img.url || FALLBACK_IMAGE_PLACEHOLDER}
                           alt={img.label}
                           className="w-full h-full object-cover"
                         />
