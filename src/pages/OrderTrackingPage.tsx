@@ -31,13 +31,13 @@ export const OrderTrackingPage: React.FC = () => {
   }, [initialOrderNumber]);
 
   useEffect(() => {
-    if (!activeOrderNumber.trim()) {
+    if (!activeOrderNumber.trim() && !inputEmail.trim()) {
       setCurrentOrder(null);
       setCurrentQuote(null);
       return;
     }
 
-    const localOrder = getOrder(activeOrderNumber);
+    const localOrder = activeOrderNumber.trim() ? getOrder(activeOrderNumber.trim()) : null;
     if (localOrder) {
       setCurrentOrder(localOrder);
       setCurrentQuote(null);
@@ -47,15 +47,15 @@ export const OrderTrackingPage: React.FC = () => {
 
     let isMounted = true;
     orderService
-      .getOrderByNumber(activeOrderNumber)
+      .getOrderByNumber(activeOrderNumber.trim(), inputEmail.trim())
       .then(async (found) => {
         if (!isMounted) return;
         if (found) {
           setCurrentOrder(found);
           setCurrentQuote(null);
-        } else {
+        } else if (activeOrderNumber.trim()) {
           // Check if this reference corresponds to a bespoke custom quote
-          const quote = await quoteService.getQuoteByReference(activeOrderNumber);
+          const quote = await quoteService.getQuoteByReference(activeOrderNumber.trim());
           if (isMounted) {
             if (quote) {
               setCurrentQuote(quote);
@@ -65,6 +65,9 @@ export const OrderTrackingPage: React.FC = () => {
               setCurrentQuote(null);
             }
           }
+        } else {
+          setCurrentOrder(null);
+          setCurrentQuote(null);
         }
       })
       .catch((err) => {
@@ -83,9 +86,27 @@ export const OrderTrackingPage: React.FC = () => {
 
   const handleLookup = (e: React.FormEvent) => {
     e.preventDefault();
-    if (inputOrderNumber.trim()) {
-      setActiveOrderNumber(inputOrderNumber.trim());
+    const cleanNum = inputOrderNumber.trim();
+    const cleanMail = inputEmail.trim();
+
+    if (cleanNum || cleanMail) {
+      setActiveOrderNumber(cleanNum);
       setSearched(true);
+      // Trigger live lookup immediately
+      setLoadingOrder(true);
+      orderService
+        .getOrderByNumber(cleanNum, cleanMail)
+        .then((found) => {
+          if (found) {
+            setCurrentOrder(found);
+            setCurrentQuote(null);
+          } else {
+            setCurrentOrder(null);
+          }
+        })
+        .finally(() => {
+          setLoadingOrder(false);
+        });
     }
   };
 
@@ -181,8 +202,8 @@ export const OrderTrackingPage: React.FC = () => {
                 </div>
                 <div className="text-xs text-atelier-charcoal font-light">
                   Carrier: <span className="font-medium">{currentOrder.carrier}</span> · Tracking:{' '}
-                  <span className="font-mono">
-                    {currentOrder.trackingNumber || 'Pending Courier Dispatch'}
+                  <span className="font-mono text-atelier-softblack">
+                    {currentOrder.trackingNumber || 'Pending Courier Dispatch (Will be emailed upon shipping)'}
                   </span>
                 </div>
               </div>

@@ -135,7 +135,7 @@ export const OrderConfirmationPage: React.FC = () => {
               </div>
             )}
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 border-b border-atelier-parchment pb-6">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 border-b border-atelier-parchment pb-6">
               <div>
                 <div className="text-xs text-atelier-taupe">Date Placed</div>
                 <div className="font-medium text-sm text-atelier-softblack">{order.date}</div>
@@ -143,14 +143,6 @@ export const OrderConfirmationPage: React.FC = () => {
               <div>
                 <div className="text-xs text-atelier-taupe">Delivery Carrier</div>
                 <div className="font-medium text-sm text-atelier-softblack">{order.carrier}</div>
-              </div>
-              <div>
-                <div className="text-xs text-atelier-taupe">Air Tracking Code</div>
-                {order.trackingNumber ? (
-                  <div className="font-mono text-sm text-atelier-darkbrown font-bold">{order.trackingNumber}</div>
-                ) : (
-                  <div className="text-xs text-atelier-charcoal font-light italic">Assigned upon dispatch</div>
-                )}
               </div>
               <div>
                 <div className="text-xs text-atelier-taupe">Estimated Delivery</div>
@@ -166,6 +158,15 @@ export const OrderConfirmationPage: React.FC = () => {
                     Ref: {order.paymentId}
                   </div>
                 )}
+              </div>
+            </div>
+
+            {/* Shipment Dispatch & Tracking Notification */}
+            <div className="p-4 bg-atelier-ivory border border-atelier-parchment text-xs text-atelier-charcoal leading-relaxed flex items-center space-x-3">
+              <Truck size={18} className="text-atelier-darkbrown flex-shrink-0" />
+              <div>
+                <span className="font-medium text-atelier-softblack">Air Courier Dispatch & Tracking: </span>
+                Your official air tracking number will be generated upon final studio inspection and sent directly to <strong className="text-atelier-softblack">{order.customer.email}</strong> as soon as your shipment is dispatched.
               </div>
             </div>
 

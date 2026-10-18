@@ -207,23 +207,78 @@ export const orderService = {
     return orderToSave;
   },
 
-  // 2. Lookup order by order number
-  async getOrderByNumber(orderNumber: string): Promise<Order | null> {
-    const cleanNum = orderNumber.toUpperCase().trim();
+  // 2. Lookup order by order number or email
+  async getOrderByNumber(orderNumber: string, email?: string): Promise<Order | null> {
+    const rawClean = (orderNumber || '').trim();
+    const normalized = rawClean
+      .replace(/[\u2010-\u2015\u2212]/g, '-') // normalize en-dash, em-dash, figure dash, minus
+      .replace(/\s+/g, '-')                  // replace spaces with hyphens
+      .toUpperCase();
+
+    const digitsOnly = normalized.replace(/[^0-9]/g, '');
 
     if (isSupabaseConfigured() && supabase) {
       try {
-        const { data: dbOrder, error } = await supabase
-          .from('orders')
-          .select(`
-            *,
-            order_items (*),
-            order_timelines (*)
-          `)
-          .eq('order_number', cleanNum)
-          .single();
+        let dbOrder: any = null;
 
-        if (!error && dbOrder) {
+        // A. Try exact and case-insensitive direct matches
+        if (normalized) {
+          const { data } = await supabase
+            .from('orders')
+            .select(`
+              *,
+              order_items (*),
+              order_timelines (*)
+            `)
+            .or(`order_number.ilike.${normalized},order_number.ilike.${rawClean}`)
+            .maybeSingle();
+
+          dbOrder = data;
+        }
+
+        // B. Fallback: If not found and digits are present (e.g. user typed 2920 or 2026-2920 on phone)
+        if (!dbOrder && digitsOnly.length >= 4) {
+          const { data: candidates } = await supabase
+            .from('orders')
+            .select(`
+              *,
+              order_items (*),
+              order_timelines (*)
+            `)
+            .ilike('order_number', `%${digitsOnly}%`)
+            .limit(5);
+
+          if (candidates && candidates.length > 0) {
+            if (email && email.trim()) {
+              const matched = candidates.find(
+                (c: any) => c.customer_email?.toLowerCase().trim() === email.toLowerCase().trim()
+              );
+              dbOrder = matched || candidates[0];
+            } else {
+              dbOrder = candidates[0];
+            }
+          }
+        }
+
+        // C. Fallback: Lookup by customer email if provided
+        if (!dbOrder && email && email.trim()) {
+          const { data: emailOrders } = await supabase
+            .from('orders')
+            .select(`
+              *,
+              order_items (*),
+              order_timelines (*)
+            `)
+            .ilike('customer_email', email.trim())
+            .order('created_at', { ascending: false })
+            .limit(1);
+
+          if (emailOrders && emailOrders.length > 0) {
+            dbOrder = emailOrders[0];
+          }
+        }
+
+        if (dbOrder) {
           return {
             id: dbOrder.id,
             orderNumber: dbOrder.order_number,
@@ -280,7 +335,14 @@ export const orderService = {
     }
 
     const local = getLocalOrders();
-    return local.find((o) => o.orderNumber.toUpperCase().trim() === cleanNum) || null;
+    return local.find((o) => {
+      const oNum = o.orderNumber.toUpperCase().trim();
+      return (
+        oNum === normalized ||
+        oNum.replace(/[^0-9]/g, '') === digitsOnly ||
+        (email && o.customer?.email?.toLowerCase() === email.toLowerCase())
+      );
+    }) || null;
   },
 
   // 3. Get all orders (for Admin Dashboard)
