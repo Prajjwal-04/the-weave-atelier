@@ -530,12 +530,131 @@ Carrier Assigned: ${order.carrier}
     `;
   },
 
+  // 7b. Generate Order Delivered Notification Email Template (Customer Facing)
+  generateDeliveryNotificationHtml(order: Order): string {
+    const today = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.prasrirugs.com';
+    const trackingUrl = `${origin}/order-tracking?orderNumber=${encodeURIComponent(order.orderNumber)}&email=${encodeURIComponent(order.customer.email)}`;
+    const careUrl = `${origin}/rug-care`;
+
+    const itemsHtml = (order.items || []).map((item) => `
+      <tr>
+        <td style="padding: 12px 0; border-bottom: 1px solid #EDE6DD;">
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td width="60" style="vertical-align: top; padding-right: 15px;">
+                <img src="${item.productImage || `${origin}/images/prasri-medallion.jpg`}" alt="${item.productName}" width="55" height="70" style="object-fit: cover; border: 1px solid #EDE6DD; display: block;" />
+              </td>
+              <td style="vertical-align: top;">
+                <div style="font-family: Georgia, serif; font-size: 14px; font-weight: bold; color: #1A1918;">${item.productName}</div>
+                <div style="font-size: 11px; color: #8A7B6E; margin-top: 3px;">Size: ${item.size} · SKU: ${item.sku}</div>
+                <div style="font-size: 11px; color: #5C4D43; margin-top: 3px;">Quantity: ${item.quantity}</div>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    `).join('');
+
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head><meta charset="utf-8"/></head>
+      <body style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #FAF8F5; margin: 0; padding: 40px 20px; color: #2D2B2A;">
+        <table align="center" width="600" style="background: #FFFFFF; border: 1px solid #EDE6DD; padding: 40px; margin: 0 auto; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+          <tr>
+            <td align="center" style="padding-bottom: 25px; border-bottom: 1px solid #EDE6DD;">
+              <h1 style="font-family: Georgia, serif; font-size: 24px; letter-spacing: 0.25em; color: #1A1918; margin: 0; text-transform: uppercase;">PRASRI RUGS</h1>
+              <div style="font-size: 9px; letter-spacing: 0.35em; color: #8A7B6E; margin-top: 4px;">BHADOHI · INDIA</div>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 30px 0;">
+              <div style="text-align: center; margin-bottom: 20px;">
+                <span style="display: inline-block; background-color: #E8F5E9; color: #2E7D32; border: 1px solid #A5D6A7; padding: 4px 14px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; font-family: monospace;">
+                  Delivered Successfully
+                </span>
+              </div>
+
+              <h2 style="font-family: Georgia, serif; font-size: 22px; color: #1A1918; margin: 0 0 16px 0; text-align: center; font-weight: normal;">
+                Your Handcrafted Rug Has Arrived
+              </h2>
+
+              <p style="font-size: 13px; line-height: 1.7; color: #5C4D43;">
+                Dear ${order.customer.firstName || 'Collector'},<br/><br/>
+                We are thrilled to let you know that your order <strong>${order.orderNumber}</strong> has been safely delivered to your address on ${today}. Handwoven slowly by master artisans in Bhadohi, India, we hope this piece brings warmth and enduring character to your space.
+              </p>
+
+              <!-- Delivery Summary Box -->
+              <div style="background: #F8F5F1; border: 1px solid #EDE6DD; padding: 18px 20px; margin: 25px 0;">
+                <table width="100%" cellpadding="0" cellspacing="0" style="font-size: 12px; color: #5C4D43;">
+                  <tr>
+                    <td style="padding-bottom: 6px; color: #8A7B6E; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;">Order Reference</td>
+                    <td style="padding-bottom: 6px; text-align: right; font-family: monospace; font-weight: bold; color: #1A1918;">${order.orderNumber}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding-bottom: 6px; color: #8A7B6E; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;">Delivered Carrier</td>
+                    <td style="padding-bottom: 6px; text-align: right; font-weight: 500;">${order.carrier || 'Express Air Courier'}</td>
+                  </tr>
+                  ${order.trackingNumber ? `
+                  <tr>
+                    <td style="padding-bottom: 6px; color: #8A7B6E; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;">Air Waybill</td>
+                    <td style="padding-bottom: 6px; text-align: right; font-family: monospace;">${order.trackingNumber}</td>
+                  </tr>
+                  ` : ''}
+                  <tr>
+                    <td style="color: #8A7B6E; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;">Delivery Address</td>
+                    <td style="text-align: right;">${order.shippingAddress?.city || ''}, ${order.shippingAddress?.country || 'India'}</td>
+                  </tr>
+                </table>
+              </div>
+
+              <!-- Delivered Items List -->
+              <div style="margin: 25px 0;">
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: #8A7B6E; font-weight: 600; margin-bottom: 10px; border-bottom: 1px solid #EDE6DD; pb-2;">
+                  Delivered Pieces
+                </div>
+                <table width="100%" cellpadding="0" cellspacing="0">
+                  ${itemsHtml}
+                </table>
+              </div>
+
+              <!-- Unpacking & Care Note -->
+              <div style="background: #FFFFFF; border-left: 3px solid #8C6D4F; padding: 16px; margin: 25px 0; font-size: 12px; line-height: 1.7; color: #5C4D43; background: #FAF8F5;">
+                <strong style="color: #1A1918; display: block; margin-bottom: 4px;">Unrolling & Care Instructions:</strong>
+                Natural wool fibers relax naturally over 24–48 hours after transit. For best results, unroll in your room and gently vacuum without a beater bar. Please explore our full <a href="${careUrl}" style="color: #8C6D4F; text-decoration: underline; font-weight: 500;">Artisanal Rug Care Guide</a> for maintenance advice.
+              </div>
+
+              <!-- Action Link -->
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="${trackingUrl}" style="display: inline-block; background-color: #1A1918; color: #FFFFFF; text-decoration: none; padding: 12px 28px; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 500;">
+                  View Order Details
+                </a>
+              </div>
+
+              <p style="font-size: 12px; line-height: 1.6; color: #73675E; text-align: center;">
+                Need help or have questions regarding placement? Simply reply directly to this email or reach our studio concierge on WhatsApp.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="border-top: 1px solid #EDE6DD; padding-top: 20px; font-size: 11px; color: #8A7B6E; line-height: 1.6;">
+              Prasri Rugs · G.T. Road, Gopiganj, Bhadohi, UP 221303, India<br/>
+              Studio Inquiries: ${ATELIER_PRIMARY_EMAIL} · WhatsApp Concierge: +91 98394 18038
+            </td>
+          </tr>
+        </table>
+      </body>
+      </html>
+    `;
+  },
+
   // 8. General Transactional Email Dispatcher (Direct Gmail to Customer)
   async sendTransactionalEmail(payload: {
     to: string;
     subject: string;
     html: string;
-    type?: 'order_confirmation' | 'dispatch' | 'quote' | 'stock_alert';
+    type?: 'order_confirmation' | 'dispatch' | 'delivery' | 'quote' | 'stock_alert';
   }): Promise<{ success: boolean; message: string }> {
     return dispatchToInbox({
       toEmail: payload.to,
@@ -543,6 +662,20 @@ Carrier Assigned: ${order.carrier}
       subject: payload.subject,
       html: payload.html,
       fromName: 'Prasri Rugs',
+    });
+  },
+
+  // 8b. Dedicated Order Delivered Notification Sender
+  async sendDeliveryNotification(order: Order): Promise<EmailDispatchResult> {
+    const subject = `[Prasri Rugs] Delivery Confirmed · Order ${order.orderNumber}`;
+    const html = this.generateDeliveryNotificationHtml(order);
+
+    return dispatchToInbox({
+      toEmail: order.customer.email,
+      replyTo: ATELIER_PRIMARY_EMAIL,
+      subject,
+      html,
+      fromName: 'Prasri Rugs Studio',
     });
   },
 

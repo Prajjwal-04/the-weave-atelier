@@ -158,7 +158,8 @@ export type MadeToOrderMilestone =
   | 'On the Loom'
   | 'Washing & Shearing'
   | 'Final Inspection'
-  | 'Dispatched';
+  | 'Dispatched'
+  | 'Delivered';
 
 export interface Order {
   id: string;

@@ -124,6 +124,11 @@ export async function handleSendEmail(req, res) {
       const isRecognizedPattern =
         cleanSubject.toLowerCase().includes('prasri rugs') ||
         cleanSubject.toLowerCase().includes('order confirmation') ||
+        cleanSubject.toLowerCase().includes('delivery') ||
+        cleanSubject.toLowerCase().includes('delivered') ||
+        cleanSubject.toLowerCase().includes('dispatch') ||
+        cleanSubject.toLowerCase().includes('dispatched') ||
+        cleanSubject.toLowerCase().includes('tracking') ||
         cleanSubject.toLowerCase().includes('custom rug quote') ||
         cleanSubject.toLowerCase().includes('inquiry received');
 

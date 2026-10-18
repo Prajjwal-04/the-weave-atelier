@@ -945,6 +945,24 @@ export const AdminDashboardPage: React.FC = () => {
         setSelectedOrder(updated);
       }
       showToast(`Order ${orderNumber} stage updated to "${newStatus}"`, 'success');
+
+      // Automatic Client Delivery Notification Email
+      if (newStatus === 'DELIVERED') {
+        try {
+          setEmailDispatchingOrder(orderNumber);
+          const emailRes = await emailService.sendDeliveryNotification(updated);
+          if (emailRes.success) {
+            showToast(`Delivery confirmation email sent to ${updated.customer.email}!`, 'success');
+          } else {
+            showToast(`Marked Delivered. Email dispatch note: ${emailRes.message}`, 'info');
+          }
+        } catch (emailErr: any) {
+          console.warn('Delivery email dispatch error:', emailErr);
+          showToast(`Order marked Delivered, but email note: ${emailErr.message}`, 'info');
+        } finally {
+          setEmailDispatchingOrder(null);
+        }
+      }
     } catch (err: any) {
       console.error('Failed to update order status:', err);
       showToast(`Failed to update order stage: ${err.message}`, 'error');
@@ -953,7 +971,7 @@ export const AdminDashboardPage: React.FC = () => {
     }
   };
 
-  // Advance Made-to-Order Loom Stage Milestones (Yarn Dyeing -> On the Loom -> Washing & Shearing -> Final Inspection -> Dispatched)
+  // Advance Made-to-Order Loom Stage Milestones (Yarn Dyeing -> On the Loom -> Washing & Shearing -> Final Inspection -> Dispatched -> Delivered)
   const handleUpdateMadeToOrderMilestone = async (
     orderNumber: string,
     milestone: MadeToOrderMilestone
@@ -966,6 +984,20 @@ export const AdminDashboardPage: React.FC = () => {
         setSelectedOrder(updated);
       }
       showToast(`Advanced ${orderNumber} to "${milestone}". Client tracking synchronized!`, 'success');
+
+      if (milestone === 'Delivered') {
+        try {
+          setEmailDispatchingOrder(orderNumber);
+          const emailRes = await emailService.sendDeliveryNotification(updated);
+          if (emailRes.success) {
+            showToast(`Delivery confirmation email sent to ${updated.customer.email}!`, 'success');
+          }
+        } catch (emailErr: any) {
+          console.warn('Delivery email dispatch warning:', emailErr);
+        } finally {
+          setEmailDispatchingOrder(null);
+        }
+      }
     } catch (err: any) {
       console.error('Failed to update milestone:', err);
       showToast(`Failed to update milestone: ${err.message}`, 'error');
@@ -1009,6 +1041,23 @@ export const AdminDashboardPage: React.FC = () => {
       }
     } catch (err: any) {
       showToast(`Dispatch email failed: ${err.message}`, 'error');
+    } finally {
+      setEmailDispatchingOrder(null);
+    }
+  };
+
+  // Delivery Email Notification to Customer
+  const handleSendDeliveryEmail = async (order: Order) => {
+    try {
+      setEmailDispatchingOrder(order.orderNumber);
+      const res = await emailService.sendDeliveryNotification(order);
+      if (res.success) {
+        showToast(`Delivery confirmation email sent to ${order.customer.email}`, 'success');
+      } else {
+        showToast(res.message || 'Delivery notification registered', 'info');
+      }
+    } catch (err: any) {
+      showToast(`Delivery email failed: ${err.message}`, 'error');
     } finally {
       setEmailDispatchingOrder(null);
     }
@@ -2486,25 +2535,30 @@ export const AdminDashboardPage: React.FC = () => {
                               )}
                             </div>
 
-                            {/* Stepper with the 5 exact milestones */}
+                            {/* Stepper with the 6 exact milestones */}
                             <div className="space-y-2 bg-atelier-ivory p-3 border border-atelier-parchment">
                               <div className="text-[10px] font-mono text-atelier-taupe flex items-center justify-between border-b border-atelier-parchment/60 pb-1.5">
                                 <span>Active Milestone:</span>
                                 <strong className="text-atelier-softblack uppercase font-semibold">
-                                  {order.productionMilestone || (order.status === 'DISPATCHED' ? 'Dispatched' : order.status === 'QUALITY CHECK' ? 'Final Inspection' : 'Yarn Dyeing')}
+                                  {order.status === 'DELIVERED' || order.productionMilestone === 'Delivered'
+                                    ? 'Delivered'
+                                    : order.productionMilestone || (order.status === 'DISPATCHED' ? 'Dispatched' : order.status === 'QUALITY CHECK' ? 'Final Inspection' : 'Yarn Dyeing')}
                                 </strong>
                               </div>
 
-                              <div className="grid grid-cols-1 sm:grid-cols-5 gap-1.5">
+                              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1.5">
                                 {([
                                   { key: 'Yarn Dyeing', step: '1', short: 'Yarn Dyeing', full: 'Yarn Dyeing & Skeining' },
                                   { key: 'On the Loom', step: '2', short: 'On the Loom', full: 'Loom Knotting / Weaving' },
                                   { key: 'Washing & Shearing', step: '3', short: 'Wash & Shear', full: 'Washing & Hand-Shearing' },
                                   { key: 'Final Inspection', step: '4', short: 'Inspection', full: 'Final Quality Audit' },
                                   { key: 'Dispatched', step: '5', short: 'Dispatched', full: 'Handed to Courier' },
+                                  { key: 'Delivered', step: '6', short: 'Delivered', full: 'Delivered to Destination' },
                                 ] as const).map((m, mIdx) => {
-                                  const milestoneOrder = ['Yarn Dyeing', 'On the Loom', 'Washing & Shearing', 'Final Inspection', 'Dispatched'];
-                                  const activeIndex = order.productionMilestone
+                                  const milestoneOrder = ['Yarn Dyeing', 'On the Loom', 'Washing & Shearing', 'Final Inspection', 'Dispatched', 'Delivered'];
+                                  const activeIndex = order.status === 'DELIVERED' || order.productionMilestone === 'Delivered'
+                                    ? 5
+                                    : order.productionMilestone
                                     ? milestoneOrder.indexOf(order.productionMilestone)
                                     : order.status === 'DISPATCHED' ? 4 : order.status === 'QUALITY CHECK' ? 3 : 0;
                                   const isCurrent = order.productionMilestone === m.key || (mIdx === activeIndex);
@@ -2610,13 +2664,38 @@ export const AdminDashboardPage: React.FC = () => {
                             </div>
                           </div>
 
-                          {/* 3. Send Dispatch Notification */}
-                          <div className="pt-2 border-t border-atelier-parchment/70">
+                          {/* 3. Send Notification Action Buttons */}
+                          <div className="pt-2 border-t border-atelier-parchment/70 space-y-1.5">
+                            {order.status === 'DELIVERED' && (
+                              <button
+                                type="button"
+                                onClick={() => handleSendDeliveryEmail(order)}
+                                disabled={isSendingEmail}
+                                className="w-full py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-medium tracking-wider uppercase transition-colors flex items-center justify-center space-x-1.5 disabled:opacity-50 shadow-xs"
+                              >
+                                {isSendingEmail ? (
+                                  <>
+                                    <RefreshCw size={12} className="animate-spin" />
+                                    <span>Sending Notice...</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <CheckCircle2 size={12} />
+                                    <span>Send Delivery Email to Client</span>
+                                  </>
+                                )}
+                              </button>
+                            )}
+
                             <button
                               type="button"
                               onClick={() => handleSendDispatchEmail(order)}
                               disabled={isSendingEmail}
-                              className="w-full py-2 bg-atelier-softblack text-atelier-parchment hover:bg-atelier-darkbrown text-xs font-medium tracking-wider uppercase transition-colors flex items-center justify-center space-x-1.5 disabled:opacity-50"
+                              className={`w-full py-2 text-xs font-medium tracking-wider uppercase transition-colors flex items-center justify-center space-x-1.5 disabled:opacity-50 ${
+                                order.status === 'DELIVERED'
+                                  ? 'bg-atelier-ivory border border-atelier-parchment text-atelier-charcoal hover:border-black'
+                                  : 'bg-atelier-softblack text-atelier-parchment hover:bg-atelier-darkbrown'
+                              }`}
                             >
                               {isSendingEmail ? (
                                 <>
@@ -2626,7 +2705,7 @@ export const AdminDashboardPage: React.FC = () => {
                               ) : (
                                 <>
                                   <Send size={12} />
-                                  <span>Send Dispatch Email to Client</span>
+                                  <span>{order.status === 'DELIVERED' ? 'Resend Dispatch Email' : 'Send Dispatch Email to Client'}</span>
                                 </>
                               )}
                             </button>

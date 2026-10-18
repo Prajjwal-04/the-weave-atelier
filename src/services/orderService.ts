@@ -501,9 +501,9 @@ export const orderService = {
     trackingNumber?: string,
     carrier?: string
   ): Promise<Order> {
-    const cleanNum = orderNumber.trim().toUpperCase();
+    const cleanNum = (orderNumber || '').trim().replace(/[\u2010-\u2015\u2212]/g, '-').toUpperCase();
     let local = getLocalOrders();
-    let index = local.findIndex((o) => o.orderNumber.trim().toUpperCase() === cleanNum);
+    let index = local.findIndex((o) => o.orderNumber.trim().replace(/[\u2010-\u2015\u2212]/g, '-').toUpperCase() === cleanNum);
 
     // Resilient fallback: If not found in local, attempt fetching from Supabase
     if (index === -1) {
@@ -523,7 +523,48 @@ export const orderService = {
 
     // Comprehensive timeline milestone update
     const todayStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    if (order.timeline && order.timeline.length > 0) {
+    if (newStatus === 'DELIVERED') {
+      order.productionMilestone = 'Delivered';
+      if (!order.timeline || order.timeline.length === 0) {
+        order.timeline = [
+          {
+            title: 'Order Placed & Payment Confirmed',
+            date: 'Confirmed',
+            description: 'Payment authorized and order registered at Bhadohi studio.',
+            completed: true,
+            current: false,
+          },
+          {
+            title: 'Delivered to Destination',
+            date: `Delivered · ${todayStr}`,
+            description: 'Handcrafted artisan rug safely delivered to your address.',
+            completed: true,
+            current: true,
+          },
+        ];
+      } else {
+        // Check if there is already a delivered milestone
+        const hasDelivered = order.timeline.some((evt) => evt.title.toLowerCase().includes('deliver'));
+        if (!hasDelivered) {
+          order.timeline.push({
+            title: 'Delivered to Destination',
+            date: `Delivered · ${todayStr}`,
+            description: 'Handcrafted artisan rug safely delivered and received at destination address.',
+            completed: true,
+            current: true,
+          });
+        }
+        order.timeline = order.timeline.map((evt, idx) => {
+          const isLast = idx === order.timeline.length - 1;
+          return {
+            ...evt,
+            completed: true,
+            current: isLast,
+            date: evt.title.toLowerCase().includes('deliver') ? `Delivered · ${todayStr}` : evt.date,
+          };
+        });
+      }
+    } else if (order.timeline && order.timeline.length > 0) {
       order.timeline = order.timeline.map((evt, idx) => {
         const titleLower = evt.title.toLowerCase();
 
@@ -567,10 +608,6 @@ export const orderService = {
           return { ...evt, completed: true, current: false };
         }
 
-        if (newStatus === 'DELIVERED') {
-          return { ...evt, completed: true, current: idx === order.timeline.length - 1, date: idx === order.timeline.length - 1 ? `Delivered · ${todayStr}` : evt.date };
-        }
-
         return evt;
       });
     }
@@ -581,6 +618,7 @@ export const orderService = {
         const updatePayload: any = { status: newStatus };
         if (trackingNumber !== undefined) updatePayload.tracking_number = trackingNumber;
         if (carrier !== undefined) updatePayload.carrier = carrier;
+        if (newStatus === 'DELIVERED') updatePayload.production_milestone = 'Delivered';
 
         const { data: updatedDbOrder, error: updateErr } = await supabase
           .from('orders')
@@ -639,9 +677,9 @@ export const orderService = {
     orderNumber: string,
     milestone: MadeToOrderMilestone
   ): Promise<Order> {
-    const cleanNum = orderNumber.trim().toUpperCase();
+    const cleanNum = (orderNumber || '').trim().replace(/[\u2010-\u2015\u2212]/g, '-').toUpperCase();
     let local = getLocalOrders();
-    let index = local.findIndex((o) => o.orderNumber.trim().toUpperCase() === cleanNum);
+    let index = local.findIndex((o) => o.orderNumber.trim().replace(/[\u2010-\u2015\u2212]/g, '-').toUpperCase() === cleanNum);
 
     if (index === -1) {
       const fetched = await this.getOrderByNumber(cleanNum);
@@ -692,6 +730,12 @@ export const orderService = {
         title: 'Dispatched & Handed to Courier',
         desc: 'Packed in protective moisture-barrier canvas and dispatched via express courier.',
         status: 'DISPATCHED',
+      },
+      {
+        name: 'Delivered',
+        title: 'Delivered to Destination',
+        desc: 'Handcrafted bespoke rug safely delivered to your address.',
+        status: 'DELIVERED',
       },
     ];
 

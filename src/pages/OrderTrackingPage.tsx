@@ -191,7 +191,11 @@ export const OrderTrackingPage: React.FC = () => {
 
               <div className="text-left sm:text-right space-y-1">
                 <div className="flex flex-wrap items-center gap-2 justify-start sm:justify-end">
-                  <div className="inline-block px-3 py-1 bg-atelier-parchment border border-atelier-sand text-atelier-darkbrown text-xs font-mono font-medium">
+                  <div className={`inline-block px-3 py-1 text-xs font-mono font-medium ${
+                    currentOrder.status === 'DELIVERED'
+                      ? 'bg-emerald-100 border border-emerald-300 text-emerald-950 font-semibold'
+                      : 'bg-atelier-parchment border border-atelier-sand text-atelier-darkbrown'
+                  }`}>
                     Status: {currentOrder.status}
                   </div>
                   {currentOrder.isMadeToOrder && (
@@ -208,6 +212,17 @@ export const OrderTrackingPage: React.FC = () => {
                 </div>
               </div>
             </div>
+
+            {/* Delivered Success Banner */}
+            {currentOrder.status === 'DELIVERED' && (
+              <div className="p-4 bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 flex items-center space-x-3">
+                <CheckCircle2 size={18} className="text-emerald-700 flex-shrink-0" />
+                <div>
+                  <strong className="block text-emerald-950 font-medium">Delivered to Destination:</strong>
+                  Your handcrafted rug has been safely delivered. We hope it enriches your space for decades to come. If you need any assistance with unrolling or care, our studio concierge is always at your service.
+                </div>
+              </div>
+            )}
 
             {/* Visual Stepper */}
             <div className="space-y-6">
