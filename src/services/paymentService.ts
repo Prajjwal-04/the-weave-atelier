@@ -281,10 +281,13 @@ export const paymentService = {
             ondismiss: async function () {
               // Proactively verify with backend if any payment succeeded or is pending
               try {
-                const statusRes = await fetch(`/api/check-payment?order_id=${encodeURIComponent(backendOrder.order_id)}`);
+                const statusRes = await fetch(`/api/check-payment?order_id=${encodeURIComponent(backendOrder.order_id)}&orderNumber=${encodeURIComponent(params.orderNumber)}`);
                 if (statusRes.ok) {
                   const statusData = await statusRes.json();
                   if (statusData.has_successful_payment) {
+                    if (typeof window !== 'undefined') {
+                      window.location.href = `/order-confirmation?orderNumber=${encodeURIComponent(params.orderNumber)}&paymentId=${encodeURIComponent(statusData.successful_payment_id || '')}&status=confirmed`;
+                    }
                     resolve({
                       success: true,
                       transactionId: statusData.successful_payment_id || '',

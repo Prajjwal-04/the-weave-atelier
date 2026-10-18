@@ -1,5 +1,13 @@
 import http from 'http';
-import { handleCreateOrder, handleVerifyPayment, handleGetOrders, sendJsonResponse } from './razorpayHandlers.js';
+import {
+  handleCreateOrder,
+  handleVerifyPayment,
+  handleGetOrders,
+  handleRazorpayCallback,
+  handleCheckPaymentStatus,
+  handleSaveOrderBackup,
+  sendJsonResponse,
+} from './razorpayHandlers.js';
 import { handleSendEmail } from './emailHandler.js';
 import dotenv from 'dotenv';
 
@@ -26,6 +34,18 @@ const server = http.createServer(async (req, res) => {
 
   if (req.method === 'POST' && url === '/api/verify-payment') {
     return handleVerifyPayment(req, res);
+  }
+
+  if ((req.method === 'POST' || req.method === 'GET') && (url === '/api/razorpay-callback' || url === '/api/payment-callback')) {
+    return handleRazorpayCallback(req, res);
+  }
+
+  if (req.method === 'GET' && url === '/api/check-payment') {
+    return handleCheckPaymentStatus(req, res);
+  }
+
+  if (req.method === 'POST' && (url === '/api/backup-order' || url === '/api/save-order-backup')) {
+    return handleSaveOrderBackup(req, res);
   }
 
   if (req.method === 'POST' && url === '/api/send-email') {

@@ -36,8 +36,21 @@ function getSupabaseClient() {
 
 export function parseRequestBody(req) {
   return new Promise((resolve) => {
-    if (req.body && typeof req.body === 'object') {
+    if (req.body && typeof req.body === 'object' && !Buffer.isBuffer(req.body)) {
       return resolve(req.body);
+    }
+    if (Buffer.isBuffer(req.body)) {
+      const str = req.body.toString('utf8');
+      try {
+        return resolve(JSON.parse(str));
+      } catch (_) {
+        try {
+          const params = new URLSearchParams(str);
+          const obj = Object.fromEntries(params.entries());
+          if (Object.keys(obj).length > 0) return resolve(obj);
+        } catch (_) {}
+        return resolve({});
+      }
     }
     if (typeof req.body === 'string' && req.body.trim()) {
       try {
@@ -51,11 +64,30 @@ export function parseRequestBody(req) {
         return resolve({});
       }
     }
+
+    // If stream has already finished or is not readable
+    if (req.readableEnded || req.complete) {
+      return resolve({});
+    }
+
     let data = '';
+    let resolved = false;
+
+    // Safety timeout to prevent hanging on serverless
+    const timer = setTimeout(() => {
+      if (!resolved) {
+        resolved = true;
+        resolve({});
+      }
+    }, 4000);
+
     req.on('data', (chunk) => {
       data += chunk;
     });
     req.on('end', () => {
+      if (resolved) return;
+      resolved = true;
+      clearTimeout(timer);
       if (!data) return resolve({});
       try {
         resolve(JSON.parse(data));
@@ -69,8 +101,70 @@ export function parseRequestBody(req) {
         }
       }
     });
-    req.on('error', () => resolve({}));
+    req.on('error', () => {
+      if (!resolved) {
+        resolved = true;
+        clearTimeout(timer);
+        resolve({});
+      }
+    });
   });
+}
+
+/**
+ * Mobile-resilient redirect helper:
+ * Sends HTTP 303 with absolute URL AND renders HTML fallback with <meta http-equiv="refresh"> and JavaScript redirect.
+ * Prevents mobile browsers / UPI apps from showing "Connection interrupted" or blank screens.
+ */
+export function sendMobileRedirect(req, res, targetUrl) {
+  const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost:3000';
+  const proto = req.headers['x-forwarded-proto'] || (host.includes('localhost') ? 'http' : 'https');
+  const fullUrl = targetUrl.startsWith('http') ? targetUrl : `${proto}://${host}${targetUrl}`;
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="refresh" content="0;url=${fullUrl}">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Successful - Prasri Rugs</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Georgia, serif; background: #FAF8F5; color: #1A1918; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center; }
+    .card { background: #FFFFFF; border: 1px solid #EDE6DD; padding: 40px 30px; max-width: 440px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+    h2 { font-size: 20px; font-weight: normal; letter-spacing: 0.05em; margin: 0 0 12px; }
+    p { font-size: 14px; color: #5C5248; line-height: 1.5; margin: 0 0 20px; }
+    a { display: inline-block; padding: 12px 24px; background: #1A1918; color: #FAF8F5; text-decoration: none; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Payment Confirmed</h2>
+    <p>Your transaction has been approved. Redirecting to your official studio receipt...</p>
+    <a href="${fullUrl}">View Order Confirmation</a>
+  </div>
+  <script>
+    try {
+      window.location.replace(${JSON.stringify(fullUrl)});
+    } catch (_) {
+      window.location.href = ${JSON.stringify(fullUrl)};
+    }
+  </script>
+</body>
+</html>`;
+
+  if (typeof res.redirect === 'function') {
+    try {
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      return res.redirect(303, fullUrl);
+    } catch (_) {}
+  }
+
+  res.writeHead(303, {
+    Location: fullUrl,
+    'Content-Type': 'text/html; charset=utf-8',
+    'Content-Length': Buffer.byteLength(html),
+  });
+  return res.end(html);
 }
 
 export function sendJsonResponse(res, statusCode, payload) {
@@ -257,12 +351,24 @@ export async function persistOrderToSupabase(order, paymentId) {
     // Check if order already exists in Supabase
     const { data: existing } = await supabase
       .from('orders')
-      .select('id')
+      .select('id, payment_id, status')
       .eq('order_number', orderNumber)
       .maybeSingle();
 
     if (existing) {
       console.log('[Supabase Persist] Order already exists in Supabase:', orderNumber);
+      // Update payment details and status if payment is confirmed
+      if (paymentId && (!existing.payment_id || existing.payment_id !== paymentId || existing.status === 'PENDING_PAYMENT' || existing.status === 'ORDER PLACED')) {
+        await supabase
+          .from('orders')
+          .update({
+            payment_id: paymentId,
+            payment_provider: order.paymentProvider || 'Razorpay Live',
+            status: order.status || 'PROCESSING',
+            updated_at: new Date().toISOString(),
+          })
+          .eq('order_number', orderNumber);
+      }
       return true;
     }
 
@@ -277,7 +383,7 @@ export async function persistOrderToSupabase(order, paymentId) {
         shipping_address: order.shippingAddress || { address: 'Registered Address', city: 'City', country: 'India' },
         shipping_method: order.shippingMethod || { name: 'Domestic Express Air Courier', estimatedDays: '3–5 days', costUSD: 0 },
         currency: order.currency || 'INR',
-        subtotal_usd: order.subtotalUSD || order.totalUSD || 0,
+        subtotal_usd: order.subtotalUSD ?? order.totalUSD ?? 0,
         shipping_usd: order.shippingUSD || 0,
         tax_usd: order.taxUSD || 0,
         total_usd: order.totalUSD || 0,
@@ -341,39 +447,39 @@ export async function persistOrderToSupabase(order, paymentId) {
 
 /**
  * STEP 4: BACKEND - Dedicated Razorpay Callback Endpoint
- * Endpoint: POST & GET /api/razorpay-callback
+ * Endpoint: POST & GET /api/razorpay-callback & /api/payment-callback
  * 
  * Crucial for mobile UPI Intent, NetBanking, and Card 3D-Secure redirects!
  * In Single Page Applications, direct POST to frontend causes 405 Method Not Allowed ("load fails").
  * This endpoint:
  * 1. Receives the form POST or GET from Razorpay
  * 2. Validates HMAC-SHA256 signature
- * 3. Persists order into Supabase database
+ * 3. Persists/updates order into Supabase database
  * 4. Dispatches confirmation emails to customer and admin directly
- * 5. Issues an HTTP 303 GET redirect to /order-confirmation?orderNumber=...
+ * 5. Issues a mobile-bulletproof HTTP 303 GET redirect + HTML fallback to /order-confirmation
  */
 export async function handleRazorpayCallback(req, res) {
   try {
     const body = await parseRequestBody(req);
-    const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+    const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost:3000';
+    const proto = req.headers['x-forwarded-proto'] || (host.includes('localhost') ? 'http' : 'https');
+    const url = new URL(req.url, `${proto}://${host}`);
 
-    const razorpay_payment_id = body.razorpay_payment_id || url.searchParams.get('razorpay_payment_id') || '';
-    const razorpay_order_id = body.razorpay_order_id || url.searchParams.get('razorpay_order_id') || '';
-    const razorpay_signature = body.razorpay_signature || url.searchParams.get('razorpay_signature') || '';
-    const queryOrderNumber = url.searchParams.get('orderNumber') || body.order_number || body['notes[order_number]'] || '';
+    const razorpay_payment_id = body.razorpay_payment_id || req.query?.razorpay_payment_id || url.searchParams.get('razorpay_payment_id') || '';
+    const razorpay_order_id = body.razorpay_order_id || req.query?.razorpay_order_id || url.searchParams.get('razorpay_order_id') || '';
+    const razorpay_signature = body.razorpay_signature || req.query?.razorpay_signature || url.searchParams.get('razorpay_signature') || '';
+    const queryOrderNumber = url.searchParams.get('orderNumber') || req.query?.orderNumber || body.order_number || body['notes[order_number]'] || '';
 
     // Check for explicit error returned by Razorpay
     if (body.error) {
       console.warn('[Razorpay Callback Error from Gateway]:', body.error);
       const desc = body.error.description || 'Payment was cancelled or declined.';
-      res.writeHead(303, { Location: `/checkout?error=${encodeURIComponent(desc)}` });
-      return res.end();
+      return sendMobileRedirect(req, res, `/checkout?error=${encodeURIComponent(desc)}`);
     }
 
-    if (!razorpay_payment_id || !razorpay_order_id) {
+    if (!razorpay_payment_id && !razorpay_order_id) {
       console.warn('[Razorpay Callback Missing Essential IDs]:', { body, query: Object.fromEntries(url.searchParams) });
-      res.writeHead(303, { Location: `/checkout?error=${encodeURIComponent('Payment session timed out or cancelled.')}` });
-      return res.end();
+      return sendMobileRedirect(req, res, `/checkout?error=${encodeURIComponent('Payment session timed out or cancelled.')}`);
     }
 
     let credentials;
@@ -384,7 +490,7 @@ export async function handleRazorpayCallback(req, res) {
     }
 
     // Verify HMAC-SHA256 signature if credentials and signature exist
-    if (credentials && razorpay_signature) {
+    if (credentials && razorpay_signature && razorpay_order_id && razorpay_payment_id) {
       const text = `${razorpay_order_id}|${razorpay_payment_id}`;
       const expectedSignature = crypto
         .createHmac('sha256', credentials.keySecret)
@@ -396,8 +502,7 @@ export async function handleRazorpayCallback(req, res) {
 
       if (expectedBuf.length !== actualBuf.length || !crypto.timingSafeEqual(expectedBuf, actualBuf)) {
         console.error('[Razorpay Callback Signature Mismatch]');
-        res.writeHead(303, { Location: `/checkout?error=${encodeURIComponent('Payment signature verification mismatch.')}` });
-        return res.end();
+        return sendMobileRedirect(req, res, `/checkout?error=${encodeURIComponent('Payment signature verification mismatch.')}`);
       }
     }
 
@@ -411,24 +516,41 @@ export async function handleRazorpayCallback(req, res) {
           key_secret: credentials.keySecret,
         });
         [rzpPayment, rzpOrder] = await Promise.all([
-          instance.payments.fetch(razorpay_payment_id).catch(() => null),
-          instance.orders.fetch(razorpay_order_id).catch(() => null),
+          razorpay_payment_id ? instance.payments.fetch(razorpay_payment_id).catch(() => null) : null,
+          razorpay_order_id ? instance.orders.fetch(razorpay_order_id).catch(() => null) : null,
         ]);
       } catch (liveErr) {
         console.warn('[Razorpay Fetch Live Details Warning]:', liveErr.message);
       }
     }
 
+    const finalPaymentId = razorpay_payment_id || rzpPayment?.id || '';
     const finalOrderNumber =
       queryOrderNumber ||
       rzpOrder?.notes?.order_number ||
       rzpOrder?.receipt ||
-      `PR-${new Date().getFullYear()}-${razorpay_payment_id.slice(-4)}`;
+      `PR-${new Date().getFullYear()}-${(finalPaymentId || '0000').slice(-4)}`;
 
-    // Look for full pre-saved pending order
-    let orderToPersist = pendingOrdersCache.get(razorpay_order_id) || pendingOrdersCache.get(finalOrderNumber);
+    // 1. Look for existing order in Supabase directly
+    const supabase = getSupabaseClient();
+    let existingDbOrder = null;
+    if (supabase) {
+      try {
+        const { data: dbO } = await supabase
+          .from('orders')
+          .select('*, order_items(*), order_timelines(*)')
+          .eq('order_number', finalOrderNumber)
+          .maybeSingle();
+        existingDbOrder = dbO;
+      } catch (err) {
+        console.warn('Supabase initial lookup warning:', err.message);
+      }
+    }
 
-    if (!orderToPersist) {
+    // 2. Look for pre-saved order in pendingOrdersCache
+    let orderToPersist = existingDbOrder ? null : (pendingOrdersCache.get(razorpay_order_id) || pendingOrdersCache.get(finalOrderNumber));
+
+    if (!existingDbOrder && !orderToPersist) {
       // Reconstruct order from Razorpay verified notes
       const notes = rzpOrder?.notes || {};
       const customerEmail = rzpPayment?.email || notes.customer_email || 'client@prasrirugs.com';
@@ -470,22 +592,22 @@ export async function handleRazorpayCallback(req, res) {
           },
         ],
         currency: rzpPayment?.currency || 'INR',
-        subtotalUSD: Number(notes.amount_usd?.replace(/[^0-9.]/g, '')) || 1,
+        subtotalUSD: Number(notes.amount_usd?.replace(/[^0-9.]/g, '')) || (rzpOrder ? rzpOrder.amount / 100 / 84 : 1),
         shippingUSD: 0,
         taxUSD: 0,
-        totalUSD: Number(notes.amount_usd?.replace(/[^0-9.]/g, '')) || 1,
+        totalUSD: Number(notes.amount_usd?.replace(/[^0-9.]/g, '')) || (rzpOrder ? rzpOrder.amount / 100 / 84 : 1),
         status: 'PROCESSING',
         carrier: 'Domestic Express Air Courier',
         trackingNumber: `TWA-EXP-${finalOrderNumber.replace(/[^0-9]/g, '')}`,
         estimatedDeliveryDate: '3–5 business days',
         isMadeToOrder: false,
         paymentProvider: 'Razorpay Live',
-        paymentId: razorpay_payment_id,
+        paymentId: finalPaymentId,
         timeline: [
           {
             title: 'Order Placed & Payment Confirmed',
             date: 'Today · Confirmed',
-            description: `Payment authorized via Razorpay UPI (Ref: ${razorpay_payment_id}). Order registered at Bhadohi studio.`,
+            description: `Payment authorized via Razorpay (Ref: ${finalPaymentId}). Order registered at Bhadohi studio.`,
             completed: true,
             current: true,
           },
@@ -505,52 +627,89 @@ export async function handleRazorpayCallback(req, res) {
           },
         ],
       };
-    } else {
-      orderToPersist.paymentId = razorpay_payment_id;
+    } else if (orderToPersist) {
+      orderToPersist.paymentId = finalPaymentId;
       orderToPersist.paymentProvider = 'Razorpay Live';
+      orderToPersist.status = 'PROCESSING';
     }
 
-    // 1. Persist to Supabase
-    await persistOrderToSupabase(orderToPersist, razorpay_payment_id);
+    // 3. Persist or update Supabase
+    if (orderToPersist) {
+      await persistOrderToSupabase(orderToPersist, finalPaymentId);
+    } else if (existingDbOrder && supabase) {
+      await supabase
+        .from('orders')
+        .update({
+          payment_id: finalPaymentId,
+          payment_provider: 'Razorpay Live',
+          status: 'PROCESSING',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('order_number', finalOrderNumber);
+    }
 
-    // 2. Persist to server backup file
+    // 4. Record to backup file
     saveVerifiedOrder({
       order_id: razorpay_order_id,
-      payment_id: razorpay_payment_id,
+      payment_id: finalPaymentId,
       signature: razorpay_signature,
       verified_at: new Date().toISOString(),
       order_number: finalOrderNumber,
-      customer: orderToPersist.customer,
-      amountUSD: orderToPersist.totalUSD,
+      customer: orderToPersist?.customer || {
+        firstName: existingDbOrder?.customer_first_name,
+        lastName: existingDbOrder?.customer_last_name,
+        email: existingDbOrder?.customer_email,
+        phone: existingDbOrder?.customer_phone,
+      },
+      amountUSD: orderToPersist?.totalUSD || existingDbOrder?.total_usd,
       status: 'PAID_VERIFIED',
     });
 
-    // 3. Dispatch emails to customer and admin
+    // 5. Dispatch emails to customer and admin
     try {
-      await dispatchOrderEmailsDirect(orderToPersist);
+      const emailTarget = orderToPersist || {
+        orderNumber: finalOrderNumber,
+        customer: {
+          firstName: existingDbOrder?.customer_first_name || 'Collector',
+          lastName: existingDbOrder?.customer_last_name || '',
+          email: existingDbOrder?.customer_email || 'client@prasrirugs.com',
+          phone: existingDbOrder?.customer_phone,
+        },
+        shippingAddress: existingDbOrder?.shipping_address,
+        items: existingDbOrder?.order_items?.map((i) => ({
+          productName: i.product_name,
+          size: i.size,
+          sku: i.sku,
+          priceUSD: i.price_usd,
+          quantity: i.quantity,
+        })) || [],
+        totalUSD: existingDbOrder?.total_usd || 0,
+        shippingUSD: existingDbOrder?.shipping_usd || 0,
+        paymentId: finalPaymentId,
+      };
+      await dispatchOrderEmailsDirect(emailTarget);
     } catch (mailErr) {
       console.warn('[Razorpay Callback Email Dispatch Warning]:', mailErr.message);
     }
 
-    // 4. HTTP 303 Redirect to Order Confirmation page (converts POST to clean GET)
-    const redirectUrl = `/order-confirmation?orderNumber=${encodeURIComponent(finalOrderNumber)}&paymentId=${encodeURIComponent(razorpay_payment_id)}&status=confirmed`;
-    res.writeHead(303, { Location: redirectUrl });
-    return res.end();
+    // 6. Resilient redirect to Order Confirmation page
+    const redirectUrl = `/order-confirmation?orderNumber=${encodeURIComponent(finalOrderNumber)}&paymentId=${encodeURIComponent(finalPaymentId)}&status=confirmed`;
+    return sendMobileRedirect(req, res, redirectUrl);
   } catch (err) {
     console.error('[Razorpay Callback Fatal Handler Error]:', err);
-    res.writeHead(303, { Location: `/order-confirmation?status=pending&error=${encodeURIComponent(err.message)}` });
-    return res.end();
+    return sendMobileRedirect(req, res, `/order-confirmation?status=pending&error=${encodeURIComponent(err.message)}`);
   }
 }
 
 /**
  * Check payment status directly with Razorpay API (prevents duplicate charges and unsafe dismissal)
- * Endpoint: GET /api/check-payment?order_id=...
+ * Endpoint: GET /api/check-payment?order_id=...&orderNumber=...
  */
 export async function handleCheckPaymentStatus(req, res) {
   try {
     const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
     const orderId = url.searchParams.get('order_id') || req.query?.order_id;
+    const orderNumber = url.searchParams.get('orderNumber') || req.query?.orderNumber;
 
     if (!orderId) {
       return sendJsonResponse(res, 400, {
@@ -581,6 +740,40 @@ export async function handleCheckPaymentStatus(req, res) {
     const capturedPayment = paymentItems.find((p) => p.status === 'captured');
     const authorizedPayment = paymentItems.find((p) => p.status === 'authorized');
     const pendingPayment = paymentItems.find((p) => p.status === 'created' || p.status === 'pending');
+    const successfulPayment = capturedPayment || authorizedPayment;
+
+    // AUTO-RECONCILE: If payment succeeded, make sure Supabase order is updated & email sent!
+    if (successfulPayment) {
+      const orderNum = orderNumber || order?.notes?.order_number || order?.receipt;
+      if (orderNum) {
+        const supabase = getSupabaseClient();
+        if (supabase) {
+          const { data: existing } = await supabase
+            .from('orders')
+            .select('id, status, payment_id')
+            .eq('order_number', orderNum)
+            .maybeSingle();
+
+          if (existing && (!existing.payment_id || existing.status === 'PENDING_PAYMENT' || existing.status === 'ORDER PLACED')) {
+            await supabase
+              .from('orders')
+              .update({
+                payment_id: successfulPayment.id,
+                payment_provider: 'Razorpay Live',
+                status: 'PROCESSING',
+                updated_at: new Date().toISOString(),
+              })
+              .eq('order_number', orderNum);
+
+            // Dispatch confirmation email
+            const cached = pendingOrdersCache.get(orderId) || pendingOrdersCache.get(orderNum);
+            if (cached) {
+              dispatchOrderEmailsDirect({ ...cached, paymentId: successfulPayment.id }).catch(() => {});
+            }
+          }
+        }
+      }
+    }
 
     return sendJsonResponse(res, 200, {
       success: true,
@@ -588,8 +781,8 @@ export async function handleCheckPaymentStatus(req, res) {
       order_status: order?.status || 'unknown',
       amount_paid: order?.amount_paid || 0,
       payment_count: paymentItems.length,
-      has_successful_payment: Boolean(capturedPayment || authorizedPayment),
-      successful_payment_id: (capturedPayment || authorizedPayment)?.id || null,
+      has_successful_payment: Boolean(successfulPayment),
+      successful_payment_id: successfulPayment?.id || null,
       is_pending: Boolean(pendingPayment),
       payments: paymentItems.map((p) => ({
         id: p.id,
@@ -611,7 +804,7 @@ export async function handleCheckPaymentStatus(req, res) {
 
 /**
  * Backup order saving endpoint in case of Supabase database connection issues
- * Endpoint: POST /api/save-order-backup
+ * Endpoint: POST /api/backup-order & /api/save-order-backup
  */
 export async function handleSaveOrderBackup(req, res) {
   try {
@@ -620,6 +813,10 @@ export async function handleSaveOrderBackup(req, res) {
       return sendJsonResponse(res, 400, { error: 'Invalid order payload' });
     }
 
+    // Cache in pending memory map
+    pendingOrdersCache.set(body.orderNumber, body);
+    if (body.paymentId) pendingOrdersCache.set(body.paymentId, body);
+
     const orderRecord = {
       ...body,
       backup_saved_at: new Date().toISOString(),
@@ -627,6 +824,16 @@ export async function handleSaveOrderBackup(req, res) {
     };
 
     saveVerifiedOrder(orderRecord);
+
+    // Also pre-persist to Supabase as PENDING_PAYMENT so items & customer details are never lost
+    try {
+      await persistOrderToSupabase({
+        ...body,
+        status: body.status || 'ORDER PLACED',
+      }, body.paymentId || null);
+    } catch (e) {
+      console.warn('Backup persist to Supabase warning:', e.message);
+    }
 
     return sendJsonResponse(res, 200, {
       success: true,
