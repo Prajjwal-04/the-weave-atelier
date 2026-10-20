@@ -17,7 +17,7 @@ export const HomePage: React.FC = () => {
   return (
     <div className="animate-fadeIn">
       <SEO
-        title="PRASRI RUGS — Contemporary Handmade Rugs from Bhadohi, India"
+        title="PRASRI RUGS — Artisan Rugs for Architectural Spaces"
         description="Contemporary rugs, rooted in Indian craftsmanship. Handcrafted slowly in Bhadohi, India for discerning architectural spaces worldwide. Ready-to-ship collections and bespoke custom sizing."
         canonicalPath="/"
       />

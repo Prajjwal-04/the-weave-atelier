@@ -11,7 +11,7 @@ interface SEOProps {
 
 const BASE_URL = 'https://www.prasrirugs.com';
 const DEFAULT_IMAGE = `${BASE_URL}/images/hero/hero-main.jpg`;
-const DEFAULT_TITLE = 'PRASRI RUGS — Contemporary Handmade Rugs from Bhadohi, India';
+const DEFAULT_TITLE = 'PRASRI RUGS — Artisan Rugs for Architectural Spaces';
 const DEFAULT_DESCRIPTION =
   'Contemporary rugs, rooted in Indian craftsmanship. Handcrafted slowly in Bhadohi, India for discerning architectural spaces worldwide. Ready-to-ship collections and bespoke custom sizing.';
 
