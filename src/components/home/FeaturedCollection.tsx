@@ -167,7 +167,7 @@ const FeaturedCardItem: React.FC<FeaturedCardItemProps> = ({
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              setQuickViewProduct(product);
+              navigate(`/product/${product.slug}`);
             }}
             className="w-full py-2.5 px-3 bg-atelier-ivory/95 backdrop-blur-md border border-atelier-parchment text-atelier-softblack text-[11px] tracking-widest uppercase hover:bg-atelier-softblack hover:text-atelier-parchment hover:border-atelier-softblack transition-all flex items-center justify-center font-medium shadow-sm active:scale-95 cursor-pointer"
           >

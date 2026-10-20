@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Filter, X, ChevronDown, SlidersHorizontal, ChevronLeft, ChevronRight, LayoutGrid, Square } from 'lucide-react';
 import { COLLECTIONS } from '../data/collections';
 import { Product, Technique, Material } from '../types';
@@ -11,6 +11,7 @@ import { useInventory } from '../context/InventoryContext';
 import { SEO } from '../components/common/SEO';
 
 export const ShopPage: React.FC = () => {
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { formatPrice } = useCurrency();
   const { products } = useInventory();
@@ -490,7 +491,7 @@ export const ShopPage: React.FC = () => {
                 <ProductCard
                   key={product.id}
                   product={product}
-                  onQuickView={(p) => setQuickViewProduct(p)}
+                  onQuickView={(p) => navigate(`/product/${p.slug}`)}
                 />
               ))}
             </div>

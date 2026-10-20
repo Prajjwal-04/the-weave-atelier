@@ -13,12 +13,14 @@ interface ProductCardProps {
   product: Product;
   onQuickView?: (product: Product) => void;
   aspectRatio?: 'portrait' | 'square';
+  showQuickView?: boolean;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({
   product,
   onQuickView,
   aspectRatio = 'portrait',
+  showQuickView = true,
 }) => {
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
@@ -139,7 +141,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         </button>
 
         {/* Quick View Button on Hover / Toggle */}
-        {onQuickView && (
+        {showQuickView && (
           <div
             className={`absolute bottom-3 inset-x-3 z-10 transition-all duration-300 transform ${
               isActive
@@ -152,9 +154,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                onQuickView(product);
+                navigate(`/product/${product.slug}`);
+                if (onQuickView) {
+                  onQuickView(product);
+                }
               }}
-              className="w-full py-2.5 bg-atelier-ivory/95 hover:bg-atelier-softblack hover:text-atelier-parchment text-atelier-softblack text-xs tracking-widest uppercase transition-all duration-200 border border-atelier-parchment shadow-md flex items-center justify-center font-medium active:scale-95"
+              className="w-full py-2.5 bg-atelier-ivory/95 hover:bg-atelier-softblack hover:text-atelier-parchment text-atelier-softblack text-xs tracking-widest uppercase transition-all duration-200 border border-atelier-parchment shadow-md flex items-center justify-center font-medium active:scale-95 cursor-pointer"
             >
               <Eye size={13} className="mr-1.5" />
               Quick View
