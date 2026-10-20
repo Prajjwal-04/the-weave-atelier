@@ -539,22 +539,6 @@ export const ProductDetailPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Standard Fixed Atelier Shipping Rate Badge */}
-            <div className="bg-atelier-cream/80 border border-atelier-parchment px-3.5 py-2.5 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
-              <div className="flex items-center space-x-2 text-atelier-charcoal font-medium">
-                <Truck size={14} className="text-atelier-agedgold flex-shrink-0" />
-                <span>Atelier Shipping:</span>
-              </div>
-              <div className="flex items-center space-x-3 text-xs">
-                <span className="text-atelier-softblack">
-                  🇮🇳 India: <strong className="font-mono text-emerald-700">Free</strong>
-                </span>
-                <span className="text-atelier-parchment">|</span>
-                <span className="text-atelier-softblack">
-                  ✈️ Global: <strong className="font-mono text-atelier-agedgold">{formatPrice(120)}</strong>
-                </span>
-              </div>
-            </div>
 
             {/* Collapsible Accordions: Specs, Craft, Care, Shipping */}
             <div className="border-t border-atelier-parchment divide-y divide-atelier-parchment pt-4 text-xs">
