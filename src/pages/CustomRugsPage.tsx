@@ -346,22 +346,19 @@ export const CustomRugsPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Live Quotation Calculator Box */}
+              {/* Atelier Consultation Specification Box */}
               <div className="p-5 sm:p-6 bg-atelier-ivory border border-atelier-parchment space-y-2">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-1">
-                  <span className="text-atelier-taupe flex items-center font-medium">
-                    <Calculator size={14} className="mr-1.5 text-atelier-agedgold shrink-0" />
-                    <span>Preliminary Atelier Estimate ({Math.round(sqFeet)} sq. ft.)</span>
+                  <span className="text-atelier-softblack flex items-center font-medium">
+                    <ShieldCheck size={14} className="mr-1.5 text-atelier-agedgold shrink-0" />
+                    <span>Bespoke Loom Specification ({Math.round(sqFeet)} sq. ft.)</span>
                   </span>
                   <span className="font-mono text-[11px] text-atelier-taupe">
-                    Timeline: {technique === 'Hand-Knotted' ? '7–10 weeks' : '4–6 weeks'}
+                    Estimated Loom Crafting: {technique === 'Hand-Knotted' ? '7–10 weeks' : '4–6 weeks'}
                   </span>
                 </div>
-                <div className="font-serif text-3xl text-atelier-softblack font-medium">
-                  {formatPrice(estMin)} – {formatPrice(estMax)}
-                </div>
-                <div className="text-[11px] text-atelier-taupe font-light leading-relaxed">
-                  *Please note: These figures are preliminary estimates only. Actual rates may vary depending on design intricacies, fiber blends, and loom specifications, and will be confirmed in our direct reply after discussion with our design and weaving team.
+                <div className="text-xs text-atelier-charcoal leading-relaxed pt-1">
+                  Every custom piece is individually assessed by our master weavers in Bhadohi. A precise quotation, loom schedule, and yarn color swatches will be prepared and sent directly to your email within 24–48 hours based on your design and architectural floor plan.
                 </div>
               </div>
 

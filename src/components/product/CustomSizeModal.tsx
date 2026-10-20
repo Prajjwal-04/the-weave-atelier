@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Check, Calculator, ShieldCheck } from 'lucide-react';
+import { X, Check, ShieldCheck } from 'lucide-react';
 import { Product, Technique, Material, RugShape, CustomQuoteRequest } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import { useCurrency } from '../../context/CurrencyContext';
@@ -292,17 +292,12 @@ export const CustomSizeModal: React.FC<CustomSizeModalProps> = ({
                 </div>
               </div>
 
-              {/* Instant Price Range Estimate */}
-              <div className="bg-atelier-cream p-4 border border-atelier-parchment space-y-1">
-                <div className="flex items-center text-xs text-atelier-taupe font-medium">
-                  <Calculator size={13} className="mr-1 text-atelier-agedgold" />
-                  Estimated Range ({Math.round(sqFeet)} sq ft):
-                </div>
-                <div className="font-serif text-xl text-atelier-softblack font-medium">
-                  {formatPrice(estimatedMin)} – {formatPrice(estimatedMax)}
-                </div>
-                <div className="text-[10px] text-atelier-taupe leading-relaxed">
-                  *Please note: These figures are indicative estimates only. Actual rates may vary and will be confirmed in our direct reply after discussion with our design and weaving team.
+              {/* Bespoke Atelier Consultation Note */}
+              <div className="bg-atelier-cream p-3.5 border border-atelier-parchment flex items-start space-x-2.5">
+                <ShieldCheck size={16} className="text-atelier-agedgold shrink-0 mt-0.5" />
+                <div className="text-xs text-atelier-charcoal leading-relaxed">
+                  <span className="font-medium text-atelier-softblack">Direct Atelier Consultation ({Math.round(sqFeet)} sq ft): </span>
+                  Every custom piece is individually assessed by our master weavers in Bhadohi. Exact quotation, loom timetable, and yarn strike-offs will be prepared and sent directly to your email within 24–48 hours based on your architectural dimensions.
                 </div>
               </div>
 

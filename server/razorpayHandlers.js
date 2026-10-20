@@ -381,10 +381,10 @@ export async function persistOrderToSupabase(order, paymentId) {
         customer_last_name: order.customer?.lastName || 'Client',
         customer_phone: order.customer?.phone || null,
         shipping_address: order.shippingAddress || { address: 'Registered Address', city: 'City', country: 'India' },
-        shipping_method: order.shippingMethod || { name: 'Domestic Express Air Courier', estimatedDays: '3–5 days', costUSD: 0 },
+        shipping_method: order.shippingMethod || { name: 'Domestic Express Air Courier', estimatedDays: '3–5 days', costUSD: 40 },
         currency: order.currency || 'INR',
         subtotal_usd: order.subtotalUSD ?? order.totalUSD ?? 0,
-        shipping_usd: order.shippingUSD || 0,
+        shipping_usd: order.shippingUSD ?? 40,
         tax_usd: order.taxUSD || 0,
         total_usd: order.totalUSD || 0,
         status: order.status || 'PROCESSING',
@@ -575,7 +575,7 @@ export async function handleRazorpayCallback(req, res) {
         shippingMethod: {
           name: 'Domestic Express Air Courier',
           estimatedDays: '3–5 business days',
-          costUSD: 0,
+          costUSD: 40,
         },
         items: [
           {
@@ -593,7 +593,7 @@ export async function handleRazorpayCallback(req, res) {
         ],
         currency: rzpPayment?.currency || 'INR',
         subtotalUSD: Number(notes.amount_usd?.replace(/[^0-9.]/g, '')) || (rzpOrder ? rzpOrder.amount / 100 / 84 : 1),
-        shippingUSD: 0,
+        shippingUSD: 40,
         taxUSD: 0,
         totalUSD: Number(notes.amount_usd?.replace(/[^0-9.]/g, '')) || (rzpOrder ? rzpOrder.amount / 100 / 84 : 1),
         status: 'PROCESSING',

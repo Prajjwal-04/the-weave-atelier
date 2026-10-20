@@ -139,7 +139,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   let shippingUSD = 0;
   if (items.length > 0) {
     if (destinationCountry === 'India') {
-      shippingUSD = 0; // Testing / Promotional: Free domestic express delivery across India
+      shippingUSD = 40; // Domestic express courier across India
     } else if (['United States', 'Canada'].includes(destinationCountry)) {
       shippingUSD = 120; // Express insured air courier
     } else if (['United Kingdom', 'Germany', 'France', 'Italy', 'Netherlands', 'Switzerland'].includes(destinationCountry)) {
