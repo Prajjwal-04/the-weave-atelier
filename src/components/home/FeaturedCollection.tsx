@@ -196,15 +196,15 @@ const FeaturedCardItem: React.FC<FeaturedCardItemProps> = ({
         </Link>
 
         {/* Price & Dimension Footnote */}
-        <div className="flex items-baseline justify-between pt-1.5 border-t border-atelier-parchment/60">
-          <div className="flex items-baseline space-x-1.5">
-            <span className="text-[11px] uppercase tracking-wider text-atelier-taupe font-normal">From</span>
-            <span className="font-sans text-sm sm:text-base text-atelier-softblack font-medium tracking-normal">
+        <div className="flex items-baseline justify-between gap-1 pt-1.5 border-t border-atelier-parchment/60">
+          <div className="flex items-baseline space-x-1.5 min-w-0">
+            <span className="text-[10px] sm:text-[11px] uppercase tracking-wider text-atelier-taupe font-normal shrink-0">From</span>
+            <span className="font-sans text-xs xs:text-sm sm:text-base text-atelier-softblack font-medium tracking-tight truncate">
               {formatPrice(startingPrice)}
             </span>
           </div>
-          <span className="text-[11px] font-sans text-atelier-taupe font-normal">
-            {product.variants[0]?.dimensionsFt || product.variants[0]?.size || "8' × 10'"}
+          <span className="text-[10px] sm:text-[11px] font-sans text-atelier-taupe font-normal shrink-0 whitespace-nowrap pl-1">
+            {(product.variants[0]?.dimensionsFt || product.variants[0]?.size || "8' × 10'").split('(')[0].trim()}
           </span>
         </div>
       </div>

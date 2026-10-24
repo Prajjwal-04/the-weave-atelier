@@ -43,6 +43,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   const hasAnyInStock = totalStock > 0;
   const isReady = product.isReadyToShip && hasAnyInStock;
 
+  // Clean short imperial dimension for compact product cards (e.g. "5' × 8'")
+  const rawDimension = product.variants[0]?.dimensionsFt || product.variants[0]?.size || "5' × 8'";
+  const shortDimension = rawDimension.split('(')[0].trim();
+
   const isActive = isHovered || isToggled;
 
   return (
@@ -169,44 +173,47 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       </div>
 
       {/* Card Info */}
-      <div className="pt-4 pb-2 space-y-2">
+      <div className="pt-3 sm:pt-4 pb-2 space-y-1.5 sm:space-y-2">
         {/* Eyebrow: Technique & Material */}
-        <div className="flex items-center space-x-2 text-[11px] tracking-wider uppercase font-medium">
-          <span className="text-atelier-agedgold">{product.technique}</span>
-          <span className="text-atelier-taupe/40">·</span>
-          <span className="text-atelier-taupe truncate max-w-[170px] font-normal">
-            {product.material.split('&')[0]}
+        <div className="flex items-center space-x-1.5 text-[10px] sm:text-[11px] tracking-wider uppercase font-medium overflow-hidden">
+          <span className="text-atelier-agedgold whitespace-nowrap shrink-0">{product.technique}</span>
+          <span className="text-atelier-taupe/40 shrink-0">·</span>
+          <span className="text-atelier-taupe truncate font-normal">
+            {product.material.split('&')[0].trim()}
           </span>
         </div>
 
         {/* Product Title */}
-        <h3 className="font-serif text-lg sm:text-xl text-atelier-softblack font-light tracking-wide group-hover:text-atelier-darkbrown transition-colors leading-snug">
+        <h3 className="font-serif text-base sm:text-xl text-atelier-softblack font-light tracking-wide group-hover:text-atelier-darkbrown transition-colors leading-snug line-clamp-1 sm:line-clamp-none">
           <Link to={`/product/${product.slug}`}>
             {product.name}
           </Link>
         </h3>
 
         {/* Price & Dimension Footnote */}
-        <div className="flex items-baseline justify-between pt-1.5 border-t border-atelier-parchment/60">
-          <div className="flex items-baseline space-x-1.5">
-            <span className="text-[11px] uppercase tracking-wider text-atelier-taupe font-normal">From</span>
-            <span className="font-sans text-sm sm:text-base text-atelier-softblack font-medium tracking-normal">
+        <div className="flex items-baseline justify-between gap-1 pt-1.5 border-t border-atelier-parchment/60">
+          <div className="flex items-baseline space-x-1 min-w-0">
+            <span className="text-[10px] sm:text-[11px] uppercase tracking-wider text-atelier-taupe font-normal shrink-0">
+              From
+            </span>
+            <span className="font-sans text-xs xs:text-sm sm:text-base text-atelier-softblack font-medium tracking-tight truncate">
               {formatPrice(startingPrice)}
             </span>
           </div>
-          <span className="text-[11px] font-sans text-atelier-taupe font-normal">
-            {product.variants[0]?.size || product.variants[0]?.dimensionsFt?.split('(')[0]?.trim() || "5' × 8'"}
+          <span className="text-[10px] sm:text-[11px] font-sans text-atelier-taupe font-normal shrink-0 whitespace-nowrap pl-1">
+            {shortDimension}
           </span>
         </div>
 
         {/* Subtle bottom info with size count & view link */}
-        <div className="pt-1 flex items-center justify-between text-[11px] tracking-widest text-atelier-taupe uppercase">
-          <span className="text-[10px] text-atelier-taupe/90 font-mono">
-            {product.variants.length} Sizes · Bespoke
+        <div className="pt-1 flex items-center justify-between gap-1 text-[10px] sm:text-[11px] tracking-widest text-atelier-taupe uppercase">
+          <span className="text-[9px] sm:text-[10px] text-atelier-taupe/90 font-mono truncate">
+            {product.variants.length} {product.variants.length === 1 ? 'Size' : 'Sizes'}
+            <span className="hidden xs:inline sm:inline"> · Bespoke</span>
           </span>
           <Link
             to={`/product/${product.slug}`}
-            className="text-atelier-charcoal/80 hover:text-atelier-softblack transition-colors inline-flex items-center group/cta font-medium"
+            className="text-atelier-charcoal/80 hover:text-atelier-softblack transition-colors inline-flex items-center group/cta font-medium shrink-0 whitespace-nowrap"
           >
             <span>Explore</span>
             <span className="inline-block transition-transform duration-200 group-hover/cta:translate-x-1 ml-1 font-sans">
